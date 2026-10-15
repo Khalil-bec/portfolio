@@ -86,3 +86,8 @@ Append-only log. Earlier decisions live in `doc/idea-v0-decisions.md`. New entri
 - **Fixed from review:** `index.html` load-order comment corrected ("alphabetical" → "document order, hero → contact").
 - **Accepted as-is (deliberate, logged):** the literal `<title>` (pre-authorized above, ticket 004 binds `meta.title`); the deferred favicon 404 (ticket 005).
 - **Forwarded to later tickets:** widen the per-ticket token gate to `src/styles/*.css` excluding `tokens.css` (so a future `layout.css` cannot slip past it); in 002, reconcile `html { scroll-behavior: smooth }` (the no-JS baseline) with Lenis owning anchor scroll; in 007, optionally assert each `src/sections/*/*.html` fragment appears verbatim in `index.html`.
+
+## 2026-10-15 — ticket 001 committed + hosted
+
+- **User approved commit + hosting.** Two commits on `main`: `b4cc247` (ticket 001 code + decisions) and `b373440` (v1 tickets, spec review, repo skills). No co-author trailer. This is the point where the "never commit without approval" rule was explicitly satisfied for ticket 001.
+- **Remote:** private GitHub repo `Khalil-bec/portfolio` (created via `gh repo create --private`, SSH remote `origin`, default branch `main`). v1 still stops at local static files — the repo is a convenience, not a deployment.
