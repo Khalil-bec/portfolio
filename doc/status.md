@@ -22,7 +22,7 @@ A ticket only reaches `done` after the user approves the commit (see
 | Ticket | Title | Blocked by | Status | Commit | Notes |
 | --- | --- | --- | --- | --- | --- |
 | 001 | Setup project scaffold | — | `done` | `b4cc247` | Reviewed (no Critical), user-approved, pushed. Repo hosted privately. |
-| 002 | Motion foundation (Lenis + anchors + kill-switch + focus) | 001 | `todo` | — | Next up. Must reconcile `html { scroll-behavior: smooth }` with Lenis owning anchor scroll. |
+| 002 | Motion foundation (Lenis + anchors + kill-switch + focus) | 001 | `in-review` | — | Implemented + screenshot-checked (375/1440/reduced/no-JS). Nav deferred to 004, GSAP bridge to 003 (user-confirmed). Awaiting code review / user approval. |
 | 003 | Reveals + numbered sections + ticker shell | 002 | `todo` | — | |
 | 004 | Bilingual wiring | 001 | `todo` | — | Parallel with 002/003. |
 | 005 | Content fit-in — hero + education + contact | 001, 003, 004 | `todo` | — | Parallel with 006. Owns favicon/OG monogram. |
@@ -34,3 +34,4 @@ A ticket only reaches `done` after the user approves the commit (see
 Append one line per status change, newest last.
 
 - 2026-10-15 — `doc/status.md` created; 001 marked `done` (`b4cc247`), 002–006 `todo`, 007 `blocked`.
+- 2026-10-15 — 002 implemented (Lenis foundation) → `in-review`. Decisions + visual-qa + code-review recorded in `doc/idea-v1-decisions.md`. Not committed; awaiting approval. Nav moved to 004, GSAP bridge to 003.

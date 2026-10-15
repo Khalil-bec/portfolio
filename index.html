@@ -12,12 +12,16 @@
       There is no build step and no runtime fetch; keep the partial and its inlined
       copy in sync whenever a section is edited.
 
-      Stylesheet order (load order): tokens -> base -> section css (document order, hero -> contact).
-      Scripts: one ES-module entry (src/main.js). Vendor libs are loaded in the
-      tickets that need them (gsap -> ScrollTrigger -> lenis, then main.js) and are
-      intentionally absent here.
+      Stylesheet order (load order): lenis (vendor utility) -> tokens -> base ->
+      section css (document order, hero -> contact). The vendor sheet only styles
+      Lenis' own hooks; it does not compete with the tokens.
+      Scripts: vendored classic libs are loaded, deferred, in the tickets that
+      need them (lenis here; gsap -> ScrollTrigger in 003), always before the
+      single ES-module entry (src/main.js). Deferred classics run in document
+      order ahead of the module, so the globals exist by the time it executes.
     -->
 
+    <link rel="stylesheet" href="vendor/lenis-1.3.27.min.css" />
     <link rel="stylesheet" href="src/styles/tokens.css" />
     <link rel="stylesheet" href="src/styles/base.css" />
     <link rel="stylesheet" href="src/sections/hero/hero.css" />
@@ -44,6 +48,8 @@
       <section id="contact" class="section section--contact" data-section="contact"></section>
     </main>
 
+    <!-- Vendor classic scripts (UMD globals), deferred; then the module entry. -->
+    <script defer src="vendor/lenis-1.3.27.min.js"></script>
     <script type="module" src="src/main.js"></script>
   </body>
 </html>

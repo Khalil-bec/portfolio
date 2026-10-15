@@ -16,6 +16,13 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Lenis adds `lenis` to <html> when it is active; at that point it owns the
+ * scroll and the native `smooth` baseline above would double-animate anchor
+ * jumps. Without JS the baseline still gives animated jumps for free. */
+html.lenis {
+  scroll-behavior: auto;
+}
+
 body {
   margin: 0;
   background-color: var(--color-bg);
