@@ -1,6 +1,6 @@
 # Mohamed Khalil BECHEIKH
 
-**DevOps & Infrastructure** — Étudiant en L3 informatique, blessé par les systèmes autant que par les applications.
+**DevOps & Infrastructure** — Étudiant en L3 informatique, passionné par les systèmes autant que par les applications.
 
 ---
 

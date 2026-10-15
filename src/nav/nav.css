@@ -1,0 +1,66 @@
+/*
+ * Persistent navigation (ticket 004).
+ *
+ * Sticky rather than fixed, so the bar occupies its own layout space and needs
+ * no body padding hack (no layout shift). Design tokens only, consumed through
+ * var() (repo rule). On narrow screens the link list wraps onto extra lines so
+ * every label stays visible; the page never overflows horizontally.
+ */
+
+.nav {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: var(--z-nav);
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding-block: var(--space-sm);
+  padding-inline: var(--container-pad);
+  background-color: var(--color-bg);
+  border-block-end: var(--border-width) solid var(--color-border);
+}
+
+.nav__list {
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  gap: var(--space-xs) var(--space-md);
+}
+
+.nav__link {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  transition: color var(--duration-fast) var(--ease-standard);
+}
+
+.nav__link:hover {
+  color: var(--color-text);
+}
+
+.lang-switch {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: var(--space-2xs);
+  padding: var(--space-2xs);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-pill);
+}
+
+.lang-switch__button {
+  padding: var(--space-2xs) var(--space-sm);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background-color: transparent;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--letter-spacing-wide);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: color var(--duration-fast) var(--ease-standard);
+}
+
+.lang-switch__button[aria-pressed="true"] {
+  background-color: var(--color-accent);
+  color: var(--color-accent-contrast);
+}

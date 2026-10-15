@@ -3,7 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Mohamed Khalil Becheikh</title>
+    <!-- Literal name = the no-JS / pre-boot fallback (data, not marketing copy);
+         ticket 004 rebinds it from the `meta.title` key. -->
+    <title data-i18n="meta.title">Mohamed Khalil Becheikh</title>
 
     <!--
       Scaffold note (ticket 001) — authoring-time partial inlining.
@@ -13,9 +15,9 @@
       copy in sync whenever a section is edited.
 
       Stylesheet order (load order): lenis (vendor utility) -> tokens -> base ->
-      section css (document order, hero -> contact) -> motion (numbering,
-      reveal, ticker shell from ticket 003). The vendor sheet only styles Lenis'
-      own hooks; it does not compete with the tokens.
+      nav (ticket 004) -> section css (document order, hero -> contact) ->
+      motion (numbering, reveal, ticker shell from ticket 003). The vendor sheet
+      only styles Lenis' own hooks; it does not compete with the tokens.
 
       Scripts: vendored classic libs (UMD globals) are loaded, deferred, before
       the single ES-module entry (src/main.js) — gsap -> ScrollTrigger -> lenis.
@@ -27,6 +29,7 @@
     <link rel="stylesheet" href="vendor/lenis-1.3.27.min.css" />
     <link rel="stylesheet" href="src/styles/tokens.css" />
     <link rel="stylesheet" href="src/styles/base.css" />
+    <link rel="stylesheet" href="src/nav/nav.css" />
     <link rel="stylesheet" href="src/sections/hero/hero.css" />
     <link rel="stylesheet" href="src/sections/projects/projects.css" />
     <link rel="stylesheet" href="src/sections/skills/skills.css" />
@@ -35,6 +38,21 @@
     <link rel="stylesheet" href="src/styles/motion.css" />
   </head>
   <body>
+    <!-- inlined from src/nav/nav.html -->
+    <nav class="nav" data-i18n-attr="aria-label=nav.aria">
+      <ul class="nav__list">
+        <li class="nav__item"><a class="nav__link" href="#hero" data-i18n="nav.hero"></a></li>
+        <li class="nav__item"><a class="nav__link" href="#projects" data-i18n="nav.projects"></a></li>
+        <li class="nav__item"><a class="nav__link" href="#skills" data-i18n="nav.skills"></a></li>
+        <li class="nav__item"><a class="nav__link" href="#education" data-i18n="nav.education"></a></li>
+        <li class="nav__item"><a class="nav__link" href="#contact" data-i18n="nav.contact"></a></li>
+      </ul>
+      <div class="lang-switch" data-lang-switch role="group" data-i18n-attr="aria-label=lang.group">
+        <button class="lang-switch__button" type="button" data-lang="en" aria-pressed="false" data-i18n="lang.en"></button>
+        <button class="lang-switch__button" type="button" data-lang="fr" aria-pressed="false" data-i18n="lang.fr"></button>
+      </div>
+    </nav>
+
     <main id="main">
       <!-- inlined from src/sections/hero/hero.html -->
       <section id="hero" class="section section--hero" data-section="hero">
@@ -69,7 +87,7 @@
     -->
     <div class="ticker" data-ticker>
       <div class="ticker__track" data-ticker-track></div>
-      <span class="ticker__item" data-ticker-source data-i18n="hero.tagline"></span>
+      <span class="ticker__item" data-ticker-source data-i18n="hero.tagline" data-i18n-mode="text"></span>
     </div>
 
     <!-- Vendor classic scripts (UMD globals), deferred; then the module entry. -->

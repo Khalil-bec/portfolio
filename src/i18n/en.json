@@ -1,0 +1,133 @@
+{
+  "meta": {
+    "title": "Mohamed Khalil Becheikh"
+  },
+  "nav": {
+    "aria": "Primary navigation",
+    "hero": "About",
+    "projects": "Projects",
+    "skills": "Skills",
+    "education": "Education",
+    "contact": "Contact"
+  },
+  "lang": {
+    "group": "Language",
+    "en": "EN",
+    "fr": "FR"
+  },
+  "hero": {
+    "name": "Mohamed Khalil BECHEIKH",
+    "tagline": "**DevOps & Infrastructure** — Computer science student, equally fascinated by systems and applications.",
+    "aboutTitle": "About",
+    "about": [
+      "A computer science student at UPPA, working my way toward **DevOps and infrastructure**: automation, containerization, CI/CD, and everything that gets code into production without pain.",
+      "What draws me in is the part nobody sees — understanding what actually happens underneath rather than copying commands from memory. I wrote my own command interpreter to know exactly what occurs when you type into a terminal.",
+      "My three projects are built as evidence, not demos: each one solves a real infrastructure problem, and every piece was chosen and configured by hand."
+    ],
+    "languages": "**Languages**: Arabic (mother tongue) · French (fluent) · English (technical)"
+  },
+  "education": {
+    "title": "Education",
+    "school": "Université de Pau et des Pays de l'Adour (UPPA)",
+    "location": "Pau, France",
+    "degree": "B.Sc. Computer Science, L3",
+    "graduation": "Expected graduation: Summer 2027"
+  },
+  "skills": {
+    "title": "Skills",
+    "tiers": [
+      {
+        "title": "Core — used in production across my projects",
+        "items": [
+          "Python",
+          "Bash",
+          "Linux",
+          "Docker",
+          "Docker Compose",
+          "Flask",
+          "MySQL",
+          "SQL",
+          "Git",
+          "Nginx",
+          "GitHub Actions"
+        ]
+      },
+      {
+        "title": "Hands-on — worked with in real setups",
+        "items": [
+          "Ansible",
+          "Traefik",
+          "Prometheus",
+          "Grafana",
+          "pytest",
+          "Uptime Kuma",
+          "node-exporter",
+          "mkcert / TLS"
+        ]
+      },
+      {
+        "title": "Academic — university coursework",
+        "items": ["C", "C++"],
+        "note": "Studied in coursework, but not applied in a personal project."
+      },
+      {
+        "title": "Currently learning",
+        "items": ["Terraform", "AWS", "Kubernetes"]
+      }
+    ]
+  },
+  "projects": {
+    "title": "Projects",
+    "items": [
+      {
+        "name": "Homelab",
+        "summary": "Self-hosted infrastructure on a single machine, provisioned declaratively.",
+        "stackLabel": "Stack",
+        "stack": "Traefik · Prometheus · node-exporter · Grafana · Uptime Kuma · Ansible · Docker Compose · mkcert",
+        "bullets": [
+          "**Traefik as reverse proxy**: automatic service discovery via Docker labels, dashboard enabled, HTTP → HTTPS redirection, and mkcert-issued TLS certificates for `*.homelab.lab`.",
+          "**Monitoring as code**: Grafana datasources and dashboards provisioned from files versioned in the repository, so the monitoring setup replays identically.",
+          "**Ansible drives everything**: the playbook creates the shared bridge network first, then brings up each Docker Compose project in order. The entire stack is reproducible from a single command.",
+          "**Disciplined installation**: pinned `ansible-core`, collections installed locally into `./.collections` instead of `~/.ansible`, and the script explicitly refuses `sudo` and any modification to system trust stores."
+        ]
+      },
+      {
+        "name": "GymTrack",
+        "summary": "A muscle-training tracking application. The goal was never to get an app running, but to build a complete stack and understand it end to end.",
+        "stackLabel": "Stack",
+        "stack": "Python 3.11 · Flask · MySQL 8.0 · Docker Compose · Nginx · Adminer · pytest · GitHub Actions",
+        "bullets": [
+          "**Careful orchestration**: a MySQL healthcheck with `condition: service_healthy`, so the API only starts once the database is genuinely ready. A named volume for persistence, a dedicated bridge network for isolation, credentials externalized to `.env`, and the SQL schema seeded automatically at startup.",
+          "**Flask API**: 6 endpoints, field validation, HTTP error handling (400, 409, 500), and multi-table joins across 4 relational tables (`athletes → seances → exercice_logs → series`) with foreign keys and a UNIQUE constraint.",
+          "**Isolated tests**: a pytest suite using `unittest.mock`, with no dependency on a live database — success, missing fields, duplicate email, empty body.",
+          "**CI/CD**: GitHub Actions on every push — pytest runs plus a Docker build check. A Makefile gathers all routine operations.",
+          "**Frontend**: an interactive dashboard served from an `nginx:alpine` image (no Python server involved), `fetch` calls to the API, Bootstrap modal forms, and a Chart.js chart of weekly training volume."
+        ],
+        "note": "*In progress: deployment to Oracle Cloud Free Tier.*"
+      },
+      {
+        "name": "Kshell",
+        "alias": "ksh",
+        "summary": "An interactive, modular command interpreter written from scratch in Python.",
+        "whyLabel": "Why",
+        "why": "to understand what really happens inside a terminal — process management, system calls, `$PATH` resolution.",
+        "bullets": [
+          "Executes any command from `$PATH`, with pipelines via `|`",
+          "Built-in commands: `cd`, `pwd`, `exit`, `alias`, `unalias`, `aide` (built-in French documentation)",
+          "Persistent aliases saved to `~/.ksh_aliases` and reloaded on every session",
+          "Tab completion for commands and file paths, via `readline`",
+          "Dynamic ANSI-colored prompt showing the current directory and Git branch",
+          "Clean modular separation: parsing, execution, built-ins, completion, prompt, aliases"
+        ]
+      }
+    ]
+  },
+  "contact": {
+    "title": "Contact",
+    "githubLabel": "GitHub",
+    "emailLabel": "Email",
+    "linkedinLabel": "LinkedIn",
+    "locationLabel": "Location",
+    "location": "Pau, France"
+  }
+}

@@ -1,0 +1,133 @@
+{
+  "meta": {
+    "title": "Mohamed Khalil Becheikh"
+  },
+  "nav": {
+    "aria": "Navigation principale",
+    "hero": "À propos",
+    "projects": "Projets",
+    "skills": "Compétences",
+    "education": "Formation",
+    "contact": "Contact"
+  },
+  "lang": {
+    "group": "Langue",
+    "en": "EN",
+    "fr": "FR"
+  },
+  "hero": {
+    "name": "Mohamed Khalil BECHEIKH",
+    "tagline": "**DevOps & Infrastructure** — Étudiant en L3 informatique, passionné par les systèmes autant que par les applications.",
+    "aboutTitle": "À propos",
+    "about": [
+      "Étudiant en informatique à l'UPPA, je m'oriente vers le **DevOps et l'infrastructure** : automatisation, conteneurisation, CI/CD, et tout ce qui fait qu'un code arrive en production sans douleur.",
+      "Ce qui m'attire, c'est la partie qu'on ne voit pas : comprendre ce qui se passe vraiment sous le capot plutôt que de recopier une commande. J'ai écrit mon propre interpréteur de commandes pour savoir exactement ce qui se passe quand on tape quelque chose dans un terminal.",
+      "Mes trois projets sont construits comme des preuves, pas comme des démos : chacun résout un vrai problème d'infrastructure, et chaque brique est choisie et configurée à la main."
+    ],
+    "languages": "**Langues** : Arabe (langue maternelle) · Français (courant) · Anglais (technique)"
+  },
+  "education": {
+    "title": "Formation",
+    "school": "Université de Pau et des Pays de l'Adour (UPPA)",
+    "location": "Pau, France",
+    "degree": "Licence Informatique, L3",
+    "graduation": "Diplôme prévu : été 2027"
+  },
+  "skills": {
+    "title": "Compétences",
+    "tiers": [
+      {
+        "title": "Maîtrise — utilisées en production sur mes projets",
+        "items": [
+          "Python",
+          "Bash",
+          "Linux",
+          "Docker",
+          "Docker Compose",
+          "Flask",
+          "MySQL",
+          "SQL",
+          "Git",
+          "Nginx",
+          "GitHub Actions"
+        ]
+      },
+      {
+        "title": "Pratique — manipulées en contexte réel",
+        "items": [
+          "Ansible",
+          "Traefik",
+          "Prometheus",
+          "Grafana",
+          "pytest",
+          "Uptime Kuma",
+          "node-exporter",
+          "mkcert / TLS"
+        ]
+      },
+      {
+        "title": "Académique — coursework universitaire",
+        "items": ["C", "C++"],
+        "note": "Étudiés en cours, mais sans mise en pratique dans un projet personnel."
+      },
+      {
+        "title": "En cours d'apprentissage",
+        "items": ["Terraform", "AWS", "Kubernetes"]
+      }
+    ]
+  },
+  "projects": {
+    "title": "Projets",
+    "items": [
+      {
+        "name": "Homelab",
+        "summary": "Infrastructure auto-hébergée sur une seule machine, provisionnée de manière déclarative.",
+        "stackLabel": "Stack",
+        "stack": "Traefik · Prometheus · node-exporter · Grafana · Uptime Kuma · Ansible · Docker Compose · mkcert",
+        "bullets": [
+          "**Traefik** en reverse proxy : découverte automatique des services via les labels Docker, dashboard activé, redirection HTTP → HTTPS, et certificats TLS générés par mkcert pour `*.homelab.lab`.",
+          "**Monitoring as code** : datasources et dashboards Grafana provisionnés depuis des fichiers versionnés dans le dépôt — l'infrastructure de monitoring se rejoue à l'identique.",
+          "**Ansible pilote l'ensemble** : le playbook crée d'abord le réseau bridge partagé, puis déploie chaque projet Docker Compose dans l'ordre. Toute la stack est reproductible depuis une seule commande.",
+          "**Installation disciplinée** : `ansible-core` épinglé, collections installées localement dans `./.collections` plutôt que dans `~/.ansible`, et le script s'interdit explicitement le `sudo` comme toute modification des stores de confiance du système."
+        ]
+      },
+      {
+        "name": "GymTrack",
+        "summary": "Application de suivi d'entraînement muscular. L'objectif n'était pas de faire tourner une application, mais de construire une stack complète et de la comprendre de bout en bout.",
+        "stackLabel": "Stack",
+        "stack": "Python 3.11 · Flask · MySQL 8.0 · Docker Compose · Nginx · Adminer · pytest · GitHub Actions",
+        "bullets": [
+          "**Orchestration soignée** : healthcheck MySQL avec `condition: service_healthy`, l'API ne démarre que lorsque la base est réellement prête. Volume nommé pour la persistance, réseau bridge dédié pour l'isolation, secrets externalisés dans `.env`, et schéma SQL initialisé automatiquement au démarrage.",
+          "**API Flask** : 6 endpoints, validation des champs, gestion des erreurs HTTP (400, 409, 500), et jointures multi-tables sur 4 tables relationnelles (`athletes → seances → exercice_logs → series`) avec clés étrangères et contrainte UNIQUE.",
+          "**Tests isolés** : suite pytest avec `unittest.mock`, aucune dépendance à une base vivante — succès, champs manquants, email dupliqué, body vide.",
+          "**CI/CD** : GitHub Actions déclenche sur chaque push — tests pytest et vérification du build Docker. Un Makefile regroupe les opérations courantes.",
+          "**Frontend** : dashboard interactif servi par une image `nginx:alpine` (aucun serveur Python), appels `fetch` vers l'API, formulaires modaux Bootstrap et graphique Chart.js du volume d'entraînement hebdomadaire."
+        ],
+        "note": "*En cours : déploiement sur Oracle Cloud Free Tier.*"
+      },
+      {
+        "name": "Kshell",
+        "alias": "ksh",
+        "summary": "Interpréteur de commandes interactif et modulaire, écrit de zéro en Python.",
+        "whyLabel": "Pourquoi",
+        "why": "comprendre ce qui se passe réellement dans un terminal — gestion des processus, appels système, résolution du `$PATH`.",
+        "bullets": [
+          "Exécution de toute commande du `$PATH`, avec pipelines via `|`",
+          "Builtins maison : `cd`, `pwd`, `exit`, `alias`, `unalias`, `aide` (documentation intégrée en français)",
+          "Alias persistants sauvegardés dans `~/.ksh_aliases` et rechargés à chaque session",
+          "Autocomplétion Tab sur les commandes et les chemins, via `readline`",
+          "Prompt dynamique en couleurs ANSI affichant le répertoire courant et la branche Git",
+          "Séparation modulaire nette : parsing, exécution, builtins, complétion, prompt, alias"
+        ]
+      }
+    ]
+  },
+  "contact": {
+    "title": "Contact",
+    "githubLabel": "GitHub",
+    "emailLabel": "Email",
+    "linkedinLabel": "LinkedIn",
+    "locationLabel": "Localisation",
+    "location": "Pau, France"
+  }
+}

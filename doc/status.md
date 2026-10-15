@@ -24,7 +24,7 @@ A ticket only reaches `done` after the user approves the commit (see
 | 001 | Setup project scaffold | — | `done` | `b4cc247` | Reviewed (no Critical), user-approved, pushed. Repo hosted privately. |
 | 002 | Motion foundation (Lenis + anchors + kill-switch + focus) | 001 | `done` | `8d611ea` | Reviewed (no Critical), user-approved, committed, pushed. Nav deferred to 004, GSAP bridge to 003 (user-confirmed). |
 | 003 | Reveals + numbered sections + ticker shell | 002 | `done` | `888e5b5` | Reviewed (no Critical), user-approved, committed. Mechanisms only; ticker binds `hero.tagline` (empty until 004). Not pushed. |
-| 004 | Bilingual wiring | 001 | `todo` | — | Parallel with 002/003. |
+| 004 | Bilingual wiring | 001 | `in-review` | — | en/fr dictionaries + `data-i18n` engine + sticky nav & EN/FR switch. Decisions + visual-qa + code-review in `doc/idea-v1-decisions.md`. FR tagline `blessé`→`passionné` (user-approved). Not committed; awaiting approval. |
 | 005 | Content fit-in — hero + education + contact | 001, 003, 004 | `todo` | — | Parallel with 006. Owns favicon/OG monogram. |
 | 006 | Content fit-in — projects + skills | 001, 003, 004 | `todo` | — | Parallel with 005. |
 | 007 | Hardening + verification | 002–006 | `blocked` | — | Unblocks once 002–006 are `done`. |
@@ -39,3 +39,4 @@ Append one line per status change, newest last.
 - 2026-10-15 — 002 pushed to `origin/main` (`55a68a6..f76cd0d`).
 - 2026-10-15 — 003 implemented (reveals + numbered sections + ticker shell) → `in-review`. Mechanisms only: no copy committed; ticker binds `hero.tagline` (empty until 004) and stays hidden while empty. Decisions + visual-qa + code-review recorded in `doc/idea-v1-decisions.md`. Not committed; awaiting approval.
 - 2026-10-15 — 003 approved + committed (`888e5b5`) → `done`. Not pushed.
+- 2026-10-15 — 004 implemented (bilingual wiring: en/fr dictionaries, i18n engine, sticky nav + EN/FR switch) → `in-review`. Dictionary scheme, storage/detection, rich-text-safe rendering and nav decisions, visual-qa and code-review recorded in `doc/idea-v1-decisions.md`. Corrected FR tagline `blessé`→`passionné` (user-approved). Not committed; awaiting approval.

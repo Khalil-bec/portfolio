@@ -69,6 +69,14 @@ button {
   color: inherit;
 }
 
+code {
+  padding: var(--space-2xs) var(--space-xs);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface-2);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-code);
+}
+
 :focus-visible {
   outline: var(--focus-ring-width) solid var(--color-focus);
   outline-offset: var(--focus-ring-offset);
