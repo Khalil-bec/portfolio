@@ -1,0 +1,11 @@
+# OS cruft
+.DS_Store
+Thumbs.db
+*~
+
+# Editor config (personal, not project)
+.vscode/
+.idea/
+
+# Local QA captures from the screenshot-check step — never committed
+.screenshots/
