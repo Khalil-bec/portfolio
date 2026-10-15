@@ -26,7 +26,7 @@ A ticket only reaches `done` after the user approves the commit (see
 | 003 | Reveals + numbered sections + ticker shell | 002 | `done` | `888e5b5` | Reviewed (no Critical), user-approved, committed. Mechanisms only; ticker binds `hero.tagline` (empty until 004). Not pushed. |
 | 004 | Bilingual wiring | 001 | `done` | `c706140` | en/fr dictionaries + `data-i18n` engine + sticky nav & EN/FR switch. Reviewed (no hard violations), user-approved, committed, pushed. FR tagline `blessé`→`passionné` (user-approved). |
 | 005 | Content fit-in — hero + education + contact | 001, 003, 004 | `done` | `2ba4571` | Hero/education/contact + KB favicon/ICO/OG + 4:5 reserved portrait slot. Reviewed (no hard violations), visual-QA approved, user-approved, committed, pushed. Parallel with 006. |
-| 006 | Content fit-in — projects + skills | 001, 003, 004 | `in-review` | — | Parallel with 005. Implemented + visual-qa approved; code review (no hard violations, one fix). Recorded in `doc/idea-v1-decisions.md`. Not committed; awaiting approval. |
+| 006 | Content fit-in — projects + skills | 001, 003, 004 | `done` | `e9ec728` | Projects (3 cards, all bullets, reserved 16:10 slots) + skills (4 chip tiers). Reviewed (no hard violations, one fix), visual-QA approved, user-approved, committed, pushed. Parallel with 005. |
 | 007 | Hardening + verification | 002–006 | `blocked` | — | Unblocks once 002–006 are `done`. |
 
 ## Update log
@@ -44,4 +44,5 @@ Append one line per status change, newest last.
 - 2026-10-15 — 004 pushed to `origin/main` (`4054219..3460f78`).
 - 2026-10-15 — 005 implemented (hero + education + contact content, code-drawn KB favicon/ICO/OG, reserved 4:5 portrait slot, hardened outbound links, hero above-fold cap with a decorative cue) → `in-review`. Decisions, visual-qa and code-review (Standards + Spec axes, no hard violations) recorded in `doc/idea-v1-decisions.md`. Fixed favicon `sizes`; verified the accessible-name separator. Not committed; awaiting approval.
 - 2026-10-15 — 005 approved + committed (`2ba4571`) → `done`. Pushing to `origin/main`.
-- 2026-10-15 — 006 implemented (projects + skills content: three project cards with all bullets visible + reserved 16:10 screenshot slots, four skill tiers as chips) → `in-review`. Decisions + visual-qa + code-review (Standards + Spec axes, no hard violations) recorded in `doc/idea-v1-decisions.md`. Not committed; awaiting approval.
+- 2026-10-15 — 006 implemented (projects + skills content: three project cards with all bullets visible + reserved 16:10 screenshot slots, four skill tiers as chips) → `in-review`. Decisions + visual-qa + code-review (Standards + Spec axes, no hard violations; fixed the `--ticker-dot` → `--dot-size` naming) recorded in `doc/idea-v1-decisions.md`. Not committed; awaiting approval.
+- 2026-10-15 — 006 approved + committed (`e9ec728`) → `done`. Pushing to `origin/main`.
