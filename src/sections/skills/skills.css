@@ -1,1 +1,47 @@
-/* Skills section. Content + layout land with ticket 006. */
+/*
+ * Skills section (content: ticket 006).
+ *
+ * Four tiers (Core / Hands-on / Academic / Currently learning), each a heading
+ * plus a wrapped row of skill chips. The Academic tier keeps its coursework
+ * note. Design tokens only, consumed via var() (repo rule).
+ */
+
+.skills__tiers {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  max-inline-size: var(--measure);
+}
+
+.skills__tier {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.skills__tier-title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-wide);
+  color: var(--color-text-subtle);
+}
+
+.skills__items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+
+.skills__item {
+  padding: var(--space-2xs) var(--space-sm);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-surface);
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+}
+
+.skills__note {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-subtle);
+}

@@ -74,6 +74,9 @@
   /* Borders */
   --border-width: 1px;
 
+  /* Decorative dots (ticker separator; project bullet markers). */
+  --dot-size: 5px;
+
   /* Motion */
   --duration-fast: 150ms;
   --duration-base: 300ms;
@@ -92,7 +95,6 @@
   /* Motion — marquee ticker (scrolls the tagline; ticket 003). */
   --ticker-height: 2.75rem;
   --ticker-speed: 60; /* px per second, read by src/motion/ticker.js */
-  --ticker-dot: 5px; /* separator dot between repeated tagline copies */
   --ticker-duration: 40s; /* default loop time; ticker.js overrides it per element */
 
   /* Focus ring */
@@ -112,8 +114,12 @@
   --slot-portrait-ratio: 4 / 5;
   --slot-portrait-width: 14rem;
 
-  /* Contact rows: aligned label column. */
-  --contact-label-width: 8rem;
+  /* Reserved project screenshot slots (ticket 006). */
+  --slot-shot-ratio: 16 / 10;
+  --slot-shot-width: 20rem;
+
+  /* Label + value rows (Contact; project Stack/Why): aligned label column. */
+  --label-width: 8rem;
 
   /* Accessibility helper: size of a visually-hidden element. */
   --visually-hidden-size: 1px;

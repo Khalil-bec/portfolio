@@ -87,8 +87,8 @@ main {
 .ticker--live .ticker__item::after {
   content: "";
   display: inline-block;
-  inline-size: var(--ticker-dot);
-  block-size: var(--ticker-dot);
+  inline-size: var(--dot-size);
+  block-size: var(--dot-size);
   margin-inline: var(--space-xl);
   border-radius: var(--radius-pill);
   background-color: var(--color-text-subtle);

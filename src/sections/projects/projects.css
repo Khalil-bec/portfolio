@@ -1,1 +1,130 @@
-/* Projects section. Content + layout land with ticket 006. */
+/*
+ * Projects section (content: ticket 006).
+ *
+ * Three project cards, every bullet visible (no collapse). Each card pairs a
+ * text body with an empty 16:10 screenshot slot (anti-CLS; the screenshot lands
+ * later). The body/slot split is an intrinsic flex wrap, so there is no
+ * breakpoint literal for the token gate. Design tokens only, consumed via var().
+ */
+
+.projects__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xl);
+}
+
+.project {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--space-xl);
+}
+
+.project__body {
+  display: flex;
+  flex: 1 1 var(--measure);
+  flex-direction: column;
+  gap: var(--space-md);
+  min-inline-size: 0;
+}
+
+.project__name {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-snug);
+}
+
+.project__link {
+  color: var(--color-text);
+  transition: color var(--duration-fast) var(--ease-standard);
+}
+
+.project__link:hover {
+  color: var(--color-accent);
+}
+
+/* Kshell's repo alias (`ksh`), a small code chip beside the linked name. */
+.project__alias {
+  margin-inline-start: var(--space-xs);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-muted);
+}
+
+.project__summary {
+  max-inline-size: var(--measure);
+  color: var(--color-text-muted);
+}
+
+/* Stack (Homelab/GymTrack) and Why (Kshell): the Contact label+value row. */
+.project__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2xs) var(--space-md);
+  font-size: var(--font-size-sm);
+}
+
+.project__label {
+  flex: 0 0 auto;
+  min-inline-size: var(--label-width);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+  color: var(--color-text-subtle);
+}
+
+.project__value {
+  flex: 1 1 auto;
+  color: var(--color-text-muted);
+}
+
+.project__bullets {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  max-inline-size: var(--measure);
+}
+
+.project__bullets li {
+  position: relative;
+  padding-inline-start: var(--space-lg);
+  color: var(--color-text-muted);
+}
+
+/* Drawn bullet dot (no literal text). */
+.project__bullets li::before {
+  content: "";
+  position: absolute;
+  inset-block-start: var(--space-xs);
+  inset-inline-start: 0;
+  inline-size: var(--dot-size);
+  block-size: var(--dot-size);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-accent);
+}
+
+.project__note {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-subtle);
+}
+
+/* Reserved screenshot slot: fixed 16:10 box that holds its space empty. */
+.project__slot {
+  position: relative;
+  flex: 0 0 var(--slot-shot-width);
+  inline-size: var(--slot-shot-width);
+  aspect-ratio: var(--slot-shot-ratio);
+  overflow: hidden;
+}
+
+/* Intentional placeholder: a faint dot grid drawn from tokens (no copy), so an
+ * empty slot reads as reserved rather than broken. */
+.project__slot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(var(--color-border) var(--border-width), transparent 0);
+  background-size: var(--space-md) var(--space-md);
+}

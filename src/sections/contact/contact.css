@@ -28,7 +28,7 @@
 
 .contact__label {
   flex: 0 0 auto;
-  min-inline-size: var(--contact-label-width);
+  min-inline-size: var(--label-width);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
   letter-spacing: var(--letter-spacing-wide);

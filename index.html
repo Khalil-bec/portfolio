@@ -94,11 +94,138 @@
       <!-- inlined from src/sections/projects/projects.html -->
       <section id="projects" class="section section--projects" data-section="projects">
         <span class="section__index" aria-hidden="true"></span>
+        <h2 class="section__title" data-i18n="projects.title"></h2>
+
+        <!-- Three projects, every bullet visible (no collapse/expand). Repo URLs are
+             data and live here; the copy (name/summary/stack/why/bullets/note) comes
+             from the dictionaries. Each card reserves an empty 16:10 screenshot slot
+             (anti-CLS; the screenshot itself is supplied later). -->
+        <ul class="projects__list">
+          <li class="project" data-reveal>
+            <div class="project__body">
+              <h3 class="project__name">
+                <a class="project__link" href="https://github.com/Khalil-bec/Homelab" target="_blank" rel="noopener noreferrer"><span data-i18n="projects.items[0].name"></span><span class="visually-hidden" data-i18n="a11y.newTab"></span></a>
+              </h3>
+              <p class="project__summary" data-i18n="projects.items[0].summary"></p>
+              <p class="project__meta">
+                <span class="project__label" data-i18n="projects.items[0].stackLabel"></span>
+                <span class="project__value" data-i18n="projects.items[0].stack"></span>
+              </p>
+              <ul class="project__bullets">
+                <li data-i18n="projects.items[0].bullets[0]"></li>
+                <li data-i18n="projects.items[0].bullets[1]"></li>
+                <li data-i18n="projects.items[0].bullets[2]"></li>
+                <li data-i18n="projects.items[0].bullets[3]"></li>
+              </ul>
+            </div>
+            <div class="project__slot image-slot" aria-hidden="true"></div>
+          </li>
+
+          <li class="project" data-reveal>
+            <div class="project__body">
+              <h3 class="project__name">
+                <a class="project__link" href="https://github.com/Khalil-bec/gymtrack" target="_blank" rel="noopener noreferrer"><span data-i18n="projects.items[1].name"></span><span class="visually-hidden" data-i18n="a11y.newTab"></span></a>
+              </h3>
+              <p class="project__summary" data-i18n="projects.items[1].summary"></p>
+              <p class="project__meta">
+                <span class="project__label" data-i18n="projects.items[1].stackLabel"></span>
+                <span class="project__value" data-i18n="projects.items[1].stack"></span>
+              </p>
+              <ul class="project__bullets">
+                <li data-i18n="projects.items[1].bullets[0]"></li>
+                <li data-i18n="projects.items[1].bullets[1]"></li>
+                <li data-i18n="projects.items[1].bullets[2]"></li>
+                <li data-i18n="projects.items[1].bullets[3]"></li>
+                <li data-i18n="projects.items[1].bullets[4]"></li>
+              </ul>
+              <p class="project__note" data-i18n="projects.items[1].note"></p>
+            </div>
+            <div class="project__slot image-slot" aria-hidden="true"></div>
+          </li>
+
+          <li class="project" data-reveal>
+            <div class="project__body">
+              <h3 class="project__name">
+                <a class="project__link" href="https://github.com/Khalil-bec/ksh" target="_blank" rel="noopener noreferrer"><span data-i18n="projects.items[2].name"></span><span class="visually-hidden" data-i18n="a11y.newTab"></span></a>
+                <code class="project__alias" data-i18n="projects.items[2].alias"></code>
+              </h3>
+              <p class="project__summary" data-i18n="projects.items[2].summary"></p>
+              <p class="project__meta">
+                <span class="project__label" data-i18n="projects.items[2].whyLabel"></span>
+                <span class="project__value" data-i18n="projects.items[2].why"></span>
+              </p>
+              <ul class="project__bullets">
+                <li data-i18n="projects.items[2].bullets[0]"></li>
+                <li data-i18n="projects.items[2].bullets[1]"></li>
+                <li data-i18n="projects.items[2].bullets[2]"></li>
+                <li data-i18n="projects.items[2].bullets[3]"></li>
+                <li data-i18n="projects.items[2].bullets[4]"></li>
+                <li data-i18n="projects.items[2].bullets[5]"></li>
+              </ul>
+            </div>
+            <div class="project__slot image-slot" aria-hidden="true"></div>
+          </li>
+        </ul>
       </section>
 
       <!-- inlined from src/sections/skills/skills.html -->
       <section id="skills" class="section section--skills" data-section="skills">
         <span class="section__index" aria-hidden="true"></span>
+        <h2 class="section__title" data-i18n="skills.title"></h2>
+
+        <!-- Four glanceable tiers (Core / Hands-on / Academic / Currently learning).
+             Items live in the dictionaries as arrays, so each renders as a chip with
+             no JS. The Academic coursework note is preserved verbatim. -->
+        <ul class="skills__tiers">
+          <li class="skills__tier" data-reveal>
+            <h3 class="skills__tier-title" data-i18n="skills.tiers[0].title"></h3>
+            <ul class="skills__items">
+              <li class="skills__item" data-i18n="skills.tiers[0].items[0]"></li>
+              <li class="skills__item" data-i18n="skills.tiers[0].items[1]"></li>
+              <li class="skills__item" data-i18n="skills.tiers[0].items[2]"></li>
+              <li class="skills__item" data-i18n="skills.tiers[0].items[3]"></li>
+              <li class="skills__item" data-i18n="skills.tiers[0].items[4]"></li>
+              <li class="skills__item" data-i18n="skills.tiers[0].items[5]"></li>
+              <li class="skills__item" data-i18n="skills.tiers[0].items[6]"></li>
+              <li class="skills__item" data-i18n="skills.tiers[0].items[7]"></li>
+              <li class="skills__item" data-i18n="skills.tiers[0].items[8]"></li>
+              <li class="skills__item" data-i18n="skills.tiers[0].items[9]"></li>
+              <li class="skills__item" data-i18n="skills.tiers[0].items[10]"></li>
+            </ul>
+          </li>
+
+          <li class="skills__tier" data-reveal>
+            <h3 class="skills__tier-title" data-i18n="skills.tiers[1].title"></h3>
+            <ul class="skills__items">
+              <li class="skills__item" data-i18n="skills.tiers[1].items[0]"></li>
+              <li class="skills__item" data-i18n="skills.tiers[1].items[1]"></li>
+              <li class="skills__item" data-i18n="skills.tiers[1].items[2]"></li>
+              <li class="skills__item" data-i18n="skills.tiers[1].items[3]"></li>
+              <li class="skills__item" data-i18n="skills.tiers[1].items[4]"></li>
+              <li class="skills__item" data-i18n="skills.tiers[1].items[5]"></li>
+              <li class="skills__item" data-i18n="skills.tiers[1].items[6]"></li>
+              <li class="skills__item" data-i18n="skills.tiers[1].items[7]"></li>
+            </ul>
+          </li>
+
+          <li class="skills__tier" data-reveal>
+            <h3 class="skills__tier-title" data-i18n="skills.tiers[2].title"></h3>
+            <ul class="skills__items">
+              <li class="skills__item" data-i18n="skills.tiers[2].items[0]"></li>
+              <li class="skills__item" data-i18n="skills.tiers[2].items[1]"></li>
+            </ul>
+            <p class="skills__note" data-i18n="skills.tiers[2].note"></p>
+          </li>
+
+          <li class="skills__tier" data-reveal>
+            <h3 class="skills__tier-title" data-i18n="skills.tiers[3].title"></h3>
+            <ul class="skills__items">
+              <li class="skills__item" data-i18n="skills.tiers[3].items[0]"></li>
+              <li class="skills__item" data-i18n="skills.tiers[3].items[1]"></li>
+              <li class="skills__item" data-i18n="skills.tiers[3].items[2]"></li>
+            </ul>
+          </li>
+        </ul>
       </section>
 
       <!-- inlined from src/sections/education/education.html -->
