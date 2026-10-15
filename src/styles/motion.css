@@ -1,0 +1,110 @@
+/*
+ * Motion shell styling (ticket 003).
+ *
+ * Numbered-section scaffold + marquee ticker. The reveals themselves are driven
+ * by GSAP (src/motion/reveals.js) with inline styles, so nothing here hides
+ * content. Design tokens only, consumed through var() (repo rule).
+ */
+
+/* --- Numbered sections ----------------------------------------------------
+ * Counters live here so numbering has a single owner (003); content tickets add
+ * the headings and rows after the index. The number is decorative, so its span
+ * is aria-hidden in the markup. */
+main {
+  counter-reset: section;
+}
+
+.section {
+  counter-increment: section;
+}
+
+.section__index {
+  display: block;
+  margin-bottom: var(--space-sm);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--letter-spacing-wide);
+  color: var(--color-text-subtle);
+}
+
+.section__index::before {
+  content: counter(section, decimal-leading-zero);
+}
+
+/* --- Ticker ---------------------------------------------------------------
+ * Default (no JS / reduced motion): a plain, readable, in-flow line showing the
+ * tagline once. JS adds `.ticker--live` to turn it into a pinned marquee. */
+.ticker {
+  margin-block-start: var(--space-2xl);
+  padding-block: var(--space-sm);
+  padding-inline: var(--container-pad);
+  border-block-start: var(--border-width) solid var(--color-border);
+  font-size: var(--font-size-sm);
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+/* Hidden until the tagline text exists (003 ships before the i18n dictionaries;
+ * without text there is nothing meaningful to scroll). */
+.ticker--idle {
+  display: none;
+}
+
+/* Live marquee: pinned to the viewport bottom, constant-speed CSS keyframes. */
+.ticker--live {
+  position: fixed;
+  inset-block-end: 0;
+  inset-inline: 0;
+  z-index: var(--z-ticker);
+  display: flex;
+  align-items: center;
+  block-size: var(--ticker-height);
+  margin-block-start: 0;
+  padding-block: 0;
+  overflow: hidden;
+  background-color: var(--color-surface);
+}
+
+.ticker--live .ticker__track {
+  display: flex;
+  inline-size: max-content;
+  animation: ticker-scroll var(--ticker-duration) linear infinite;
+}
+
+.ticker--live .ticker__group {
+  display: flex;
+}
+
+.ticker--live .ticker__item {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+/* Drawn separator dot between copies (no literal text). */
+.ticker--live .ticker__item::after {
+  content: "";
+  display: inline-block;
+  inline-size: var(--ticker-dot);
+  block-size: var(--ticker-dot);
+  margin-inline: var(--space-xl);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-text-subtle);
+}
+
+@keyframes ticker-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Reserve room for the pinned bar so it never covers content. Toggling this
+ * only extends the page bottom, so it causes no layout shift. */
+body.has-ticker {
+  padding-block-end: var(--ticker-height);
+}

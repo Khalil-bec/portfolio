@@ -3,10 +3,10 @@
  *
  * Owns the page's scroll feel: Lenis smooth scrolling with anchor handling,
  * the `prefers-reduced-motion` kill-switch, and sensible focus moves on anchor
- * jumps. GSAP/ScrollTrigger are intentionally absent here: ticket 003 adds the
- * reveals and the Lenis<->ScrollTrigger bridge. When it does, it is expected to
- * take over the rAF loop below (swap it for gsap.ticker) rather than start a
- * second loop, using the `lenis` instance this module returns.
+ * jumps. This module no longer runs its own frame loop: ticket 003's GSAP
+ * bridge (src/motion/gsap-bridge.js) drives `lenis.raf` from `gsap.ticker`, so
+ * there is a single loop. The `lenis` instance returned here is what the bridge
+ * consumes.
  *
  * Lenis is a vendored classic script (UMD) that exposes `window.Lenis`; it is
  * deferred so it has run before this module executes.
@@ -78,12 +78,6 @@ export function initSmoothScroll() {
     lerp: LERP,
     anchors: true,
   });
-
-  function raf(time) {
-    lenis.raf(time);
-    requestAnimationFrame(raf);
-  }
-  requestAnimationFrame(raf);
 
   return { lenis, reducedMotion: false };
 }

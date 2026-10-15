@@ -70,6 +70,9 @@
   --radius-lg: 16px;
   --radius-pill: 999px;
 
+  /* Borders */
+  --border-width: 1px;
+
   /* Motion */
   --duration-fast: 150ms;
   --duration-base: 300ms;
@@ -77,6 +80,19 @@
   --duration-instant: 0.001ms; /* reduced-motion kill-switch duration */
   --ease-standard: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-linear: linear;
+
+  /* Motion — row reveals. Unitless numbers consumed by GSAP in
+   * src/motion/reveals.js (seconds and pixels). Kept as tokens so the pacing
+   * has a single source of truth, per the repo's token rule. */
+  --reveal-duration: 0.7; /* seconds */
+  --reveal-distance: 24; /* px */
+  --reveal-stagger: 0.08; /* seconds */
+
+  /* Motion — marquee ticker (scrolls the tagline; ticket 003). */
+  --ticker-height: 2.75rem;
+  --ticker-speed: 60; /* px per second, read by src/motion/ticker.js */
+  --ticker-dot: 5px; /* separator dot between repeated tagline copies */
+  --ticker-duration: 40s; /* default loop time; ticker.js overrides it per element */
 
   /* Focus ring */
   --focus-ring-width: 2px;
