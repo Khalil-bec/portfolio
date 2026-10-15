@@ -15,6 +15,9 @@
     "en": "EN",
     "fr": "FR"
   },
+  "a11y": {
+    "newTab": "opens in new tab"
+  },
   "hero": {
     "name": "Mohamed Khalil BECHEIKH",
     "tagline": "**DevOps & Infrastructure** — Computer science student, equally fascinated by systems and applications.",

@@ -25,7 +25,7 @@ A ticket only reaches `done` after the user approves the commit (see
 | 002 | Motion foundation (Lenis + anchors + kill-switch + focus) | 001 | `done` | `8d611ea` | Reviewed (no Critical), user-approved, committed, pushed. Nav deferred to 004, GSAP bridge to 003 (user-confirmed). |
 | 003 | Reveals + numbered sections + ticker shell | 002 | `done` | `888e5b5` | Reviewed (no Critical), user-approved, committed. Mechanisms only; ticker binds `hero.tagline` (empty until 004). Not pushed. |
 | 004 | Bilingual wiring | 001 | `done` | `c706140` | en/fr dictionaries + `data-i18n` engine + sticky nav & EN/FR switch. Reviewed (no hard violations), user-approved, committed, pushed. FR tagline `blessé`→`passionné` (user-approved). |
-| 005 | Content fit-in — hero + education + contact | 001, 003, 004 | `todo` | — | Parallel with 006. Owns favicon/OG monogram. |
+| 005 | Content fit-in — hero + education + contact | 001, 003, 004 | `in-review` | — | Implemented. Hero/education/contact + KB favicon/ICO/OG + 4:5 reserved portrait slot. Parallel with 006. Reviewed (no hard violations), visual-QA approved. Not committed; awaiting approval. |
 | 006 | Content fit-in — projects + skills | 001, 003, 004 | `todo` | — | Parallel with 005. |
 | 007 | Hardening + verification | 002–006 | `blocked` | — | Unblocks once 002–006 are `done`. |
 
@@ -42,3 +42,4 @@ Append one line per status change, newest last.
 - 2026-10-15 — 004 implemented (bilingual wiring: en/fr dictionaries, i18n engine, sticky nav + EN/FR switch) → `in-review`. Dictionary scheme, storage/detection, rich-text-safe rendering and nav decisions, visual-qa and code-review recorded in `doc/idea-v1-decisions.md`. Corrected FR tagline `blessé`→`passionné` (user-approved). Not committed; awaiting approval.
 - 2026-10-15 — 004 approved + committed (`c706140`) → `done`. Pushing to `origin/main`.
 - 2026-10-15 — 004 pushed to `origin/main` (`4054219..3460f78`).
+- 2026-10-15 — 005 implemented (hero + education + contact content, code-drawn KB favicon/ICO/OG, reserved 4:5 portrait slot, hardened outbound links, hero above-fold cap with a decorative cue) → `in-review`. Decisions, visual-qa and code-review (Standards + Spec axes, no hard violations) recorded in `doc/idea-v1-decisions.md`. Fixed favicon `sizes`; verified the accessible-name separator. Not committed; awaiting approval.

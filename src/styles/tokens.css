@@ -107,6 +107,17 @@
   --section-min-height: 50svh;
   --hero-min-height: 100svh;
 
+  /* Reserved media slots (ticket 005). Fixed aspect ratio + width so an empty
+   * slot already holds the space its asset will need later (no layout shift). */
+  --slot-portrait-ratio: 4 / 5;
+  --slot-portrait-width: 14rem;
+
+  /* Contact rows: aligned label column. */
+  --contact-label-width: 8rem;
+
+  /* Accessibility helper: size of a visually-hidden element. */
+  --visually-hidden-size: 1px;
+
   /* Layers */
   --z-base: 1;
   --z-nav: 100;

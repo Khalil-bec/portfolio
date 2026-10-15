@@ -92,6 +92,36 @@ code {
   padding-inline: var(--container-pad);
 }
 
+/* Section heading, shared by the content tickets (005/006). */
+.section__title {
+  margin-block-end: var(--space-lg);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-snug);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+/* Reserved media slot: holds its box before the asset lands, so the page does
+ * not shift when a portrait/screenshot is dropped in later. */
+.image-slot {
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
+}
+
+/* Visually hidden but read by assistive tech (e.g. the new-tab announcement). */
+.visually-hidden {
+  position: absolute;
+  inline-size: var(--visually-hidden-size);
+  block-size: var(--visually-hidden-size);
+  margin: calc(var(--visually-hidden-size) * -1);
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* CSS-level motion kill-switch, independent of the JS one wired in ticket 002. */
 @media (prefers-reduced-motion: reduce) {
   html {

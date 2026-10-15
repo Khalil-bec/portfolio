@@ -1,1 +1,53 @@
-/* Contact section. Content + layout land with ticket 005. */
+/*
+ * Contact section (content: ticket 005).
+ *
+ * A verbatim contact block: dictionary labels + data values (URLs / email /
+ * location). Email is the accent CTA; GitHub/LinkedIn are outbound links that
+ * open in a new tab. Design tokens only, consumed through var().
+ */
+
+.contact__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  max-inline-size: var(--measure);
+}
+
+.contact__item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2xs) var(--space-md);
+  padding-block-end: var(--space-sm);
+  border-block-end: var(--border-width) solid var(--color-border);
+}
+
+.contact__item:last-child {
+  border-block-end: 0;
+}
+
+.contact__label {
+  flex: 0 0 auto;
+  min-inline-size: var(--contact-label-width);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+  color: var(--color-text-subtle);
+}
+
+.contact__value {
+  flex: 1 1 auto;
+  font-size: var(--font-size-md);
+  color: var(--color-text);
+  overflow-wrap: anywhere;
+  transition: color var(--duration-fast) var(--ease-standard);
+}
+
+a.contact__value:hover {
+  color: var(--color-accent);
+}
+
+.contact__value--email {
+  color: var(--color-accent);
+}

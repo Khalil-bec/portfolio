@@ -7,6 +7,17 @@
          ticket 004 rebinds it from the `meta.title` key. -->
     <title data-i18n="meta.title">Mohamed Khalil Becheikh</title>
 
+    <!-- Brand assets (ticket 005): code-drawn KB monogram. Favicon ships as SVG
+         (crisp) with an ICO fallback for the browser's unprompted /favicon.ico
+         request. Open Graph gets the monogram image + title now; og:url is
+         omitted until the site is hosted (it needs an absolute https URL —
+         never localhost). TODO(host): add og:url + absolute og:image. -->
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" sizes="any" />
+    <link rel="alternate icon" href="favicon.ico" type="image/x-icon" sizes="16x16 32x32 48x48 64x64" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Mohamed Khalil Becheikh" />
+    <meta property="og:image" content="og-image.png" />
+
     <!--
       Scaffold note (ticket 001) — authoring-time partial inlining.
       src/sections/<name>/<name>.html is the authoritative source for a section.
@@ -57,6 +68,27 @@
       <!-- inlined from src/sections/hero/hero.html -->
       <section id="hero" class="section section--hero" data-section="hero">
         <span class="section__index" aria-hidden="true"></span>
+
+        <!-- Above the fold: name + tagline + a decorative scroll cue. -->
+        <div class="hero__head">
+          <h1 class="hero__name" data-i18n="hero.name"></h1>
+          <p class="hero__tagline" data-i18n="hero.tagline"></p>
+          <span class="hero__cue" aria-hidden="true"></span>
+        </div>
+
+        <!-- Below the fold: about paragraphs + human languages + reserved portrait. -->
+        <div class="hero__about">
+          <h2 class="hero__about-title" data-i18n="hero.aboutTitle"></h2>
+          <div class="hero__about-grid">
+            <div class="hero__about-body">
+              <p data-reveal data-i18n="hero.about[0]"></p>
+              <p data-reveal data-i18n="hero.about[1]"></p>
+              <p data-reveal data-i18n="hero.about[2]"></p>
+              <p class="hero__languages" data-reveal data-i18n="hero.languages"></p>
+            </div>
+            <div class="hero__portrait image-slot" aria-hidden="true" data-reveal></div>
+          </div>
+        </div>
       </section>
 
       <!-- inlined from src/sections/projects/projects.html -->
@@ -72,11 +104,43 @@
       <!-- inlined from src/sections/education/education.html -->
       <section id="education" class="section section--education" data-section="education">
         <span class="section__index" aria-hidden="true"></span>
+        <h2 class="section__title" data-i18n="education.title"></h2>
+
+        <div class="education__entry" data-reveal>
+          <h3 class="education__school" data-i18n="education.school"></h3>
+          <p class="education__location" data-i18n="education.location"></p>
+          <p class="education__degree" data-i18n="education.degree"></p>
+          <p class="education__graduation" data-i18n="education.graduation"></p>
+        </div>
       </section>
 
       <!-- inlined from src/sections/contact/contact.html -->
       <section id="contact" class="section section--contact" data-section="contact">
         <span class="section__index" aria-hidden="true"></span>
+        <h2 class="section__title" data-i18n="contact.title"></h2>
+
+        <!-- Labels come from the dictionaries; the addresses/URLs are data and live
+             here in the HTML (they are identical in both languages). GitHub/LinkedIn
+             open in a new tab and announce it; email is a same-tab, parameter-free
+             mailto. -->
+        <ul class="contact__list">
+          <li class="contact__item" data-reveal>
+            <span class="contact__label" data-i18n="contact.githubLabel"></span>
+            <a class="contact__value" href="https://github.com/Khalil-bec" target="_blank" rel="noopener noreferrer">https://github.com/Khalil-bec<span class="visually-hidden" data-i18n="a11y.newTab"></span></a>
+          </li>
+          <li class="contact__item" data-reveal>
+            <span class="contact__label" data-i18n="contact.emailLabel"></span>
+            <a class="contact__value contact__value--email" href="mailto:khalil.becheikh54@gmail.com">khalil.becheikh54@gmail.com</a>
+          </li>
+          <li class="contact__item" data-reveal>
+            <span class="contact__label" data-i18n="contact.linkedinLabel"></span>
+            <a class="contact__value" href="https://www.linkedin.com/in/becheikh-mohamed-khalil/" target="_blank" rel="noopener noreferrer">https://www.linkedin.com/in/becheikh-mohamed-khalil/<span class="visually-hidden" data-i18n="a11y.newTab"></span></a>
+          </li>
+          <li class="contact__item" data-reveal>
+            <span class="contact__label" data-i18n="contact.locationLabel"></span>
+            <span class="contact__value" data-i18n="contact.location"></span>
+          </li>
+        </ul>
       </section>
     </main>
 

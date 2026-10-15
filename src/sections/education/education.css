@@ -1,1 +1,29 @@
-/* Education section. Content + layout land with ticket 005. */
+/*
+ * Education section (content: ticket 005).
+ *
+ * One school entry: school, location, degree line and expected graduation, all
+ * bound from the dictionaries. Design tokens only, consumed through var().
+ */
+
+.education__entry {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  max-inline-size: var(--measure);
+}
+
+.education__school {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-snug);
+}
+
+.education__location,
+.education__graduation {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.education__degree {
+  color: var(--color-text);
+}

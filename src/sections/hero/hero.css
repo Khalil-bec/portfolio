@@ -1,7 +1,84 @@
-/* Hero section. Content + layout land with ticket 005. */
+/*
+ * Hero section (content: ticket 005).
+ *
+ * First viewport is capped to identity (name + tagline + cue); the about block
+ * and the reserved portrait sit below the fold within #hero. Design tokens only,
+ * consumed through var() (repo rule). No media query: the about grid uses an
+ * intrinsic flex wrap, so there is no breakpoint literal for the token gate.
+ */
+
 .section--hero {
   display: flex;
   flex-direction: column;
+  gap: var(--section-gap);
+}
+
+.hero__head {
+  display: flex;
+  flex-direction: column;
   justify-content: center;
-  min-height: var(--hero-min-height);
+  gap: var(--space-lg);
+  /* Leaves room for the sticky nav, the section padding and the section index
+   * so name + tagline + cue stay inside the first viewport. */
+  min-block-size: calc(var(--hero-min-height) - var(--space-3xl) - var(--space-2xl));
+}
+
+.hero__name {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.hero__tagline {
+  max-inline-size: var(--measure);
+  font-size: var(--font-size-md);
+  color: var(--color-text-muted);
+}
+
+/* Decorative down-chevron (no text): the cue that there is more to scroll. */
+.hero__cue {
+  inline-size: var(--space-sm);
+  block-size: var(--space-sm);
+  margin-block-start: var(--space-sm);
+  border-inline-end: var(--border-width) solid var(--color-text-subtle);
+  border-block-end: var(--border-width) solid var(--color-text-subtle);
+  transform: rotate(45deg);
+}
+
+/* --- About block --------------------------------------------------------- */
+
+.hero__about-title {
+  margin-block-end: var(--space-lg);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+  color: var(--color-text-subtle);
+}
+
+.hero__about-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xl);
+  align-items: flex-start;
+}
+
+.hero__about-body {
+  display: flex;
+  flex: 1 1 var(--measure);
+  flex-direction: column;
+  gap: var(--space-md);
+  max-inline-size: var(--measure);
+}
+
+.hero__languages {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.hero__portrait {
+  flex: 0 0 var(--slot-portrait-width);
+  aspect-ratio: var(--slot-portrait-ratio);
+  inline-size: var(--slot-portrait-width);
 }
