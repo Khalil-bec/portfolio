@@ -46,3 +46,4 @@ Append one line per status change, newest last.
 - 2026-10-15 — 005 approved + committed (`2ba4571`) → `done`. Pushing to `origin/main`.
 - 2026-10-15 — 006 implemented (projects + skills content: three project cards with all bullets visible + reserved 16:10 screenshot slots, four skill tiers as chips) → `in-review`. Decisions + visual-qa + code-review (Standards + Spec axes, no hard violations; fixed the `--ticker-dot` → `--dot-size` naming) recorded in `doc/idea-v1-decisions.md`. Not committed; awaiting approval.
 - 2026-10-15 — 006 approved + committed (`e9ec728`) → `done`. Pushing to `origin/main`.
+- 2026-10-15 — 006 pushed to `origin/main` (`886f07f..1ad394c`).
