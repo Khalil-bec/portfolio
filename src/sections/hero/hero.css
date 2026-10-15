@@ -1,0 +1,7 @@
+/* Hero section. Content + layout land with ticket 005. */
+.section--hero {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: var(--hero-min-height);
+}

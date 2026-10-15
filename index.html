@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mohamed Khalil Becheikh</title>
+
+    <!--
+      Scaffold note (ticket 001) — authoring-time partial inlining.
+      src/sections/<name>/<name>.html is the authoritative source for a section.
+      The <section> elements in <main> below are those partials inlined BY HAND.
+      There is no build step and no runtime fetch; keep the partial and its inlined
+      copy in sync whenever a section is edited.
+
+      Stylesheet order (load order): tokens -> base -> section css (document order, hero -> contact).
+      Scripts: one ES-module entry (src/main.js). Vendor libs are loaded in the
+      tickets that need them (gsap -> ScrollTrigger -> lenis, then main.js) and are
+      intentionally absent here.
+    -->
+
+    <link rel="stylesheet" href="src/styles/tokens.css" />
+    <link rel="stylesheet" href="src/styles/base.css" />
+    <link rel="stylesheet" href="src/sections/hero/hero.css" />
+    <link rel="stylesheet" href="src/sections/projects/projects.css" />
+    <link rel="stylesheet" href="src/sections/skills/skills.css" />
+    <link rel="stylesheet" href="src/sections/education/education.css" />
+    <link rel="stylesheet" href="src/sections/contact/contact.css" />
+  </head>
+  <body>
+    <main id="main">
+      <!-- inlined from src/sections/hero/hero.html -->
+      <section id="hero" class="section section--hero" data-section="hero"></section>
+
+      <!-- inlined from src/sections/projects/projects.html -->
+      <section id="projects" class="section section--projects" data-section="projects"></section>
+
+      <!-- inlined from src/sections/skills/skills.html -->
+      <section id="skills" class="section section--skills" data-section="skills"></section>
+
+      <!-- inlined from src/sections/education/education.html -->
+      <section id="education" class="section section--education" data-section="education"></section>
+
+      <!-- inlined from src/sections/contact/contact.html -->
+      <section id="contact" class="section section--contact" data-section="contact"></section>
+    </main>
+
+    <script type="module" src="src/main.js"></script>
+  </body>
+</html>
