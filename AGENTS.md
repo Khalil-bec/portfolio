@@ -13,3 +13,4 @@ Static vanilla site. Spec: doc/idea-v1-spec.md. Content: doc/content.md.
 
 ## Workflow
 Plan → ticket → implement one ticket → screenshot check → code review → stop.
+Update `doc/status.md` every time a ticket's implementation is done (and on any status change).
