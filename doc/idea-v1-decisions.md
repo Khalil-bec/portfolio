@@ -259,4 +259,23 @@ Append-only log. Earlier decisions live in `doc/idea-v0-decisions.md`. New entri
 - **Scope calls (user-confirmed):** ruler + rail share the 375px right edge without overlap (geometry owned by 100); rail labels reuse nav keys (zero new copy); `%`/digits are chrome; no-JS-scroll limitation rides inside 102's acceptance; strategy-A deviations from the inspiration (nav stays, dark stays, no footer) are spec, not drift.
 - **Committed with approval; next:** implement 100 → screenshot check → review → stop.
 
+## 2026-10-16 — v2 spec review (backend-architect + security-engineer + product-manager)
+
+- **Review ran:** three parallel read-only reviews of `doc/idea-v2-spec.md` + tickets `100–104` against `doc/idea-v1-spec.md`, `doc/content.md`, `AGENTS.md`, and this log. Each agent asked clarifying questions first (recorded, answered by stated assumption), then gave concerns + recommendations. Full output in `doc/idea-v2-spec-review.md`; no spec or ticket files changed in this pass.
+- **Backend-architect deltas (pending fold-back):** lane tokens + edge DOM skeleton + consume-contract in 100; single-loop render rule (`driver.onScroll` only, drag via `driver.scrollTo`, no private rAF/`window.scrollTo`) + `ScrollTrigger.refresh()` in 102; slider semantics + key map + thumb tab stop in 102/104; single-publisher rail highlight with threshold in 103; 375px lane composition as tokens in 100/104; `scrollbar-width: none` (never `overflow: hidden`); `src/chrome/` home + aria-key carve-outs appended here before 100.
+- **Security-engineer deltas (pending fold-back):** `role="slider"` key map (arrows ±5, PgUp/Dn ±20, Home/End) + focus-visible + no trap in 102; reveal→scrollTo→`focus({preventScroll:true})` on `tabindex="-1"` in 103 (+ per-jump Tab check in 104); pointer-capture/cancel + thumb-only `touch-action:none` + rAF-throttled `scrollTo` in 102; sanctioned `noscript` no-JS notice (+104 view-source check); reduced-motion thumb freeze + Lenis bypass; explicit `innerHTML` ban + unchanged outbound/storage/vendor gates in 102–104.
+- **Product-manager deltas (pending fold-back):** nav-owns-anchors/rail-owns-position split + rail `aria-current` + per-system tab stops in 103/104; single-line ticker cap + hero+ticker above-fold screenshot in 101/104; readout tolerance (`Math.round`, 2px, <100ms drag) in 102; `EN 42% / FR 42 %` (nbsp) format in spec §Data + 104 check; 375px lane widths in tokens + collapsed rail mode in 100/103; driver-failure arrows/space test in 104.
+- **Open conflicts with earlier user calls (needs re-confirmation):** 102 split into readout vs drive/keyboard (backend + PM recommend; user chose whole); 768px rail-collapse breakpoint (token-gate/no-media-query tension); touch-drag scope (agents split pointer-only vs readout-only); `noscript` notice + aria-label keys + `%` spacing vs no-new-copy rule (each needs explicit chrome sanction).
+- **Next step:** user folds approved items back into spec and tickets; no auto-apply.
+
+## 2026-10-16 — v2 review fold-back (user-delegated calls, inspo-first)
+
+- **Rule:** user delegated all 5 open conflicts with "choose whatever makes the product as similar as possible as the inspo"; folded below only, no other review items applied.
+- **102 stays whole** (conflict resolved for process speed + the earlier one-ticket call; product outcome identical to a split).
+- **Collapsed rail under 768px** (inspo adapts on narrow screens): icon-mode rail lane, narrow media-query exception scoped to lane widths only — logged against the 004 no-breakpoint precedent.
+- **Touch scrolls natively, ruler readout-only on touch** (custom drag would fight mobile swipe); mouse/pointer drag keeps pointer-capture robustness.
+- **Sanctioned bilingual `noscript` notice** (static EN+FR lines inline — `noscript` cannot run the dictionary binder): explicit chrome exception, same precedent as `a11y.newTab`. Closest reachable stand-in for the inspo's no-JS rendering.
+- **Sanctioned ruler/rail aria-label i18n keys + `EN 42% / FR 42 %` (nbsp) readout format** (FR typography, same chrome precedent).
+- **Applied to:** spec §§Scope-3/4, Data, Acceptance; tickets 100 (lane/icon-mode checkbox), 102 (touch, noscript, `%` format checkboxes), 103 (icon mode, aria-key sanction checkboxes), 104 (format + noscript view-source checkboxes). 101 untouched. Not committed — never commit without explicit approval.
+
 

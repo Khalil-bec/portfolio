@@ -12,8 +12,8 @@ Build in vertical slices over the assembled v1 site (tickets 001–006 done; 007
 
 1. **Table divisions.** 1px cell borders on all five sections plus small numbered headers (`01/`–style) extending the existing `.section` counter system. Borders and numbering are tokens; no new copy.
 2. **Ticker relocation.** Marquee band moves from the fixed bottom bar into in-flow position directly under the hero and scrolls away with the page (no longer fixed; the `has-ticker` body-padding hack is retired). Still binds the active-language `hero.tagline`, still idles hidden while empty, still static in-flow under reduced motion.
-3. **Ruler replaces native scroll.** A thin right-edge overlay (0–100 ticks, blue progress line, `%` readout at the thumb) becomes the scroll readout *and driver*: native scrollbar hidden, scroll position owned by the single scroll-driver seam (Lenis bridge + ruler sync). Ruler updates must stay on one rAF loop. JS is required for scrolling (explicit user-approved override — see decisions).
-4. **Side rail.** Persistent right-side vertical stack of section names (hero → projects → skills → education → contact) mirroring the nav anchors. Highlights the current section on scroll; clicking jumps (smooth via the driver) and moves DOM focus sensibly. Labels reuse the nav/section headings per language (zero new marketing copy); only digits/`%` and existing aria patterns are added.
+3. **Ruler replaces native scroll.** A thin right-edge overlay (0–100 ticks, blue progress line, `%` readout at the thumb) becomes the scroll readout *and driver*: native scrollbar hidden, scroll position owned by the single scroll-driver seam (Lenis bridge + ruler sync). Ruler updates must stay on one rAF loop. Thumb exposes slider semantics (focusable, arrows/Home/End/PageUp/PageDown, `aria-valuenow` = depth %). Mouse/pointer drag drives scroll with pointer capture; touch scrolls natively while the ruler stays readout-only. JS is required for scrolling (explicit user-approved override — see decisions).
+4. **Side rail.** Persistent right-side vertical stack of section names (hero → projects → skills → education → contact) mirroring the nav anchors. Highlights the current section on scroll; clicking jumps (smooth via the driver: reveal-first, then scroll, then focus the target section with `preventScroll`) and moves DOM focus sensibly. Labels reuse the nav/section headings per language (zero new marketing copy); ruler/rail aria-label keys and the `%`/digits format are sanctioned chrome (see Data). Under 768px the rail collapses to icon mode so it shares the narrow edge with the ruler (explicit narrow media-query exception, lane widths only).
 5. **Nav stays, page ends at contact.** The sticky top nav keeps owning the 5 anchors + EN/FR switch (user override of the earlier "no navbar" read). No footer and no credits bar — contact is the last painted element.
 6. **Hardening as v1.** Token gate, vendor-only libs, vanilla ES modules, no reference code; screenshot checks at 375px and 1440px (EN/FR + reduced); keyboard pass via nav/rail/links with visible focus; Lighthouse performance > 90.
 
@@ -40,7 +40,8 @@ None — static files only, no backend, no network API. The interaction surface 
 ## Data
 
 - **Source of truth:** `doc/content.md` (FR + EN approved as-is; unchanged by v2).
-- **Runtime:** `src/i18n/en.json`, `src/i18n/fr.json`, keyed per string and bound via `data-i18n` keys; rail labels reuse existing nav/section keys; no hardcoded copy in HTML.
+- **Runtime:** `src/i18n/en.json`, `src/i18n/fr.json`, keyed per string and bound via `data-i18n` keys; rail labels reuse existing nav/section keys; ruler/rail aria-label keys are sanctioned chrome (same precedent as `a11y.newTab`); no hardcoded copy in HTML except the bilingual `noscript` scroll notice (static by necessity — sanctioned chrome, EN+FR lines inline).
+- **Readout format:** integer percent, `EN 42%` / `FR 42 %` (non-breaking space).
 - **Browser state:** one localStorage key for language choice; ruler/rail hold no persisted state (scroll position is live only).
 - **Assets:** favicon + OG image as v1; reserved sized slots unchanged (no layout shift).
 
@@ -49,7 +50,8 @@ None — static files only, no backend, no network API. The interaction surface 
 - [ ] Section order is hero → projects → skills → education → contact; contact is last with no footer/credits after it.
 - [ ] Sections render as 1px table-like cells with numbered headers continuing the existing counter system.
 - [ ] Ticker sits in-flow directly under the hero, scrolls away (not fixed), shows the active-language tagline, idles hidden while empty.
-- [ ] Native scrollbar is hidden; the right ruler (ticks 0–100 + blue progress + `%`) reflects and drives scroll position on one rAF loop.
+- [ ] Native scrollbar is hidden; the right ruler (ticks 0–100 + blue progress + `%` in `EN 42% / FR 42 %` format) reflects and drives scroll position on one rAF loop; touch scrolls natively with the ruler readout-only.
+- [ ] A static bilingual `noscript` notice states scrolling needs JS (sanctioned chrome); verified via view-source.
 - [ ] Right rail persistently lists all section names, highlights the current section on scroll, click-jumps with sensible focus moves, and flips language with the switch.
 - [ ] Nav bar stays with 5 anchors + visible EN/FR switch; switch flips every string (including rail), persists, defaults from browser language, updates `<html lang>`.
 - [ ] With `prefers-reduced-motion`: no smoothing, no reveals/ticker motion; ruler reflects position instantly without animation; all content readable.

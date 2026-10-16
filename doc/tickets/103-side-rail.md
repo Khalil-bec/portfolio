@@ -8,5 +8,5 @@
 
 - [ ] Rail persistently lists all five section names and highlights the current one while scrolling
 - [ ] Clicking (or activating) a rail name jumps to that section and moves focus sensibly
-- [ ] Rail labels flip with the EN/FR switch and reuse existing section headings (zero new marketing copy)
-- [ ] Rail shares the 375px right edge with the ruler without overlap; reachable keyboard-only with visible focus
+- [ ] Rail labels flip with the EN/FR switch and reuse existing section headings (zero new marketing copy); ruler/rail aria-label keys are sanctioned chrome
+- [ ] Rail shares the 375px right edge with the ruler without overlap (icon mode under 768px); reachable keyboard-only with visible focus

@@ -10,4 +10,5 @@
 - [ ] Screenshot checks pass at 375px and 1440px in EN and FR (no overflow, no broken layout, no overlapping ruler/rail)
 - [ ] Reduced-motion pass: no smoothing, no reveals/ticker motion, ruler instant, all content readable
 - [ ] Keyboard-only pass: nav, rail, ruler, switch, and all links reachable with visible focus; jumps move focus sensibly
+- [ ] `%` readout verified in both languages (`EN 42%` / `FR 42 %`); `noscript` notice verified via view-source
 - [ ] Repo hygiene: tokens only in the token store, one section per section directory, vanilla modules with no build step, vendored libraries only, no reference code or assets, no hosting/deployment work
