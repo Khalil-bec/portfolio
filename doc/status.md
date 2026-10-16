@@ -31,6 +31,7 @@ A ticket only reaches `done` after the user approves the commit (see
 | 100 | Table divisions + edge lanes | 007 | `done` | `d2b2e93` | Cells (side+bottom borders, nav rule = table top) + `01 ───` numbered headers + lane tokens/reservation (rail icon collapse <768px). Reviewed via `code-review` (no Critical; ticker-over-gutter accepted transitional → 101). Approval gate waived (user). Committed + pushed. |
 | 101 | Ticker under hero | 007 | `done` | `ff8ac35` | In-flow band hero→ticker→projects, scrolls away; `has-ticker` hack + `--z-ticker` retired; band-width measure; static line under reduced motion; EN→FR flip verified. Reviewed via `code-review` (no Critical; 2 review fixes applied). Committed + pushed. |
 | 102 | Ruler replaces native scroll | 100 | `done` | `093069d` | Scroll-driver seam + fixed ruler (ticks, blue progress, `EN 42%`/`FR 42 %` thumb slider); native bar hidden; keys/drag through driver; noscript notice; reduced instant. Reviewed via `code-review` (1 real bug fixed: arrows from link focus). Committed + pushed. |
+| 103 | Side rail | 100 | `done` | `584f60d` | Five anchors (nav labels, `rail.aria` landmark) in inner lane; IO most-visible tracking + `aria-current` both directions; jump/focus/reveal-first verified; icon dots <768px; lane 7.5rem fits labels. Reviewed via `code-review` (tracking upgraded to threshold-argmax). Committed + pushed. |
 
 ## Update log
 
@@ -55,3 +56,4 @@ Append one line per status change, newest last.
 - 2026-10-16 — 100 implemented (table cells + `01 ───` headers + lane reservation) → reviewed (`code-review`: no Critical; ticker-over-gutter accepted transitional → 101) → `done` (`d2b2e93`). Approval gate waived per session decision. Pushing to `origin/main`.
 - 2026-10-16 — 101 implemented (in-flow ticker band) → reviewed (`code-review`: no Critical; applied `minWidth` rename + lane-comment update) → `done` (`ff8ac35`). Pushing to `origin/main`.
 - 2026-10-16 — 102 implemented (scroll driver + ruler) → reviewed (`code-review`: fixed arrows-from-link bug, Left/Right keys, dict-sourced readout tag, maxScroll dedup) → `done` (`093069d`). Pushing to `origin/main`.
+- 2026-10-16 — 103 implemented (side rail) → reviewed (`code-review`: tracking upgraded to threshold-argmax, state trimmed, `font-size: 0` sanctioned) → `done` (`584f60d`). Pushing to `origin/main`.
