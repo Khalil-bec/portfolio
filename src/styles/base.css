@@ -32,6 +32,13 @@ body {
   line-height: var(--line-height-base);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  /* Edge-lane reservation (ticket 100): the right edge holds two fixed lanes
+   * (rail inside, ruler outside; widths in tokens.css). The padding keeps
+   * every in-flow element — including the sticky nav — clear of both lanes.
+   * Out-of-flow elements ignore body padding: the v1 fixed ticker still spans
+   * the gutter until ticket 101 moves it in-flow, so the full lane guarantee
+   * lands with 101–103, not here. */
+  padding-inline-end: calc(var(--lane-ruler) + var(--lane-rail));
 }
 
 h1,
@@ -90,6 +97,12 @@ code {
   min-height: var(--section-min-height);
   padding-block: var(--section-gap);
   padding-inline: var(--container-pad);
+  /* Table cell (ticket 100): 1px side borders make every section a cell and
+   * each section's bottom border is the divider beneath it. The table's top
+   * edge is the sticky nav's existing bottom rule, so the hero takes no top
+   * border (no doubled line); contact's bottom border closes the table. */
+  border-inline: var(--border-width) solid var(--color-border);
+  border-block-end: var(--border-width) solid var(--color-border);
 }
 
 /* Section heading, shared by the content tickets (005/006). */
@@ -120,6 +133,17 @@ code {
   clip-path: inset(50%);
   white-space: nowrap;
   border: 0;
+}
+
+/* Narrow exception (ticket 100): the rail collapses to icon mode, so the
+ * reservation shrinks to the narrow rail lane. 768px is a media-condition
+ * literal — CSS variables cannot appear there; the lane widths themselves stay
+ * tokens. This is the repo's first breakpoint literal (006 avoided one with an
+ * intrinsic flex wrap); the ticket explicitly sanctions it for lane widths. */
+@media (max-width: 768px) {
+  body {
+    padding-inline-end: calc(var(--lane-ruler) + var(--lane-rail-narrow));
+  }
 }
 
 /* CSS-level motion kill-switch, independent of the JS one wired in ticket 002. */

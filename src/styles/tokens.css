@@ -121,11 +121,21 @@
   /* Label + value rows (Contact; project Stack/Why): aligned label column. */
   --label-width: 8rem;
 
+  /* Edge lanes (ticket 100). The right edge reserves two non-overlapping lanes
+   * for the v2 chrome: the ruler readout/driver (102) outermost, the section
+   * rail (103) inside it. Body padding (base.css) holds content clear of both;
+   * under 768px the rail collapses to icon mode (narrow lane). */
+  --lane-ruler: 1.75rem;
+  --lane-rail: 6rem;
+  --lane-rail-narrow: 2rem;
+
   /* Accessibility helper: size of a visually-hidden element. */
   --visually-hidden-size: 1px;
 
   /* Layers */
   --z-base: 1;
   --z-nav: 100;
+  --z-rail: 150;
+  --z-ruler: 160;
   --z-ticker: 200;
 }

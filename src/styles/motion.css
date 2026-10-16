@@ -19,7 +19,9 @@ main {
 }
 
 .section__index {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
   margin-bottom: var(--space-sm);
   font-family: var(--font-mono);
   font-size: var(--font-size-xs);
@@ -30,6 +32,15 @@ main {
 
 .section__index::before {
   content: counter(section, decimal-leading-zero);
+}
+
+/* Numbered header rule (ticket 100): the counter number opens a full-width 1px
+ * rule, giving each cell an ArtCraft-style `01 ───` header with zero new copy
+ * (the span stays aria-hidden; the heading below names the section). */
+.section__index::after {
+  content: "";
+  flex: 1 1 auto;
+  border-block-start: var(--border-width) solid var(--color-border);
 }
 
 /* --- Ticker ---------------------------------------------------------------

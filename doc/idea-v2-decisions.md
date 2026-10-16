@@ -27,3 +27,19 @@ Append-only log. v1 decisions live in `doc/idea-v1-decisions.md`. Entries below 
 
 - **Files:** `doc/idea-v2-spec.md` created (goal/scope/non-goals/endpoints/data/acceptance); this log created. Not committed — never commit without explicit approval.
 - **Next:** break into tickets (to-tickets, 100-series in `doc/tickets/`), then implement one ticket → screenshot check (375px/1440px) → code review → stop.
+
+## 2026-10-16 — v2 implementation run: session decisions (user-answered)
+
+- **Approval gate waived (user override):** for the v2 run (tickets 100–104) the `AGENTS.md` "never commit without my approval" rule and the `status.md` approval requirement are waived. After each ticket's screenshot check + code review passes (no Critical findings), commit and push to `main` directly, recording the SHA in `doc/status.md`.
+- **`code-review` substitutes `code-review-expert`:** no `code-review-expert` skill exists in this repo; each ticket's review uses the existing `code-review` skill (Standards + Spec axes, parallel sub-agents) against the diff since the previous commit.
+- **Full run, no stopping:** all five v2 tickets (100 → 101 → 102 → 103 → 104) execute end-to-end in one session instead of stopping after each ticket per the `AGENTS.md` workflow.
+
+## 2026-10-16 — ticket 100 implemented (table divisions + edge lanes)
+
+- **Cell model:** every `.section` gets `border-inline` + `border-block-end` (base.css). Each section's bottom border is the divider beneath it; the table's top edge is the sticky nav's existing bottom rule (hero takes no top border, avoiding a doubled line); contact's bottom border closes the table. Class-free positional selectors avoided so ticket 101's in-flow ticker cannot break the dividers.
+- **Numbered headers:** `.section__index` becomes a flex row — counter number + full-width 1px rule (`01 ───`), zero new copy (span stays `aria-hidden`; the `<h2>` below names the section). Counter mechanism (reset/increment) untouched from v1.
+- **Lanes:** `--lane-ruler: 1.75rem` (outermost, fits ticks + rotated `%`), `--lane-rail: 6rem` desktop / `--lane-rail-narrow: 2rem` icon mode under 768px, plus `--z-rail: 150` / `--z-ruler: 160` so 102/103 never touch `tokens.css`. Body `padding-inline-end` holds all in-flow content (incl. sticky nav) clear.
+- **First breakpoint literal:** `@media (max-width: 768px)` in base.css — CSS variables are illegal in media conditions; lane widths stay tokens. Sanctioned by the ticket's "explicit narrow media-query exception, lane widths only".
+- **Verification:** `/tmp/opencode/qa-100.mjs` — 6 configs (1440/375 × EN/FR + reduced): zero console/page errors, no overflow, counter rule on all 5, 1px side+bottom borders, hero no top border, lane padding exact, nav+sections clear of lanes. Screenshots `100-*.png`. Counter `content` returns the unresolved `counter()` string via `getComputedStyle` (Chromium), so sequencing is asserted via rule presence + visual (`01`, `02`, `05` confirmed in shots).
+- **Review:** `code-review` skill (Standards + Spec, parallel subagents). No Critical findings: 768px sanctioned by ticket; session waiver explicitly user-approved; fixed ticker spanning the gutter accepted as transitional (101 moves it in-flow and re-verifies lanes); z-tokens judged in-scope reservation. One fix applied: narrowed the overbroad "never cover content" comment to in-flow elements.
+- **Known transitional:** lanes are reserved geometry only (empty gutter in shots); overlap guarantee is re-verified with real overlays in 102/103.
