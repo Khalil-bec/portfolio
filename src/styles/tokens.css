@@ -19,7 +19,7 @@
   /* Colour — text */
   --color-text: #e7eaf0;
   --color-text-muted: #a2acbb;
-  --color-text-subtle: #6d7787;
+  --color-text-subtle: #767f8f; /* AA on --color-bg (4.85:1); was #6d7787 (4.32:1) */
 
   /* Colour — accent + focus */
   --color-accent: #6ee7b7;

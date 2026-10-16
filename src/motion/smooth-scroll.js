@@ -70,6 +70,15 @@ export function initSmoothScroll() {
   // path too, where jumps are instant but still deserve sensible focus.
   document.addEventListener("click", onDocumentClick);
 
+  // A deep link (`/#contact`) lands with the viewport at the target but focus on
+  // <body>; move focus there too so keyboard users continue from where they are.
+  // Back/forward history navigation is deliberately out of scope: Lenis does not
+  // restore scroll on it, so focusing the target then would point off-screen
+  // (deferred from ticket 002; logged in doc/idea-v1-decisions.md).
+  if (window.location.hash && window.location.hash !== "#") {
+    requestAnimationFrame(() => focusAnchorTarget(window.location.hash));
+  }
+
   if (prefersReducedMotion() || typeof window.Lenis !== "function") {
     return { lenis: null, reducedMotion: prefersReducedMotion() };
   }

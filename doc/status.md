@@ -27,7 +27,7 @@ A ticket only reaches `done` after the user approves the commit (see
 | 004 | Bilingual wiring | 001 | `done` | `c706140` | en/fr dictionaries + `data-i18n` engine + sticky nav & EN/FR switch. Reviewed (no hard violations), user-approved, committed, pushed. FR tagline `blessé`→`passionné` (user-approved). |
 | 005 | Content fit-in — hero + education + contact | 001, 003, 004 | `done` | `2ba4571` | Hero/education/contact + KB favicon/ICO/OG + 4:5 reserved portrait slot. Reviewed (no hard violations), visual-QA approved, user-approved, committed, pushed. Parallel with 006. |
 | 006 | Content fit-in — projects + skills | 001, 003, 004 | `done` | `e9ec728` | Projects (3 cards, all bullets, reserved 16:10 slots) + skills (4 chip tiers). Reviewed (no hard violations, one fix), visual-QA approved, user-approved, committed, pushed. Parallel with 005. |
-| 007 | Hardening + verification | 002–006 | `blocked` | — | Unblocks once 002–006 are `done`. |
+| 007 | Hardening + verification | 002–006 | `in-review` | — | Verification gate + 3 defects fixed (keyboard-unreachable below-fold links; AA contrast on `--color-text-subtle`; i18n nav shift). Lighthouse 13.5.0 mobile perf 94 / a11y 100, desktop 100 / 100. Reviewed (Standards: no hard violations; Spec: 5 checkboxes met). Not committed; awaiting approval. |
 
 ## Update log
 
@@ -47,3 +47,4 @@ Append one line per status change, newest last.
 - 2026-10-15 — 006 implemented (projects + skills content: three project cards with all bullets visible + reserved 16:10 screenshot slots, four skill tiers as chips) → `in-review`. Decisions + visual-qa + code-review (Standards + Spec axes, no hard violations; fixed the `--ticker-dot` → `--dot-size` naming) recorded in `doc/idea-v1-decisions.md`. Not committed; awaiting approval.
 - 2026-10-15 — 006 approved + committed (`e9ec728`) → `done`. Pushing to `origin/main`.
 - 2026-10-15 — 006 pushed to `origin/main` (`886f07f..1ad394c`).
+- 2026-10-15 — 007 implemented (hardening + verification) → `in-review`. Ran the static audits + Playwright runtime passes (375/768/1440 EN/FR, reduced motion, keyboard, storage, no-JS, CLS, zero-external-request, OG view-source) and Lighthouse mobile+desktop (perf 94/100). Fixed 3 defects it surfaced — below-fold links keyboard-unreachable (`autoAlpha`→`opacity`+focusin), `--color-text-subtle` AA contrast `#6d7787`→`#767f8f`, i18n nav layout shift — plus a deep-link focus gap. Decisions, verification and code-review (Standards + Spec, no hard violations) recorded in `doc/idea-v1-decisions.md`. Accepted residual: 375px CLS 0.1175. Not committed; awaiting approval.

@@ -49,6 +49,12 @@
 
 .lang-switch__button {
   padding: var(--space-2xs) var(--space-sm);
+  /* Reserve the filled height so the switch does not grow when the i18n
+   * dictionaries fill the EN/FR labels. That growth (the dominant part of the
+   * i18n layout shift at wide viewports) would push <main> down. border-box, so
+   * the padding is included. The nav list's own wrap to two rows at very narrow
+   * widths is content-dependent and not covered here. */
+  min-block-size: calc(var(--font-size-xs) * var(--line-height-base) + var(--space-2xs) * 2);
   border: 0;
   border-radius: var(--radius-pill);
   background-color: transparent;
