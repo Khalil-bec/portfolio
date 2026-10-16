@@ -13,8 +13,9 @@
  *   a plain, readable, in-flow line (see motion.css).
  * - Empty tagline (003 alone, before 004 fills it): the ticker is hidden rather
  *   than rendered as a bar of separator dots.
- * - Motion on with text: the marquee is pinned to the viewport bottom; the clones
- *   are `aria-hidden`, so a screen reader hears the tagline exactly once.
+ * - Motion on with text: the marquee is an in-flow band directly under the hero
+ *   (ticket 101) that scrolls away with the page; the clones are `aria-hidden`,
+ *   so a screen reader hears the tagline exactly once.
  */
 
 import { readNumberToken } from "./tokens.js";
@@ -61,7 +62,9 @@ function measure() {
  */
 function build() {
   const { track, source } = state;
-  const viewport = window.innerWidth;
+  // One group must cover the band's own width for a seamless loop; fall back
+  // to the viewport if the band is not laid out yet.
+  const minWidth = state.ticker.clientWidth || window.innerWidth;
 
   const groupA = document.createElement("span");
   groupA.className = "ticker__group";
@@ -69,7 +72,7 @@ function build() {
 
   // The original source is the single announced copy; it heads the first group.
   groupA.append(source);
-  fillGroup(groupA, source, viewport);
+  fillGroup(groupA, source, minWidth);
 
   // Mirror the group for a seamless -50% translate; every clone is aria-hidden.
   const groupB = document.createElement("span");
@@ -88,7 +91,6 @@ function sync() {
   if (source.textContent.trim() === "") {
     ticker.classList.remove("ticker--live");
     ticker.classList.add("ticker--idle");
-    document.body.classList.remove("has-ticker");
     return;
   }
 
@@ -97,7 +99,6 @@ function sync() {
   // `.ticker--live` gives the track its `max-content`/flex layout, so groups
   // measure at their intrinsic width. Apply it before building.
   ticker.classList.add("ticker--live");
-  document.body.classList.add("has-ticker");
 
   build();
   measure();

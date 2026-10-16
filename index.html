@@ -91,6 +91,18 @@
         </div>
       </section>
 
+      <!--
+        Ticker band (tickets 003/101). In-flow directly under the hero; it
+        scrolls away with the page. The source element carries the i18n key
+        (bound in ticket 004); with JS off or under reduced motion it stays a
+        plain, readable, static line. JS clones the source into an aria-hidden
+        marquee.
+      -->
+      <div class="ticker" data-ticker>
+        <div class="ticker__track" data-ticker-track></div>
+        <span class="ticker__item" data-ticker-source data-i18n="hero.tagline" data-i18n-mode="text"></span>
+      </div>
+
       <!-- inlined from src/sections/projects/projects.html -->
       <section id="projects" class="section section--projects" data-section="projects">
         <span class="section__index" aria-hidden="true"></span>
@@ -270,16 +282,6 @@
         </ul>
       </section>
     </main>
-
-    <!--
-      Ticker shell (ticket 003). The source element carries the i18n key (bound in
-      ticket 004); with JS off or under reduced motion it stays a plain, readable,
-      in-flow line. JS clones it into an aria-hidden marquee pinned to the bottom.
-    -->
-    <div class="ticker" data-ticker>
-      <div class="ticker__track" data-ticker-track></div>
-      <span class="ticker__item" data-ticker-source data-i18n="hero.tagline" data-i18n-mode="text"></span>
-    </div>
 
     <!-- Vendor classic scripts (UMD globals), deferred; then the module entry. -->
     <script defer src="vendor/gsap-3.15.0.min.js"></script>

@@ -44,13 +44,15 @@ main {
 }
 
 /* --- Ticker ---------------------------------------------------------------
- * Default (no JS / reduced motion): a plain, readable, in-flow line showing the
- * tagline once. JS adds `.ticker--live` to turn it into a pinned marquee. */
+ * Default (no JS / reduced motion): a plain, readable, in-flow band showing the
+ * tagline once. JS adds `.ticker--live` to turn it into a scrolling marquee.
+ * The band sits in-flow directly under the hero and scrolls away with the page
+ * (ticket 101); hero's bottom border is the divider above it, its own bottom
+ * border the divider above projects. */
 .ticker {
-  margin-block-start: var(--space-2xl);
   padding-block: var(--space-sm);
   padding-inline: var(--container-pad);
-  border-block-start: var(--border-width) solid var(--color-border);
+  border-block-end: var(--border-width) solid var(--color-border);
   font-size: var(--font-size-sm);
   letter-spacing: var(--letter-spacing-wide);
   text-transform: uppercase;
@@ -63,16 +65,12 @@ main {
   display: none;
 }
 
-/* Live marquee: pinned to the viewport bottom, constant-speed CSS keyframes. */
+/* Live marquee: in-flow band under the hero (ticket 101), constant-speed CSS
+ * keyframes. Marquee items never wrap, so the band is always a single line. */
 .ticker--live {
-  position: fixed;
-  inset-block-end: 0;
-  inset-inline: 0;
-  z-index: var(--z-ticker);
   display: flex;
   align-items: center;
   block-size: var(--ticker-height);
-  margin-block-start: 0;
   padding-block: 0;
   overflow: hidden;
   background-color: var(--color-surface);
@@ -112,10 +110,4 @@ main {
   to {
     transform: translateX(-50%);
   }
-}
-
-/* Reserve room for the pinned bar so it never covers content. Toggling this
- * only extends the page bottom, so it causes no layout shift. */
-body.has-ticker {
-  padding-block-end: var(--ticker-height);
 }

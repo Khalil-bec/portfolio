@@ -34,10 +34,9 @@ body {
   text-rendering: optimizeLegibility;
   /* Edge-lane reservation (ticket 100): the right edge holds two fixed lanes
    * (rail inside, ruler outside; widths in tokens.css). The padding keeps
-   * every in-flow element — including the sticky nav — clear of both lanes.
-   * Out-of-flow elements ignore body padding: the v1 fixed ticker still spans
-   * the gutter until ticket 101 moves it in-flow, so the full lane guarantee
-   * lands with 101–103, not here. */
+   * every in-flow element — including the sticky nav and, since ticket 101,
+   * the ticker band — clear of both lanes. The fixed overlays themselves land
+   * in 102/103, which re-verify the guarantee with real chrome in the lanes. */
   padding-inline-end: calc(var(--lane-ruler) + var(--lane-rail));
 }
 
