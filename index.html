@@ -27,7 +27,8 @@
 
       Stylesheet order (load order): lenis (vendor utility) -> tokens -> base ->
       nav (ticket 004) -> section css (document order, hero -> contact) ->
-      motion (numbering, reveal, ticker shell from ticket 003). The vendor sheet
+      motion (numbering, reveal, ticker shell from ticket 003) ->
+      ruler (fixed overlay, ticket 102). The vendor sheet
       only styles Lenis' own hooks; it does not compete with the tokens.
 
       Scripts: vendored classic libs (UMD globals) are loaded, deferred, before
@@ -47,8 +48,18 @@
     <link rel="stylesheet" href="src/sections/education/education.css" />
     <link rel="stylesheet" href="src/sections/contact/contact.css" />
     <link rel="stylesheet" href="src/styles/motion.css" />
+    <link rel="stylesheet" href="src/ruler/ruler.css" />
   </head>
   <body>
+    <!-- Static no-JS notice (ticket 102, sanctioned chrome): the ruler driver
+         is JS, so without it the hidden native bar leaves no way to scroll. -->
+    <noscript>
+      <p class="noscript-notice">
+        <span class="noscript-notice__line">This portfolio needs JavaScript to scroll — please enable it.</span>
+        <span class="noscript-notice__line">Ce portfolio nécessite JavaScript pour défiler — veuillez l'activer.</span>
+      </p>
+    </noscript>
+
     <!-- inlined from src/nav/nav.html -->
     <nav class="nav" data-i18n-attr="aria-label=nav.aria">
       <ul class="nav__list">
@@ -282,6 +293,23 @@
         </ul>
       </section>
     </main>
+
+    <!--
+      Ruler readout + driver (ticket 102). Fixed overlay in the outer
+      right-edge lane: 0–100 ticks, blue progress, draggable thumb with the
+      page-depth readout. The thumb is the slider (keys handled by the scroll
+      driver); `0`/`100`/digits are chrome, aria-hidden.
+    -->
+    <div class="ruler" data-ruler>
+      <span class="ruler__bound" aria-hidden="true">0</span>
+      <div class="ruler__track" data-ruler-track>
+        <div class="ruler__progress" data-ruler-progress></div>
+        <div class="ruler__thumb" data-ruler-thumb role="slider" tabindex="0" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-i18n-attr="aria-label=ruler.aria" aria-label="">
+          <span class="ruler__readout" data-ruler-readout aria-hidden="true"></span>
+        </div>
+      </div>
+      <span class="ruler__bound" aria-hidden="true">100</span>
+    </div>
 
     <!-- Vendor classic scripts (UMD globals), deferred; then the module entry. -->
     <script defer src="vendor/gsap-3.15.0.min.js"></script>

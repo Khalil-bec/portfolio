@@ -14,6 +14,15 @@
 html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
+  /* Ruler replaces native scroll (ticket 102): the native bar is hidden in
+   * every mode, so the ruler is the only readout. Accepted limitation: with
+   * JS disabled the ruler driver is inert and the page cannot scroll — the
+   * noscript notice below says so instead of failing silently. */
+  scrollbar-width: none;
+}
+
+html::-webkit-scrollbar {
+  display: none;
 }
 
 /* Lenis adds `lenis` to <html> when it is active; at that point it owns the
@@ -119,6 +128,22 @@ code {
   border: var(--border-width) solid var(--color-border);
   border-radius: var(--radius-lg);
   background-color: var(--color-surface);
+}
+
+/* Static no-JS scroll notice (ticket 102, sanctioned chrome): an in-flow banner
+ * at the top of the page. Both language lines are inline by necessity — no
+ * dictionary exists without JS. */
+.noscript-notice {
+  margin: 0;
+  padding: var(--space-sm) var(--container-pad);
+  border-block-end: var(--border-width) solid var(--color-border);
+  background-color: var(--color-surface);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.noscript-notice__line {
+  display: block;
 }
 
 /* Visually hidden but read by assistive tech (e.g. the new-tab announcement). */

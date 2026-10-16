@@ -18,6 +18,9 @@
   "a11y": {
     "newTab": "opens in new tab"
   },
+  "ruler": {
+    "aria": "Scroll position"
+  },
   "hero": {
     "name": "Mohamed Khalil BECHEIKH",
     "tagline": "**DevOps & Infrastructure** — Computer science student, equally fascinated by systems and applications.",

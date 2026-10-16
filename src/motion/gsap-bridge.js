@@ -15,11 +15,13 @@
 /**
  * Minimal frame loop used only if the vendor globals are missing. Lenis
  * preventDefaults wheel/touch scroll while it is active, so it must be driven
- * even when GSAP failed to load — otherwise the page would freeze.
+ * even when GSAP failed to load — otherwise the page would freeze. The
+ * scroll-driver chrome frame (ruler sync) rides the same loop.
  */
-function driveLenis(lenis) {
+function driveLenis(lenis, onFrame) {
   const step = (time) => {
     lenis.raf(time);
+    if (onFrame) onFrame();
     requestAnimationFrame(step);
   };
   requestAnimationFrame(step);
@@ -32,8 +34,12 @@ function driveLenis(lenis) {
  * under reduced motion / when the vendor globals are absent. In the latter case
  * Lenis is still driven by a fallback rAF and no animation is set up, so the
  * page stays static but scrollable and readable.
+ *
+ * `onFrame` (ticket 102) is the scroll-driver chrome callback (ruler sync).
+ * It rides whichever loop is active — the GSAP ticker or the fallback rAF —
+ * so chrome updates never add a loop of their own.
  */
-export function initGsapBridge(lenis, reducedMotion) {
+export function initGsapBridge(lenis, reducedMotion, onFrame) {
   if (reducedMotion) {
     return null;
   }
@@ -42,7 +48,7 @@ export function initGsapBridge(lenis, reducedMotion) {
   const ScrollTrigger = window.ScrollTrigger;
 
   if (!gsap || !ScrollTrigger) {
-    if (lenis) driveLenis(lenis);
+    if (lenis) driveLenis(lenis, onFrame);
     return null;
   }
 
@@ -50,7 +56,10 @@ export function initGsapBridge(lenis, reducedMotion) {
 
   if (lenis) {
     lenis.on("scroll", ScrollTrigger.update);
-    gsap.ticker.add((time) => lenis.raf(time * 1000));
+    gsap.ticker.add((time) => {
+      lenis.raf(time * 1000);
+      if (onFrame) onFrame();
+    });
     gsap.ticker.lagSmoothing(0);
   }
 

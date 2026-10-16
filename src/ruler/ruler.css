@@ -1,0 +1,87 @@
+/*
+ * Ruler readout + driver chrome (ticket 102).
+ *
+ * Fixed overlay in the outer right-edge lane (`--lane-ruler`): 0–100 ticks, a
+ * blue progress line, and a draggable thumb carrying the page-depth readout.
+ * Under reduced motion there is no animation anywhere here — the driver just
+ * repaints positions. Design tokens only, consumed through var() (repo rule);
+ * gradient stops reuse the border tokens with percentage spacing.
+ */
+
+.ruler {
+  position: fixed;
+  inset-block: 0;
+  inset-inline-end: 0;
+  z-index: var(--z-ruler);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  inline-size: var(--lane-ruler);
+  border-inline-start: var(--border-width) solid var(--color-border);
+}
+
+/* 0 / 100 bounds: digits are chrome, aria-hidden in the markup. */
+.ruler__bound {
+  padding-block: var(--space-2xs);
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-subtle);
+}
+
+.ruler__track {
+  position: relative;
+  flex: 1 1 auto;
+  margin-inline: auto;
+  inline-size: var(--space-sm);
+  /* Minor ticks every 1% of the track, major ticks every 10%. */
+  background:
+    repeating-linear-gradient(to bottom, var(--color-border-strong) 0 var(--border-width), transparent var(--border-width) 10%),
+    repeating-linear-gradient(to bottom, var(--color-border) 0 var(--border-width), transparent var(--border-width) 1%);
+}
+
+/* Blue progress line riding the track (the inspiration's blue, in our tokens). */
+.ruler__progress {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 50%;
+  inline-size: var(--border-width);
+  block-size: 0;
+  transform: translateX(-50%);
+  background-color: var(--color-focus);
+}
+
+/* Thumb: full-lane handle, the slider. `touch-action: none` lets pointer drags
+ * drive scroll from the thumb; touch anywhere else still scrolls natively. */
+.ruler__thumb {
+  position: absolute;
+  /* The thumb is positioned against the narrow track but spans the full lane
+   * so it is easy to grab; the negative inset bridges the width difference. */
+  inset-inline: calc((var(--space-sm) - var(--lane-ruler)) / 2);
+  block-size: fit-content;
+  padding-block: var(--space-xs);
+  border-block: var(--border-width) solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.ruler__thumb:active {
+  cursor: grabbing;
+}
+
+/* Vertical readout at the thumb (`EN 42%` / `FR 42 %` — spec §Data format). */
+.ruler__readout {
+  display: block;
+  inline-size: fit-content;
+  margin-inline: auto;
+  writing-mode: vertical-rl;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  letter-spacing: var(--letter-spacing-wide);
+  white-space: nowrap;
+  color: var(--color-text-muted);
+}

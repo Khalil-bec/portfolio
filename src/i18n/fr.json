@@ -18,6 +18,9 @@
   "a11y": {
     "newTab": "ouvre dans un nouvel onglet"
   },
+  "ruler": {
+    "aria": "Position de défilement"
+  },
   "hero": {
     "name": "Mohamed Khalil BECHEIKH",
     "tagline": "**DevOps & Infrastructure** — Étudiant en L3 informatique, passionné par les systèmes autant que par les applications.",
