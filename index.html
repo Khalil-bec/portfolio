@@ -14,6 +14,12 @@
          never localhost). TODO(host): add og:url + absolute og:image. -->
     <link rel="icon" href="favicon.svg" type="image/svg+xml" sizes="any" />
     <link rel="alternate icon" href="favicon.ico" type="image/x-icon" sizes="16x16 32x32 48x48 64x64" />
+    <!-- Preload both dictionaries (ticket 104): the hero text — the LCP
+         element — cannot paint before they arrive, so fetch them in parallel
+         with the parse instead of after module evaluation. Static, local,
+         no build step. -->
+    <link rel="preload" href="src/i18n/en.json" as="fetch" type="application/json" crossorigin="anonymous" />
+    <link rel="preload" href="src/i18n/fr.json" as="fetch" type="application/json" crossorigin="anonymous" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Mohamed Khalil Becheikh" />
     <meta property="og:image" content="og-image.png" />

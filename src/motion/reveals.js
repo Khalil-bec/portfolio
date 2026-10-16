@@ -73,7 +73,9 @@ export function initReveals(gsap, ScrollTrigger) {
   // focus there does not also scroll it into ScrollTrigger's range.
   document.addEventListener("focusin", (event) => {
     const row = event.target instanceof Element ? event.target.closest(REVEAL_SELECTOR) : null;
-    if (row) gsap.set(row, REVEALED);
+    // Spread: GSAP mutates its vars object (adds duration/ease), which throws
+    // on the frozen shared REVEALED (ticket 104 — the deferred 007 minor).
+    if (row) gsap.set(row, { ...REVEALED });
   });
 }
 
