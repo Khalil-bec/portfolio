@@ -21,6 +21,9 @@
   "ruler": {
     "aria": "Position de défilement"
   },
+  "rail": {
+    "aria": "Navigation des sections"
+  },
   "hero": {
     "name": "Mohamed Khalil BECHEIKH",
     "tagline": "**DevOps & Infrastructure** — Étudiant en L3 informatique, passionné par les systèmes autant que par les applications.",

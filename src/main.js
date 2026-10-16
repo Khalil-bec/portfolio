@@ -17,6 +17,7 @@ import { initScrollDriver } from "./motion/scroll-driver.js";
 import { initReveals } from "./motion/reveals.js";
 import { initTicker } from "./motion/ticker.js";
 import { initRuler } from "./ruler/ruler.js";
+import { initRail } from "./rail/rail.js";
 import { initI18n } from "./i18n/i18n.js";
 import { initNav } from "./nav/nav.js";
 
@@ -42,4 +43,5 @@ if (motion) {
 
 initTicker(reducedMotion);
 initRuler(driver);
+initRail();
 initNav();

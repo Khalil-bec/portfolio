@@ -126,7 +126,7 @@
    * rail (103) inside it. Body padding (base.css) holds content clear of both;
    * under 768px the rail collapses to icon mode (narrow lane). */
   --lane-ruler: 1.75rem;
-  --lane-rail: 6rem;
+  --lane-rail: 7.5rem; /* fits the longest label (PROJECTS / COMPÉTENCES) untruncated */
   --lane-rail-narrow: 2rem;
 
   /* Accessibility helper: size of a visually-hidden element. */

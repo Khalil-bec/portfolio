@@ -1,0 +1,71 @@
+/*
+ * Side rail chrome (ticket 103).
+ *
+ * Fixed overlay in the inner right-edge lane (`--lane-rail`), between the
+ * content and the ruler: a persistent vertical stack of the five section
+ * links. The current section reads accent via `aria-current`. Under 768px the
+ * lane collapses to icon mode (drawn dots; labels kept for assistive tech at
+ * font-size 0). Design tokens only, consumed through var() (repo rule).
+ */
+
+.rail {
+  position: fixed;
+  inset-block: 0;
+  inset-inline-end: var(--lane-ruler);
+  z-index: var(--z-rail);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-md);
+  inline-size: var(--lane-rail);
+  padding-inline: var(--space-xs);
+  border-inline-start: var(--border-width) solid var(--color-border);
+}
+
+.rail__link {
+  display: block;
+  padding-block: var(--space-2xs);
+  overflow: hidden;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  text-transform: uppercase;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--color-text-muted);
+}
+
+.rail__link[aria-current="true"] {
+  color: var(--color-accent);
+}
+
+/* Narrow exception (ticket 100/103): icon mode shares the 375px edge with the
+ * ruler without overlap. 768px is a media-condition literal — CSS variables
+ * cannot appear there; the lane width stays a token. */
+@media (max-width: 768px) {
+  .rail {
+    align-items: center;
+    gap: var(--space-sm);
+    inline-size: var(--lane-rail-narrow);
+    padding-inline: 0;
+  }
+
+  /* The label text stays in the accessibility tree (font-size 0 keeps it
+   * announced); sighted users get a drawn dot per stop. The zero is a
+   * functional hiding value, not a type-scale choice (same standing as the
+   * sanctioned 768px media literal — no token). */
+  .rail__link {
+    min-inline-size: var(--space-lg);
+    padding-block: var(--space-sm);
+    font-size: 0;
+  }
+
+  .rail__link::before {
+    content: "";
+    display: block;
+    inline-size: var(--dot-size);
+    block-size: var(--dot-size);
+    margin-inline: auto;
+    border-radius: var(--radius-pill);
+    background-color: currentColor;
+  }
+}
