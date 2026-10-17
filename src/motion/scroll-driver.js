@@ -55,18 +55,6 @@ export function initScrollDriver({ lenis, reducedMotion }) {
     scrollToY(window.scrollY + dy, options);
   }
 
-  /** 0–1 page-depth ratio from live layout (0 when the page does not scroll). */
-  function ratio() {
-    const max = maxScroll();
-    if (max <= 0) return 0;
-    return Math.min(Math.max(window.scrollY / max, 0), 1);
-  }
-
-  /** Integer percent for the readout and `aria-valuenow`. */
-  function percent() {
-    return Math.round(ratio() * 100);
-  }
-
   /**
    * Readout pieces in the spec format: `EN 42%` / `FR 42 %` (non-breaking space
    * before `%` in French). The language tag is read from the dict-bound
@@ -84,18 +72,33 @@ export function initScrollDriver({ lenis, reducedMotion }) {
     return bound || (french ? "FR" : "EN");
   }
 
-  function readoutParts() {
+  function readoutParts(depth) {
     const french = document.documentElement.lang === "fr";
     const separator = french ? "\u00a0" : ""; // non-breaking space before % in French
-    const depth = percent();
+    const value = Math.round(depth * 100);
     const tag = langTag(french);
-    return { french, tag, percent: depth, text: `${tag} ${depth}${separator}%` };
+    return { french, tag, percent: value, text: `${tag} ${value}${separator}%` };
   }
 
-  /** Push the current position into the ruler view (no-op before it mounts). */
+  /**
+   * Push the current position into the ruler view (no-op before it mounts).
+   * One read of `scrollY` per frame feeds every derived value, so the ruler's
+   * document-space scale (ticket 110) translates by exactly the position the
+   * readout was computed from — two reads could land a frame apart and show as
+   * jitter between the scale and the handle. `pageHeight` is the height of the
+   * document the scale is measured against.
+   */
   function frame() {
     if (!view) return;
-    view.render({ ratio: ratio(), ...readoutParts() });
+    const max = maxScroll();
+    const scrollY = window.scrollY;
+    const depth = max > 0 ? Math.min(Math.max(scrollY / max, 0), 1) : 0;
+    view.render({
+      ratio: depth,
+      scrollY,
+      pageHeight: max + window.innerHeight,
+      ...readoutParts(depth),
+    });
   }
 
   /** Minimal rAF loop for the no-Lenis modes (reduced motion / load failure). */
@@ -166,8 +169,6 @@ export function initScrollDriver({ lenis, reducedMotion }) {
     scrollToY,
     scrollBy,
     maxScroll,
-    ratio,
-    percent,
     frame,
     startLoop,
     /** The ruler view registers here so `frame()` can render into it. */

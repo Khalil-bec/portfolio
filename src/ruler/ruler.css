@@ -1,12 +1,16 @@
 /*
- * Ruler readout + driver chrome (ticket 102).
+ * Ruler: document-space scale + readout + driver chrome (tickets 102, 109, 110).
  *
- * Fixed overlay in the outer right-edge lane (`--lane-ruler`): 0–100 ticks, a
- * blue progress line, and a draggable thumb carrying the page-depth readout
- * (ticket 109 rebuilt it as upright rolling digit drums).
+ * Fixed overlay in the outer right-edge lane (`--lane-ruler`): a scale that is
+ * as tall as the page and slides 1:1 with the scroll past this fixed window
+ * (graduations every 1% of the document, numbered grades every 5%), a blue
+ * position marker riding the handle, and a draggable thumb carrying the
+ * page-depth readout (ticket 109 rebuilt it as upright rolling digit drums).
  * Under reduced motion there is no animation anywhere here — the driver just
- * repaints positions. Design tokens only, consumed through var() (repo rule);
- * gradient stops reuse the border tokens with percentage spacing.
+ * repaints positions, and the scale's slide is position tracking, not a
+ * transition. Design tokens only, consumed through var() (repo rule); the
+ * gradient stops reuse the text/border ramp with the document-percentage
+ * spacing from `--ruler-minor-step` / `--ruler-grade-step`.
  */
 
 .ruler {
@@ -21,34 +25,88 @@
   border-inline-start: var(--border-width) solid var(--color-border);
 }
 
-/* 0 / 100 bounds: digits are chrome, aria-hidden in the markup. */
+/* 0 / 100 bounds: digits are chrome, aria-hidden in the markup. They mark the
+ * slider's range at the window's ends; the scale's own numbers ride the
+ * document (ticket 110). Right-aligned to the grades' column so every number in
+ * the lane shares one edge. */
 .ruler__bound {
   padding-block: var(--space-2xs);
-  text-align: center;
+  padding-inline-end: calc(var(--space-xs) + var(--border-width));
+  text-align: right;
   font-family: var(--font-mono);
   font-size: var(--font-size-xs);
   color: var(--color-text-subtle);
 }
 
+/* Window on the document (ticket 110). The lane IS the fixed window a
+ * page-height scale slides past; `overflow: hidden` is what makes that a
+ * window, and it is also what clips the grades at the document's ends. */
 .ruler__track {
   position: relative;
   flex: 1 1 auto;
-  margin-inline: auto;
-  inline-size: var(--space-sm);
-  /* Minor ticks every 1% of the track, major ticks every 10%. */
-  background:
-    repeating-linear-gradient(to bottom, var(--color-border-strong) 0 var(--border-width), transparent var(--border-width) 10%),
-    repeating-linear-gradient(to bottom, var(--color-border) 0 var(--border-width), transparent var(--border-width) 1%);
+  overflow: hidden;
 }
 
-/* Blue progress line riding the track (the inspiration's blue, in our tokens). */
-.ruler__progress {
+/* The scale layer is the document: as tall as the page, translated by the
+ * scroll position the driver publishes. Both are complete px lengths written by
+ * ruler.js — measurements, not design values (the `--eyebrow-top` pattern) — and
+ * the offset arrives already negated, so CSS reads it straight into
+ * `translateY` and the fallbacks stay unitless. Because the layer's own height
+ * is the page height, the graduation gradient's percentage stops *are* document
+ * positions, so the 1%/5% spacing needs no unit math at all.
+ *
+ * Graduations hang from the lane's right edge in two layers, sized to the tick
+ * length (`--space-2xs` minors, `--space-xs` majors — the inspiration's 2:1
+ * ratio) and confined to it with `background-size` / `no-repeat`, majors drawn
+ * over minors. Colours are the 105/108 ramp in the inspiration's order
+ * (its 0.4/0.8 → our 0.38/0.70). */
+.ruler__scale {
   position: absolute;
   inset-block-start: 0;
-  inset-inline-start: 50%;
-  inline-size: var(--border-width);
-  block-size: 0;
-  transform: translateX(-50%);
+  inset-inline: 0;
+  block-size: var(--page-height, 0);
+  transform: translateY(var(--scale-offset, 0));
+  background-image:
+    repeating-linear-gradient(to bottom, var(--color-text-bright) 0 var(--border-width), transparent var(--border-width) var(--ruler-grade-step)),
+    repeating-linear-gradient(to bottom, var(--color-border-strong) 0 var(--border-width), transparent var(--border-width) var(--ruler-minor-step));
+  background-size: var(--space-xs) 100%, var(--space-2xs) 100%;
+  background-position: right top, right top;
+  background-repeat: no-repeat, no-repeat;
+}
+
+/* Numbered grades (ticket 110): chrome rows every 5% of the document, centred
+ * on their graduation and right-aligned just inboard of the major ticks — the
+ * inspiration's labels sit the same way (right edge 4px from its major's tip;
+ * ours 1px, because 32px of lane has to hold both). `inset-block-start` is a
+ * percentage of the scale layer, i.e. a document position. */
+.ruler__grade {
+  position: absolute;
+  inset-block-start: calc(var(--ruler-grade-index) * var(--ruler-grade-step));
+  inset-inline-end: calc(var(--space-xs) + var(--border-width));
+  transform: translateY(-50%);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-2xs);
+  line-height: var(--line-height-tight);
+  color: var(--color-text-subtle);
+  white-space: nowrap;
+}
+
+/* The grade the handle is sitting on: an opaque band over a number can only
+ * ever show it cut in half, so the number is covered instead of slivered
+ * (ruler.js decides which one from document positions). */
+.ruler__grade.is-covered {
+  visibility: hidden;
+}
+
+/* Position marker (ticket 110): the inspiration's blue is not a progress fill
+ * but a 1px horizontal rule spanning the lane at the readout's top (measured
+ * `[1380, 391, 60, 1]` in `rgb(45, 129, 255)`), so the fill that ticket 102
+ * drew is replaced by that rule. It is positioned with the handle and painted
+ * after it, so it reads as the handle's top edge. */
+.ruler__marker {
+  position: absolute;
+  inset-inline: 0;
+  block-size: var(--border-width);
   background-color: var(--color-focus);
 }
 
@@ -56,9 +114,11 @@
  * drive scroll from the thumb; touch anywhere else still scrolls natively. */
 .ruler__thumb {
   position: absolute;
-  /* The thumb is positioned against the narrow track but spans the full lane
-   * so it is easy to grab; the negative inset bridges the width difference. */
-  inset-inline: calc((var(--space-sm) - var(--lane-ruler)) / 2);
+  /* Since 110 the window spans the lane's content box, so the handle is exactly
+   * that box: full-lane grab area, and the readout's widest row (27.75px in FR)
+   * fits inside it with room instead of overhanging the viewport edge as the
+   * 28px-wide thumb did. */
+  inset-inline: 0;
   block-size: fit-content;
   padding-block: var(--space-xs);
   border-block: var(--border-width) solid var(--color-border-strong);

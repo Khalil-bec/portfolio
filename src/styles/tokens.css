@@ -50,6 +50,15 @@
    * screenshot check); the inspiration's strip step is likewise 2× its font. */
   --font-size-2xs: 0.6rem;
   --ruler-drum-step: 1.2rem;
+
+  /* Ruler scale divisions (ticket 110). These are percentages of the *document*,
+   * not of the lane: the scale layer is as tall as the page and slides past the
+   * fixed window, so 1% / 5% of it are page positions — minors every 1%, a
+   * numbered grade every 5% (the inspiration's 0.4/0.5/0.8 ink ramp, every
+   * 58px/291px on its 5812px page). Shared by the graduation gradient and the
+   * grade rows so the ticks and their numbers cannot drift apart. */
+  --ruler-minor-step: 1%;
+  --ruler-grade-step: 5%;
   --font-size-xs: 0.78rem;
   --font-size-sm: 0.875rem;
   --font-size-base: 1rem;
@@ -163,10 +172,16 @@
   --label-width: 8rem;
 
   /* Edge lanes (ticket 100). The right edge reserves two non-overlapping lanes
-   * for the v2 chrome: the ruler readout/driver (102) outermost, the section
-   * rail (103) inside it. Body padding (base.css) holds content clear of both;
-   * under 768px the rail collapses to icon mode (narrow lane). */
-  --lane-ruler: 1.75rem;
+   * for the v2 chrome: the ruler readout/driver (102, scale 110) outermost, the
+   * section rail (103) inside it. Body padding (base.css) holds content clear of
+   * both; under 768px the rail collapses to icon mode (narrow lane).
+   * Ruler lane 32px since 110: the scale's numbered grade column needs the
+   * widest grade (`100` = 17.8px at `--font-size-2xs`) plus the 8px major tick
+   * inside the content box — 28px left 0.2px of slack, one fallback-mono advance
+   * away from clipping. The 4px come out of the content column only below 1432px
+   * (above that `--container` caps it); the readout's FR row (27.75px) now sits
+   * inside the thumb with room instead of overhanging the viewport edge. */
+  --lane-ruler: 2rem;
   --lane-rail: 7.5rem; /* fits the longest label (PROJECTS / COMPÉTENCES) untruncated */
   --lane-rail-narrow: 2rem;
 

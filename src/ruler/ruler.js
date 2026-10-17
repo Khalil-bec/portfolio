@@ -1,12 +1,20 @@
 /**
- * Ruler readout + driver (tickets 102, 109).
+ * Ruler: document-space scale + readout (tickets 102, 109, 110).
  *
- * Fixed right-edge overlay in the outer edge lane (width `--lane-ruler`):
- * 0–100 ticks, a blue progress fill, and a draggable thumb carrying the
- * page-depth `%` readout (`EN 42%` / `FR 42 %`). The thumb is a real slider
- * (focusable, arrows/Home/End/PageUp/PageDown, `aria-valuenow` = depth %);
- * the keys themselves are handled globally by the scroll driver
+ * Fixed right-edge overlay in the outer edge lane (width `--lane-ruler`): a
+ * scale that is as tall as the page and slides 1:1 with the scroll past this
+ * fixed window, a blue position marker on the handle, and a draggable thumb
+ * carrying the page-depth `%` readout (`EN 42%` / `FR 42 %`). The thumb is a
+ * real slider (focusable, arrows/Home/End/PageUp/PageDown, `aria-valuenow` =
+ * depth %); the keys themselves are handled globally by the scroll driver
  * (src/motion/scroll-driver.js), so focus stays on the thumb while it moves.
+ *
+ * The scale (ticket 110) is the document itself: the driver publishes the
+ * scroll position and the page height, this view writes them as custom
+ * properties on the ruler, and CSS turns them into the layer's height and its
+ * 1:1 slide — so the graduation gradient's percentage spacing *is* a document
+ * position and the numbered grades ride the page with it. Grades are chrome
+ * `0…100` rows built here, like the `0`/`100` bounds in the markup.
  *
  * The readout (ticket 109) is upright: a dict-sourced language tag over a row
  * of per-place **digit drums** — one clipped one-line window per decimal place
@@ -18,8 +26,8 @@
  *
  * Dragging the thumb (pointer capture) jumps straight to the grabbed depth;
  * touch elsewhere scrolls natively while the ruler stays readout-only.
- * Digits and `%` are chrome, not copy (spec §Data); the slider name comes
- * from the `ruler.aria` dictionary key like any other string.
+ * Digits, grades and `%` are chrome, not copy (spec §Data); the slider name
+ * comes from the `ruler.aria` dictionary key like any other string.
  */
 
 let state = null;
@@ -40,6 +48,31 @@ const DRUMS = [
   { lines: [BLANK, ...DIGITS], index: (depth) => (depth < 10 ? 0 : (Math.floor(depth / 10) % 10) + 1) },
   { lines: DIGITS, index: (depth) => depth % 10 },
 ];
+
+/** Numbered grades of the scale: one every 5% of the document, `0 … 100`.
+ * Chrome, exactly like the `0`/`100` bounds in the markup; the inspiration's
+ * own scale numbers every 5 too. */
+const GRADE_STEP = 5;
+const GRADE_INTERVALS = 100 / GRADE_STEP;
+
+/**
+ * Build the scale's numbered grades once. Each row is positioned by CSS from
+ * its index (`--ruler-grade-index` × `--ruler-grade-step` of the scale layer's
+ * height = a document position), so geometry stays in CSS. Returns the rows so
+ * the render pass can cover the one the handle sits on.
+ */
+function buildScale(scale) {
+  const grades = [];
+  for (let i = 0; i <= GRADE_INTERVALS; i += 1) {
+    const grade = document.createElement("span");
+    grade.className = "ruler__grade";
+    grade.textContent = String(i * GRADE_STEP);
+    grade.style.setProperty("--ruler-grade-index", String(i));
+    scale.append(grade);
+    grades.push(grade);
+  }
+  return grades;
+}
 
 /** Build the tag + drum row inside the readout once; returns the mutable bits. */
 function buildReadout(readout) {
@@ -108,14 +141,31 @@ export function initRuler(driver) {
   if (!ruler || !driver) return null;
 
   const track = ruler.querySelector("[data-ruler-track]");
-  const progress = ruler.querySelector("[data-ruler-progress]");
+  const scale = ruler.querySelector("[data-ruler-scale]");
+  const marker = ruler.querySelector("[data-ruler-marker]");
   const thumb = ruler.querySelector("[data-ruler-thumb]");
   const readout = ruler.querySelector("[data-ruler-readout]");
-  if (!track || !progress || !thumb || !readout) return null;
+  if (!track || !scale || !marker || !thumb || !readout) return null;
 
+  const grades = buildScale(scale);
   const readoutNodes = buildReadout(readout);
 
-  state = { ruler, track, progress, thumb, readout, readoutNodes, driver, dragging: false, lastText: "" };
+  state = {
+    track,
+    marker,
+    thumb,
+    readout,
+    readoutNodes,
+    driver,
+    dragging: false,
+    lastText: "",
+    // Sentinels: -1 never equals a real page height and null never equals an
+    // offset, so the first frame writes both scale properties; -99 never equals
+    // a grade index.
+    pageHeight: -1,
+    scaleOffset: null,
+    coveredGrade: -99,
+  };
 
   thumb.addEventListener("pointerdown", onPointerDown);
   thumb.addEventListener("pointermove", onPointerMove);
@@ -123,12 +173,52 @@ export function initRuler(driver) {
   thumb.addEventListener("pointercancel", endDrag);
 
   driver.setView({
-    render({ ratio, percent, tag, french, text }) {
+    render({ ratio, percent, tag, french, text, scrollY, pageHeight }) {
+      // Document-space scale (ticket 110): the layer's height is the page and
+      // its slide is the scroll position, so both are written only when they
+      // change — the page height once per resize, the position rounded to whole
+      // pixels so sub-pixel churn cannot re-invalidate style every frame. Like
+      // `--eyebrow-top` they are complete px lengths, unlike the drums' unitless
+      // ordinals, and the offset is published already negated so CSS can read it
+      // straight into `translateY` with no unit math.
+      const docY = Math.round(scrollY);
+      const scaleOffset = -docY;
+      if (pageHeight !== state.pageHeight) {
+        state.pageHeight = pageHeight;
+        ruler.style.setProperty("--page-height", `${pageHeight}px`);
+      }
+      if (scaleOffset !== state.scaleOffset) {
+        state.scaleOffset = scaleOffset;
+        ruler.style.setProperty("--scale-offset", `${scaleOffset}px`);
+      }
+
       const trackHeight = track.clientHeight;
       const thumbHeight = thumb.offsetHeight;
-      const travel = Math.max(0, trackHeight - thumbHeight);
-      progress.style.height = `${ratio * trackHeight}px`;
-      thumb.style.top = `${ratio * travel}px`;
+      const thumbOffset = ratio * Math.max(0, trackHeight - thumbHeight);
+      thumb.style.top = `${thumbOffset}px`;
+      marker.style.top = `${thumbOffset}px`;
+
+      // The handle's band is opaque, so a grade it sits on can only ever show
+      // cut in half — which read as a rendering artefact in the visual pass (a
+      // sliver under the handle at 39.9% depth). Cover that grade instead: at 5%
+      // spacing against a 48px handle it is never more than one row, and the
+      // handle's readout already carries the value — the substitution the
+      // inspiration's readout makes for the label it sits on. Both sides are
+      // document positions, so the test needs no measurement.
+      const gradeGap = pageHeight / GRADE_INTERVALS;
+      const handleCentre = docY + thumbOffset + thumbHeight / 2; // document position under the handle's centre
+      const nearestGrade = Math.round(handleCentre / gradeGap);
+      const coversGrade =
+        nearestGrade >= 0 &&
+        nearestGrade <= GRADE_INTERVALS &&
+        Math.abs(handleCentre - nearestGrade * gradeGap) <= thumbHeight / 2;
+      const covered = coversGrade ? nearestGrade : -1;
+      if (covered !== state.coveredGrade) {
+        if (state.coveredGrade >= 0) grades[state.coveredGrade].classList.remove("is-covered");
+        if (covered >= 0) grades[covered].classList.add("is-covered");
+        state.coveredGrade = covered;
+      }
+
       if (text === state.lastText) return;
       state.lastText = text;
       readoutNodes.tag.textContent = tag;

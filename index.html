@@ -303,20 +303,24 @@
     </main>
 
     <!--
-      Ruler readout + driver (tickets 102, 109). Fixed overlay in the outer
-      right-edge lane: 0–100 ticks, blue progress, draggable thumb with the
-      page-depth readout. The thumb is the slider (keys handled by the scroll
-      driver); `0`/`100`/digits are chrome, aria-hidden. The readout itself —
-      language tag over the rolling digit drums — is built by src/ruler/ruler.js
-      (chrome, not copy), so the span ships empty.
+      Ruler: document-space scale + readout + driver (tickets 102, 109, 110).
+      Fixed overlay in the outer right-edge lane: a scale as tall as the page
+      that slides 1:1 with the scroll past this fixed window (graduations every
+      1% of the document, numbered grades every 5%), a blue position marker, and
+      a draggable thumb carrying the page-depth readout. The thumb is the slider
+      (keys handled by the scroll driver); `0`/`100`, the grades and the digits
+      are chrome, aria-hidden. Both the grades and the readout's rolling digit
+      drums are built by src/ruler/ruler.js (chrome, not copy), so the scale and
+      the readout ship empty.
     -->
     <div class="ruler" data-ruler>
       <span class="ruler__bound" aria-hidden="true">0</span>
       <div class="ruler__track" data-ruler-track>
-        <div class="ruler__progress" data-ruler-progress></div>
+        <div class="ruler__scale" data-ruler-scale aria-hidden="true"></div>
         <div class="ruler__thumb" data-ruler-thumb role="slider" tabindex="0" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-i18n-attr="aria-label=ruler.aria" aria-label="">
           <span class="ruler__readout" data-ruler-readout aria-hidden="true"></span>
         </div>
+        <div class="ruler__marker" data-ruler-marker aria-hidden="true"></div>
       </div>
       <span class="ruler__bound" aria-hidden="true">100</span>
     </div>
