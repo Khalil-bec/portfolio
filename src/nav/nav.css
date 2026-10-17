@@ -1,5 +1,5 @@
 /*
- * Persistent navigation (ticket 004; full-bleed since 105).
+ * Persistent navigation (ticket 004; full-bleed since 105; restyled since 107).
  *
  * Sticky rather than fixed, so the bar occupies its own layout space and needs
  * no body padding hack (no layout shift). Design tokens only, consumed through
@@ -7,8 +7,12 @@
  * width (negative lane margin, so its bottom rule matches the full-bleed
  * section dividers as the table's top edge) while the extra inline padding
  * keeps the link list and switch clear of the rail/ruler lanes exactly as
- * before. On narrow screens the link list wraps onto extra lines so
- * every label stays visible; the page never overflows horizontally.
+ * before. Since ticket 107 the bar matches the inspiration's chrome: ~48px
+ * tall, a translucent blurred band (same band formula as the 106 brows), mono
+ * uppercase link labels, and links that draw an inverted box on hover. On
+ * narrow screens the link list wraps onto extra lines so every label stays
+ * visible; the page never overflows horizontally. --eyebrow-top re-syncs to
+ * whatever height this reflows into (src/motion/eyebrows.js).
  */
 
 .nav {
@@ -19,10 +23,12 @@
   align-items: center;
   gap: var(--space-md);
   margin-inline-end: calc(var(--lane-total) * -1);
-  padding-block: var(--space-sm);
+  padding-block: var(--space-2xs);
   padding-inline: var(--container-pad);
   padding-inline-end: calc(var(--container-pad) + var(--lane-total));
-  background-color: var(--color-bg);
+  background-color: var(--overlay-bg);
+  -webkit-backdrop-filter: blur(var(--blur-radius));
+  backdrop-filter: blur(var(--blur-radius));
   border-block-end: var(--border-width) solid var(--color-border);
 }
 
@@ -33,14 +39,29 @@
   gap: var(--space-xs) var(--space-md);
 }
 
+/* Mono uppercase labels (ticket 107), matching the brow bars and micro-labels.
+ * The hover box is drawn with padding + negative margins so the underline-free
+ * label stays exactly where it was — the bar (and the page) never shifts. */
 .nav__link {
-  font-size: var(--font-size-sm);
+  padding: var(--space-2xs) var(--space-sm);
+  margin: calc(var(--space-2xs) * -1) calc(var(--space-sm) * -1);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
   color: var(--color-text-muted);
-  transition: color var(--duration-fast) var(--ease-standard);
+  transition: color var(--duration-fast) var(--ease-standard),
+    background-color var(--duration-fast) var(--ease-standard);
 }
 
-.nav__link:hover {
-  color: var(--color-text);
+/* One combined state block: box AND text flip together, so keyboard focus
+ * gets the same readable inverted box as hover (splitting them would leave
+ * muted text composited on the white box — invisible). */
+.nav__link:hover,
+.nav__link:focus-visible {
+  color: var(--color-accent-contrast);
+  background-color: var(--color-accent);
 }
 
 .lang-switch {

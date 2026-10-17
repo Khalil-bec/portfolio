@@ -66,14 +66,14 @@
   --line-height-display: 1.05;
   --letter-spacing-display: -0.03em;
 
-  /* Sticky eyebrow bars (ticket 106): the rebuilt `.section__index` pinned
-   * flush under the nav. `--eyebrow-top` is the no-JS fallback; eyebrows.js
-   * overrides it with the nav's live measured height (it reflows on narrow
-   * screens and on language switches). The translucent band keeps pinned text
-   * readable over scrolled content — 0.85 chosen so muted stays AA even in the
-   * worst case. Punctuation/blur offsets live here per the token rule. */
+  /* Overlay bands (ticket 106 brows + the 107 nav bar share one formula):
+   * translucent warm-near-black so pinned/reserved text stays AA over scrolled
+   * content (0.85 chosen analytically; inspo's ~0.6 composites below 4.5:1 on
+   * white content). `--eyebrow-top` is the no-JS fallback; eyebrows.js
+   * overrides it with the nav's live measured height. Blur radius and the
+   * drawn `/` live here per the token rule. */
   --eyebrow-top: 4rem;
-  --eyebrow-bg: rgba(18, 19, 22, 0.85);
+  --overlay-bg: rgba(18, 19, 22, 0.85);
   --blur-radius: 8px;
 
   /* Link hover underline offset (ticket 105): monochrome hover feedback on
