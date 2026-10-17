@@ -26,9 +26,9 @@ main {
  * so no JS animation and reduced motion is unaffected). The band spans the
  * cell border-to-border via negative margins; its bottom border continues the
  * numbered-header look (the old ::after full rule is retired — one hairline,
- * no doubling). Zero new copy: the name reuses existing keys (double-binding,
- * like the rail), and the bar stays aria-hidden because the real heading below
- * carries the semantics. */
+ * no doubling). Zero new copy: the name reuses existing keys (double-binding
+ * semantics stay intact), and the bar stays aria-hidden because the real
+ * heading below carries the semantics. */
 .section__index {
   position: sticky;
   inset-block-start: var(--eyebrow-top);
@@ -101,10 +101,12 @@ main {
  * only top edge), and the band's own bottom border is the divider above
  * projects. Single hairlines, no doubling (review fix). */
 .ticker {
-  margin-inline-end: calc(var(--lane-total) * -1);
+  /* Since 112 the band needs no lane margin: it is a direct child of <main>
+   * and the body carries no reservation, so it spans the viewport naturally
+   * (bare viewport width, no overflow) and the lane-correction machinery dies
+   * with the reservation. */
   padding-block: var(--space-sm);
   padding-inline: var(--container-pad);
-  padding-inline-end: calc(var(--container-pad) + var(--lane-total));
   border-block-end: var(--border-width) solid var(--color-border);
   font-size: var(--font-size-sm);
   letter-spacing: var(--letter-spacing-wide);
@@ -120,8 +122,9 @@ main {
 
 /* Live marquee: in-flow band under the hero (ticket 101), constant-speed CSS
  * keyframes. Marquee items never wrap, so the band is always a single line.
- * Full-bleed geometry (lane margin + padded text) comes from the base .ticker
- * rule since ticket 105; only the surface fill and clipping are live-only. */
+ * Full-bleed geometry comes from the base .ticker rule (viewport-wide since
+ * the reservation's retirement, 112); only the surface fill and clipping are
+ * live-only. */
 .ticker--live {
   display: flex;
   align-items: center;

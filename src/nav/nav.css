@@ -1,18 +1,18 @@
 /*
- * Persistent navigation (ticket 004; full-bleed since 105; restyled since 107).
+ * Persistent navigation (ticket 004; full-bleed since 105; restyled since 107;
+ * plain viewport-width since 112 — the lane reservation that the negative
+ * margin and the compounded padding used to cancel is gone, so the bar simply
+ * runs the full width).
  *
  * Sticky rather than fixed, so the bar occupies its own layout space and needs
- * no body padding hack (no layout shift). Design tokens only, consumed through
- * var() (repo rule). Since ticket 105 the bar itself runs the full viewport
- * width (negative lane margin, so its bottom rule matches the full-bleed
- * section dividers as the table's top edge) while the extra inline padding
- * keeps the link list and switch clear of the rail/ruler lanes exactly as
- * before. Since ticket 107 the bar matches the inspiration's chrome: ~48px
- * tall, a translucent blurred band (same band formula as the 106 brows), mono
- * uppercase link labels, and links that draw an inverted box on hover. On
- * narrow screens the link list wraps onto extra lines so every label stays
- * visible; the page never overflows horizontally. --eyebrow-top re-syncs to
- * whatever height this reflows into (src/motion/eyebrows.js).
+ * no body padding hack (no layout shift). Design tokens only, consumed
+ * through var() (repo rule). Since ticket 107 the bar matches the
+ * inspiration's chrome: ~48px tall, a translucent blurred band (same band
+ * formula as the 106 brows), mono uppercase link labels, and links that draw
+ * an inverted box on hover. On narrow screens the link list wraps onto extra
+ * lines so every label stays visible; the page never overflows horizontally.
+ * --eyebrow-top re-syncs to whatever height this reflows into
+ * (src/motion/eyebrows.js).
  */
 
 .nav {
@@ -22,10 +22,8 @@
   display: flex;
   align-items: center;
   gap: var(--space-md);
-  margin-inline-end: calc(var(--lane-total) * -1);
   padding-block: var(--space-2xs);
   padding-inline: var(--container-pad);
-  padding-inline-end: calc(var(--container-pad) + var(--lane-total));
   background-color: var(--overlay-bg);
   -webkit-backdrop-filter: blur(var(--blur-radius));
   backdrop-filter: blur(var(--blur-radius));

@@ -34,7 +34,9 @@
       Stylesheet order (load order): lenis (vendor utility) -> tokens -> base ->
       nav (ticket 004) -> section css (document order, hero -> contact) ->
       motion (numbering, reveal, ticker shell from ticket 003) ->
-      ruler (fixed overlay, ticket 102) -> rail (section jumps, ticket 103).
+      ruler (fixed overlay, ticket 102). The rail that followed (tickets
+      103/108) was retired in ticket 112 — the section list it duplicated is
+      carried by the nav's mono links until the fixed name layer (114).
       The vendor sheet
       only styles Lenis' own hooks; it does not compete with the tokens.
 
@@ -56,7 +58,6 @@
     <link rel="stylesheet" href="src/sections/contact/contact.css" />
     <link rel="stylesheet" href="src/styles/motion.css" />
     <link rel="stylesheet" href="src/ruler/ruler.css" />
-    <link rel="stylesheet" href="src/rail/rail.css" />
   </head>
   <body>
     <!-- Static no-JS notice (ticket 102, sanctioned chrome): the ruler driver
@@ -324,21 +325,6 @@
       </div>
       <span class="ruler__bound" aria-hidden="true">100</span>
     </div>
-
-    <!--
-      Side rail (ticket 103). Fixed stack in the inner right-edge lane,
-      mirroring the nav anchors. Labels reuse the nav keys (zero new copy);
-      the landmark name comes from the sanctioned `rail.aria` key. Jumps ride
-      the existing anchor machinery (Lenis + focus moves); the current section
-      is marked with `aria-current` by src/rail/rail.js.
-    -->
-    <nav class="rail" data-rail data-i18n-attr="aria-label=rail.aria" aria-label="">
-      <a class="rail__link" href="#hero" data-i18n="nav.hero"></a>
-      <a class="rail__link" href="#projects" data-i18n="nav.projects"></a>
-      <a class="rail__link" href="#skills" data-i18n="nav.skills"></a>
-      <a class="rail__link" href="#education" data-i18n="nav.education"></a>
-      <a class="rail__link" href="#contact" data-i18n="nav.contact"></a>
-    </nav>
 
     <!-- Vendor classic scripts (UMD globals), deferred; then the module entry. -->
     <script defer src="vendor/gsap-3.15.0.min.js"></script>

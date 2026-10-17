@@ -41,12 +41,10 @@ body {
   line-height: var(--line-height-base);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  /* Edge-lane reservation (ticket 100, consumed via --lane-total since 105):
-   * the right edge holds two fixed lanes (rail inside, ruler outside; widths in
-   * tokens.css). The padding keeps every in-flow element clear of both. The
-   * fixed overlays themselves land in 102/103, which re-verify the guarantee
-   * with real chrome in the lanes. */
-  padding-inline-end: var(--lane-total);
+  /* Ticket 112: the edge-lane reservation is gone (ticket 100/105 previously
+   * padded the body by the lanes' combined width). The column is now a centred
+   * container and the fixed overlays land in the gutter on top, matching the
+   * inspiration's model; the anchor framing lives on each `.section` below. */
 }
 
 h1,
@@ -112,18 +110,19 @@ code {
   border-inline: var(--border-width) solid var(--color-border);
 }
 
-/* Full-bleed horizontal divider (ticket 105): the cell's bottom rule spans the
- * whole viewport instead of the column, passing under the rail/ruler overlays
- * (higher z-index) like the inspiration's table rules. Centered at viewport
- * midpoint — the column is centred inside the lane-padded content box, so half
- * the lane total shifts the line back to true centre; its right edge lands
- * exactly on the viewport edge in both lane modes (no overflow). Decorative,
- * replaces the former border-block-end. */
+/* Full-bleed horizontal divider (ticket 105; true-centre since 112 — the body
+ * no longer carries the lane reservation that used to offset the column, so no
+ * correction is needed): the cell's bottom rule spans the whole viewport
+ * instead of the column, passing under the ruler overlay (higher z-index) like
+ * the inspiration's table rules. Centered at the viewport midpoint — the column
+ * is centred in the plain viewport, so 50% is the line's midpoint too. The
+ * right edge lands exactly on the viewport edge in both modes (no overflow).
+ * Decorative, replaces the former border-block-end. */
 .section::after {
   content: "";
   position: absolute;
   inset-block-end: 0;
-  inset-inline-start: calc(50% + var(--lane-total) / 2);
+  inset-inline-start: 50%;
   inline-size: var(--bleed-width);
   border-block-start: var(--border-width) solid var(--color-border);
   transform: translateX(-50%);
@@ -180,9 +179,10 @@ code {
   border: 0;
 }
 
-/* The 768px lane collapse (ticket 100) now lives entirely in tokens.css: the
- * media override re-points --lane-total, and the single body rule above
- * consumes it in both modes. */
+/* The narrow-mode switches (ticket 111's `--eyebrow-meta-display`) now live
+ * only in tokens.css, which owns the 768px condition since 112 retired the
+ * lane re-point (the geometry needs no narrow query — the centred column is
+ * the same model at every width). */
 
 /* CSS-level motion kill-switch, independent of the JS one wired in ticket 002. */
 @media (prefers-reduced-motion: reduce) {

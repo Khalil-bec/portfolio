@@ -19,7 +19,8 @@
 
   /* Colour — text (ink is warm off-white; muted/subtle are ink alphas,
    * AA-checked on --color-bg with alpha compositing: bright ~8.4:1, muted
-   * ~6.5:1, subtle ~5.6:1). The rail's three states (ticket 108) read the ramp
+   * ~6.5:1, subtle ~5.6:1). The ruler's settled/current states (tickets
+   * 108's ramp, now carried by 110's grades and 109's readout) read
    * downwards — settled bright, current ink, undiscovered subtle; a further
    * step *below* subtle would composite at ~4.8:1, i.e. back to the marginal
    * value ticket 007 raised, so the ramp stops here. */
@@ -101,7 +102,7 @@
    * no-JS page keeps it (the narrow-mode query at the end of this file hides it
    * without any scripting). Its longest candidate value — education's
    * "Expected graduation: Summer 2027", 32 characters / 279px measured — needs
-   * more room than a 375px cell offers, so it goes with the rail's collapse at
+   * more room than a 375px cell offers, so it goes with the collapsed edge at
    * the same 768px boundary. The value is a display keyword rather than a length
    * because a media condition cannot read a custom property: the switch has to
    * live where that condition is already written, which is this file. */
@@ -159,13 +160,14 @@
   /* Layout */
   --measure: 68ch;
   --container-max: 80rem; /* 1280px — the inspiration's column width (ticket 105) */
-  --container-pad: clamp(1.25rem, 4vw, 4rem);
+  --container-pad: 2rem; /* flat: the inspiration's measured 32px at every width (112) */
   --section-gap: clamp(3.5rem, 7vw, 5rem); /* capped at 5rem (was 9rem) — ticket 105 */
   --section-min-height: 50svh;
   --hero-min-height: 100svh;
 
-  /* Full-bleed divider width (ticket 105): viewport-wide rule drawn by the
-   * section dividers (base.css), passing under the edge-lane overlays. */
+  /* Full-bleed divider width (ticket 105; the edge overlays — the ruler since
+   * 112 — sit under nothing: the rule passes beneath them). Section dividers
+   * (base.css) draw it; --lane-total's other consumers are gone. */
   --bleed-width: 100vw;
 
   /* Reserved media slots (ticket 005). Fixed aspect ratio + width so an empty
@@ -180,25 +182,21 @@
   /* Label + value rows (Contact; project Stack/Why): aligned label column. */
   --label-width: 8rem;
 
-  /* Edge lanes (ticket 100). The right edge reserves two non-overlapping lanes
-   * for the v2 chrome: the ruler readout/driver (102, scale 110) outermost, the
-   * section rail (103) inside it. Body padding (base.css) holds content clear of
-   * both; under 768px the rail collapses to icon mode (narrow lane).
-   * Ruler lane 32px since 110: the scale's numbered grade column needs the
-   * widest grade (`100` = 17.8px at `--font-size-2xs`) plus the 8px major tick
-   * inside the content box — 28px left 0.2px of slack, one fallback-mono advance
-   * away from clipping. The 4px come out of the content column only below 1432px
-   * (above that `--container` caps it); the readout's FR row (27.75px) now sits
-   * inside the thumb with room instead of overhanging the viewport edge. */
+  /* Edge chrome (ticket 112: the reservation is gone). The right edge holds
+   * ONE fixed lane, the ruler's (102, scale 110; 32px wide since 110 — the
+   * scale's numbered grade column needs the widest grade (`100` = 17.8px at
+   * `--font-size-2xs`) plus the 8px major tick inside the content box — 28px
+   * left 0.2px of slack). Nothing reserves layout width any more: the column
+   * is a centred container and the lane overlays the right gutter exactly as
+   * the inspiration's does — the 2rem body padding plus the 1px frame border
+   * (33px) always exceed the 2rem lane when a frame is full-width, and above
+   * 1280px the gutter is 80px wider. The inspiration's own right band is not a
+   * persistent label list (its section list is the fixed name layer, v2
+   * ticket 114), so our 103/108 rail was retired with the reservation; the
+   * ruler survives at narrow widths because it is our only scroll readout
+   * (102: the native bar is hidden in every mode) and it rides the padding
+   * gutter for free. */
   --lane-ruler: 2rem;
-  --lane-rail: 7.5rem; /* fits the longest label (PROJECTS / COMPÉTENCES) untruncated */
-  --lane-rail-narrow: 2rem;
-
-  /* Combined edge-lane reservation (ticket 105). Single source for the three
-   * full-bleed consumers (section dividers, nav, ticker) and for body padding;
-   * the 768px override below swaps it to the collapsed-rail value so the
-   * breakpoints stay token-owned. */
-  --lane-total: calc(var(--lane-ruler) + var(--lane-rail));
 
   /* Accessibility helper: size of a visually-hidden element. */
   --visually-hidden-size: 1px;
@@ -207,20 +205,20 @@
   --z-base: 1;
   --z-eyebrow: 10; /* sticky brow: above flowing content, below the nav (100) */
   --z-nav: 100;
-  --z-rail: 150;
   --z-ruler: 160;
 }
 
 /* Narrow mode (ticket 105/111): the switches that ride the collapsed-rail
  * breakpoint live here, because a CSS variable cannot be swapped inside a media
  * query any other way and this file is where the 768px condition is already
- * written (rail.css carries the matching rules for the rail itself). Same
- * literal as base.css's body-padding exception. */
+ * written (it gates the rail-icon collapse there, retired with the rail in
+ * ticket 112). The 112 geometry change needs no narrow switch of its own: the
+ * centred column is the same model at every width, and the ruler overlays the
+ * padding gutter at 375 exactly as it does in the gutter above. */
 @media (max-width: 768px) {
   :root {
-    --lane-total: calc(var(--lane-ruler) + var(--lane-rail-narrow));
-    /* The eyebrow's right meta goes with the rail (ticket 111): one narrow
-     * moment, one boundary. */
+    /* The eyebrow's right meta goes with the collapsed edge (ticket 111): one
+     * narrow moment, one boundary. */
     --eyebrow-meta-display: none;
   }
 }
