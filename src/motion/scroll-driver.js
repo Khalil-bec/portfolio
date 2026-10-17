@@ -68,11 +68,15 @@ export function initScrollDriver({ lenis, reducedMotion }) {
   }
 
   /**
-   * Readout text in the spec format: `EN 42%` / `FR 42 %` (non-breaking space
+   * Readout pieces in the spec format: `EN 42%` / `FR 42 %` (non-breaking space
    * before `%` in French). The language tag is read from the dict-bound
    * language-switch buttons (the `lang.en` / `lang.fr` keys), so no copy lives
    * here — it follows the dictionaries live. Digits and `%` are chrome
    * (spec §Data, same sanction as `a11y.newTab`).
+   *
+   * `text` is the canonical formatted string (the slider's `aria-valuetext`);
+   * the view gets the pieces too (ticket 109) because the visual readout is
+   * per-place digit drums and cannot parse the format back apart.
    */
   function langTag(french) {
     const code = french ? "fr" : "en";
@@ -80,16 +84,18 @@ export function initScrollDriver({ lenis, reducedMotion }) {
     return bound || (french ? "FR" : "EN");
   }
 
-  function readout() {
+  function readoutParts() {
     const french = document.documentElement.lang === "fr";
     const separator = french ? "\u00a0" : ""; // non-breaking space before % in French
-    return `${langTag(french)} ${percent()}${separator}%`;
+    const depth = percent();
+    const tag = langTag(french);
+    return { french, tag, percent: depth, text: `${tag} ${depth}${separator}%` };
   }
 
   /** Push the current position into the ruler view (no-op before it mounts). */
   function frame() {
     if (!view) return;
-    view.render(ratio(), readout());
+    view.render({ ratio: ratio(), ...readoutParts() });
   }
 
   /** Minimal rAF loop for the no-Lenis modes (reduced motion / load failure). */
@@ -162,7 +168,6 @@ export function initScrollDriver({ lenis, reducedMotion }) {
     maxScroll,
     ratio,
     percent,
-    readout,
     frame,
     startLoop,
     /** The ruler view registers here so `frame()` can render into it. */

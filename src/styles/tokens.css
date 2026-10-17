@@ -41,7 +41,15 @@
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
 
-  /* Typography — sizes */
+  /* Typography — sizes. `2xs` is the ruler readout's micro step (ticket 109):
+   * its value row is three digit drums + `%` inside the 28px lane, which only
+   * fits below the xs size (inspo's own readout digits are 9px). `drum-step` is
+   * one digit cell of that readout's rolling strips: 2 × `2xs`, because a line
+   * box of exactly 1em is *smaller* than the font's content area (~1.16em), so
+   * the next digit's ink bled ~1px into the window at rest (caught in the 3x
+   * screenshot check); the inspiration's strip step is likewise 2× its font. */
+  --font-size-2xs: 0.6rem;
+  --ruler-drum-step: 1.2rem;
   --font-size-xs: 0.78rem;
   --font-size-sm: 0.875rem;
   --font-size-base: 1rem;

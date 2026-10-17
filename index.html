@@ -303,10 +303,12 @@
     </main>
 
     <!--
-      Ruler readout + driver (ticket 102). Fixed overlay in the outer
+      Ruler readout + driver (tickets 102, 109). Fixed overlay in the outer
       right-edge lane: 0–100 ticks, blue progress, draggable thumb with the
       page-depth readout. The thumb is the slider (keys handled by the scroll
-      driver); `0`/`100`/digits are chrome, aria-hidden.
+      driver); `0`/`100`/digits are chrome, aria-hidden. The readout itself —
+      language tag over the rolling digit drums — is built by src/ruler/ruler.js
+      (chrome, not copy), so the span ships empty.
     -->
     <div class="ruler" data-ruler>
       <span class="ruler__bound" aria-hidden="true">0</span>

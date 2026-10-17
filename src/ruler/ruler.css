@@ -2,7 +2,8 @@
  * Ruler readout + driver chrome (ticket 102).
  *
  * Fixed overlay in the outer right-edge lane (`--lane-ruler`): 0–100 ticks, a
- * blue progress line, and a draggable thumb carrying the page-depth readout.
+ * blue progress line, and a draggable thumb carrying the page-depth readout
+ * (ticket 109 rebuilt it as upright rolling digit drums).
  * Under reduced motion there is no animation anywhere here — the driver just
  * repaints positions. Design tokens only, consumed through var() (repo rule);
  * gradient stops reuse the border tokens with percentage spacing.
@@ -73,15 +74,64 @@
   cursor: grabbing;
 }
 
-/* Vertical readout at the thumb (`EN 42%` / `FR 42 %` — spec §Data format). */
+/* Readout (ticket 109): upright, two lines inside the thumb — the dict-sourced
+ * tag over the value row. The value is one **digit drum** per decimal place: a
+ * one-line window (`block-size` = `--ruler-drum-step`) over a strip of chrome
+ * digits whose `transform` rolls the wanted line into the window. This replaces
+ * the tilted `writing-mode: vertical-rl` text that read sideways. */
 .ruler__readout {
-  display: block;
-  inline-size: fit-content;
-  margin-inline: auto;
-  writing-mode: vertical-rl;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   font-family: var(--font-mono);
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-2xs);
+  line-height: var(--line-height-tight);
+  color: var(--color-text-bright);
+}
+
+/* Dict-sourced language tag (EN / FR) — the one part of the readout that is copy. */
+.ruler__tag {
   letter-spacing: var(--letter-spacing-wide);
-  white-space: nowrap;
-  color: var(--color-text-muted);
+  color: var(--color-text-subtle);
+}
+
+.ruler__value {
+  display: flex;
+  align-items: center;
+}
+
+/* Window: exactly one strip line tall; the view sets the line index. */
+.ruler__drum {
+  display: block;
+  block-size: var(--ruler-drum-step);
+  overflow: hidden;
+}
+
+/* Strip: one digit per line (`\n`-joined chrome glyphs, blanks kept by `pre`).
+ * The line box and the window are both `--ruler-drum-step`, so the roll step,
+ * the clip height and the geometry stay one value — a 1em line box is smaller
+ * than the font's content area (~1.16em), which let the next digit's ink bleed
+ * into the window at rest. */
+.ruler__strip {
+  display: block;
+  line-height: var(--ruler-drum-step);
+  white-space: pre;
+  transform: translateY(calc(var(--ruler-drum-index, 0) * var(--ruler-drum-step) * -1));
+  transition: none;
+}
+
+/* Armed one frame after the first paint (ruler.js), so a mid-page load or deep
+ * link opens settled instead of spinning the drums up from zero. */
+.ruler__readout.is-live .ruler__strip {
+  transition: transform var(--duration-base) var(--ease-standard);
+}
+
+/* `%` is chrome like the digits. The French narrow space before it is a layout
+ * gap here — the spec's nbsp survives verbatim in `aria-valuetext`. */
+.ruler__sign {
+  color: var(--color-text-subtle);
+}
+
+.ruler__readout.is-fr .ruler__sign {
+  margin-inline-start: var(--space-2xs);
 }
