@@ -29,6 +29,7 @@
 .contact__label {
   flex: 0 0 auto;
   min-inline-size: var(--label-width);
+  font-family: var(--font-mono); /* ticket 106: micro-labels are mono */
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
   letter-spacing: var(--letter-spacing-wide);
@@ -36,16 +37,21 @@
   color: var(--color-text-subtle);
 }
 
+/* Monochrome accent (ticket 105): underline that fades in, same as the
+ * project links. */
 .contact__value {
   flex: 1 1 auto;
   font-size: var(--font-size-md);
   color: var(--color-text);
   overflow-wrap: anywhere;
-  transition: color var(--duration-fast) var(--ease-standard);
+  text-decoration-line: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: var(--underline-offset);
+  transition: text-decoration-color var(--duration-fast) var(--ease-standard);
 }
 
 a.contact__value:hover {
-  color: var(--color-accent);
+  text-decoration-color: currentColor;
 }
 
 .contact__value--email {

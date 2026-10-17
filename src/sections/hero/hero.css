@@ -50,6 +50,7 @@
 
 .hero__about-title {
   margin-block-end: var(--space-lg);
+  font-family: var(--font-mono); /* ticket 106: micro-labels are mono */
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
   letter-spacing: var(--letter-spacing-wide);

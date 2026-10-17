@@ -18,40 +18,77 @@ main {
   counter-increment: section;
 }
 
+/* --- Sticky eyebrow bar (ticket 106) ---------------------------------------
+ * The 100-era `NN ───` header line, rebuilt as the inspiration's eyebrow: a
+ * per-section translucent hairline bar (number, drawn slash, section name) that
+ * arrives in flow and pins flush under the nav while its section is active,
+ * releasing at the section end (position sticky is constrained to the parent,
+ * so no JS animation and reduced motion is unaffected). The band spans the
+ * cell border-to-border via negative margins; its bottom border continues the
+ * numbered-header look (the old ::after full rule is retired — one hairline,
+ * no doubling). Zero new copy: the name reuses existing keys (double-binding,
+ * like the rail), and the bar stays aria-hidden because the real heading below
+ * carries the semantics. */
 .section__index {
+  position: sticky;
+  inset-block-start: var(--eyebrow-top);
+  z-index: var(--z-eyebrow);
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
-  margin-bottom: var(--space-sm);
+  gap: var(--space-xs);
+  /* The brow hugs the cell's top rule: cancel the section's top padding so all
+   * the breathing room sits below the bar (as on the inspiration), and the bar
+   * pins the moment its cell reaches the nav. */
+  margin-block-start: calc(var(--section-gap) * -1);
+  margin-inline: calc(var(--container-pad) * -1);
+  margin-block-end: var(--space-2xs);
+  padding-block: var(--space-xs);
+  padding-inline: var(--container-pad);
+  border-block-end: var(--border-width) solid var(--color-border);
+  background-color: var(--eyebrow-bg);
+  -webkit-backdrop-filter: blur(var(--blur-radius));
+  backdrop-filter: blur(var(--blur-radius));
   font-family: var(--font-mono);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
   letter-spacing: var(--letter-spacing-wide);
-  color: var(--color-text-subtle);
+  text-transform: uppercase;
+  color: var(--color-text-muted);
 }
 
-.section__index::before {
+/* Counter opens the bar ("02"); the separator and the name belong to the same
+ * flow. Whitespace is handled by the flex gap, so the drawn separator sits
+ * between the two children through this ::after on the number span. */
+.section__num::before {
   content: counter(section, decimal-leading-zero);
 }
 
-/* Numbered header rule (ticket 100): the counter number opens a full-width 1px
- * rule, giving each cell an ArtCraft-style `01 ───` header with zero new copy
- * (the span stays aria-hidden; the heading below names the section). */
-.section__index::after {
-  content: "";
-  flex: 1 1 auto;
-  border-block-start: var(--border-width) solid var(--color-border);
+.section__num::after {
+  /* Chrome punctuation (the `EN 42%`-format sanction family), not i18n copy:
+   * a drawn separator between counter and name. */
+  content: "/";
+  margin-inline-start: var(--space-xs);
+  color: var(--color-text-subtle);
+}
+
+.section__name {
+  color: var(--color-text-muted);
 }
 
 /* --- Ticker ---------------------------------------------------------------
  * Default (no JS / reduced motion): a plain, readable, in-flow band showing the
  * tagline once. JS adds `.ticker--live` to turn it into a scrolling marquee.
  * The band sits in-flow directly under the hero and scrolls away with the page
- * (ticket 101); hero's bottom border is the divider above it, its own bottom
- * border the divider above projects. */
+ * (ticket 101). Since ticket 105 the dividers around it are full-bleed: the
+ * rule above is the hero section's own `.section::after` line (the hero keeps
+ * the same bottom divider it has always had — the nav rule stays the table's
+ * only top edge), and the band's own bottom border is the divider above
+ * projects. Single hairlines, no doubling (review fix). */
 .ticker {
+  margin-inline-end: calc(var(--lane-total) * -1);
   padding-block: var(--space-sm);
   padding-inline: var(--container-pad);
+  padding-inline-end: calc(var(--container-pad) + var(--lane-total));
   border-block-end: var(--border-width) solid var(--color-border);
   font-size: var(--font-size-sm);
   letter-spacing: var(--letter-spacing-wide);
@@ -66,7 +103,9 @@ main {
 }
 
 /* Live marquee: in-flow band under the hero (ticket 101), constant-speed CSS
- * keyframes. Marquee items never wrap, so the band is always a single line. */
+ * keyframes. Marquee items never wrap, so the band is always a single line.
+ * Full-bleed geometry (lane margin + padded text) comes from the base .ticker
+ * rule since ticket 105; only the surface fill and clipping are live-only. */
 .ticker--live {
   display: flex;
   align-items: center;

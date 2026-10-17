@@ -1,9 +1,13 @@
 /*
- * Persistent navigation (ticket 004).
+ * Persistent navigation (ticket 004; full-bleed since 105).
  *
  * Sticky rather than fixed, so the bar occupies its own layout space and needs
  * no body padding hack (no layout shift). Design tokens only, consumed through
- * var() (repo rule). On narrow screens the link list wraps onto extra lines so
+ * var() (repo rule). Since ticket 105 the bar itself runs the full viewport
+ * width (negative lane margin, so its bottom rule matches the full-bleed
+ * section dividers as the table's top edge) while the extra inline padding
+ * keeps the link list and switch clear of the rail/ruler lanes exactly as
+ * before. On narrow screens the link list wraps onto extra lines so
  * every label stays visible; the page never overflows horizontally.
  */
 
@@ -14,8 +18,10 @@
   display: flex;
   align-items: center;
   gap: var(--space-md);
+  margin-inline-end: calc(var(--lane-total) * -1);
   padding-block: var(--space-sm);
   padding-inline: var(--container-pad);
+  padding-inline-end: calc(var(--container-pad) + var(--lane-total));
   background-color: var(--color-bg);
   border-block-end: var(--border-width) solid var(--color-border);
 }

@@ -9,22 +9,27 @@
 :root {
   color-scheme: dark;
 
-  /* Colour — surfaces */
-  --color-bg: #0a0c10;
-  --color-surface: #12161d;
-  --color-surface-2: #1a1f28;
-  --color-border: #262d38;
-  --color-border-strong: #37404e;
+  /* Colour — surfaces (warm neutrals; ticket 105 — measured from the
+   * inspiration's dark palette and re-tokenized as our own values) */
+  --color-bg: #121316;
+  --color-surface: #191a1f;
+  --color-surface-2: #23242a;
+  --color-border: rgba(242, 241, 238, 0.15); /* hairline: 15% ink */
+  --color-border-strong: rgba(242, 241, 238, 0.38);
 
-  /* Colour — text */
-  --color-text: #e7eaf0;
-  --color-text-muted: #a2acbb;
-  --color-text-subtle: #767f8f; /* AA on --color-bg (4.85:1); was #6d7787 (4.32:1) */
+  /* Colour — text (ink is warm off-white; muted/subtle are ink alphas,
+   * AA-checked on --color-bg with alpha compositing: muted ~6.5:1, subtle ~5.6:1) */
+  --color-text: #f2f1ee;
+  --color-text-muted: rgba(242, 241, 238, 0.6);
+  --color-text-subtle: rgba(242, 241, 238, 0.55);
 
-  /* Colour — accent + focus */
-  --color-accent: #6ee7b7;
-  --color-accent-strong: #34d399;
-  --color-accent-contrast: #06281d;
+  /* Colour — accent + focus (ticket 105: mint retired; the accent is now the
+   * ink itself, so active states read as monochrome white-on-dark like the
+   * inspiration's boxed nav item. Blue stays for focus/ruler progress — the
+   * inspiration's own progress line is blue.) */
+  --color-accent: #f2f1ee;
+  --color-accent-strong: #ffffff;
+  --color-accent-contrast: #121316;
   --color-focus: #7dd3fc;
 
   /* Typography — families (system stack only; no webfonts) */
@@ -54,6 +59,27 @@
   --letter-spacing-tight: -0.02em;
   --letter-spacing-wide: 0.08em;
 
+  /* Display scale (ticket 106): section headlines. Measured from the
+   * inspiration (~60px @1440, leading ~1.02, tracking ~-0.035em) and tokenized
+   * as our own clamp — ~34px @375 → ~58px @1440. */
+  --font-size-title: clamp(2.25rem, 1.6rem + 2.25vw, 3.75rem);
+  --line-height-display: 1.05;
+  --letter-spacing-display: -0.03em;
+
+  /* Sticky eyebrow bars (ticket 106): the rebuilt `.section__index` pinned
+   * flush under the nav. `--eyebrow-top` is the no-JS fallback; eyebrows.js
+   * overrides it with the nav's live measured height (it reflows on narrow
+   * screens and on language switches). The translucent band keeps pinned text
+   * readable over scrolled content — 0.85 chosen so muted stays AA even in the
+   * worst case. Punctuation/blur offsets live here per the token rule. */
+  --eyebrow-top: 4rem;
+  --eyebrow-bg: rgba(18, 19, 22, 0.85);
+  --blur-radius: 8px;
+
+  /* Link hover underline offset (ticket 105): monochrome hover feedback on
+   * project/contact links. */
+  --underline-offset: 0.2em;
+
   /* Space */
   --space-2xs: 0.25rem;
   --space-xs: 0.5rem;
@@ -67,8 +93,6 @@
 
   /* Radius */
   --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 16px;
   --radius-pill: 999px;
 
   /* Borders */
@@ -103,11 +127,15 @@
 
   /* Layout */
   --measure: 68ch;
-  --container-max: 72rem;
+  --container-max: 80rem; /* 1280px — the inspiration's column width (ticket 105) */
   --container-pad: clamp(1.25rem, 4vw, 4rem);
-  --section-gap: clamp(4rem, 10vw, 9rem);
+  --section-gap: clamp(3.5rem, 7vw, 5rem); /* capped at 5rem (was 9rem) — ticket 105 */
   --section-min-height: 50svh;
   --hero-min-height: 100svh;
+
+  /* Full-bleed divider width (ticket 105): viewport-wide rule drawn by the
+   * section dividers (base.css), passing under the edge-lane overlays. */
+  --bleed-width: 100vw;
 
   /* Reserved media slots (ticket 005). Fixed aspect ratio + width so an empty
    * slot already holds the space its asset will need later (no layout shift). */
@@ -129,12 +157,29 @@
   --lane-rail: 7.5rem; /* fits the longest label (PROJECTS / COMPÉTENCES) untruncated */
   --lane-rail-narrow: 2rem;
 
+  /* Combined edge-lane reservation (ticket 105). Single source for the three
+   * full-bleed consumers (section dividers, nav, ticker) and for body padding;
+   * the 768px override below swaps it to the collapsed-rail value so the
+   * breakpoints stay token-owned. */
+  --lane-total: calc(var(--lane-ruler) + var(--lane-rail));
+
   /* Accessibility helper: size of a visually-hidden element. */
   --visually-hidden-size: 1px;
 
   /* Layers */
   --z-base: 1;
+  --z-eyebrow: 10; /* sticky brow: above flowing content, below the nav (100) */
   --z-nav: 100;
   --z-rail: 150;
   --z-ruler: 160;
+}
+
+/* Lane total under the collapsed-rail breakpoint (ticket 105): same 768px
+ * media-condition literal as base.css's body-padding exception — a CSS variable
+ * cannot be swapped inside a media query any other way, and the widths
+ * themselves stay tokens. */
+@media (max-width: 768px) {
+  :root {
+    --lane-total: calc(var(--lane-ruler) + var(--lane-rail-narrow));
+  }
 }

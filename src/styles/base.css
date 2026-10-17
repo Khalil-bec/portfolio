@@ -41,12 +41,12 @@ body {
   line-height: var(--line-height-base);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  /* Edge-lane reservation (ticket 100): the right edge holds two fixed lanes
-   * (rail inside, ruler outside; widths in tokens.css). The padding keeps
-   * every in-flow element — including the sticky nav and, since ticket 101,
-   * the ticker band — clear of both lanes. The fixed overlays themselves land
-   * in 102/103, which re-verify the guarantee with real chrome in the lanes. */
-  padding-inline-end: calc(var(--lane-ruler) + var(--lane-rail));
+  /* Edge-lane reservation (ticket 100, consumed via --lane-total since 105):
+   * the right edge holds two fixed lanes (rail inside, ruler outside; widths in
+   * tokens.css). The padding keeps every in-flow element clear of both. The
+   * fixed overlays themselves land in 102/103, which re-verify the guarantee
+   * with real chrome in the lanes. */
+  padding-inline-end: var(--lane-total);
 }
 
 h1,
@@ -100,33 +100,54 @@ code {
 /* Shared section shell. Sections give the scaffold enough height to be
  * scrollable and testable before real content lands (tickets 005/006). */
 .section {
+  position: relative;
   max-width: var(--container-max);
   margin-inline: auto;
   min-height: var(--section-min-height);
   padding-block: var(--section-gap);
   padding-inline: var(--container-pad);
-  /* Table cell (ticket 100): 1px side borders make every section a cell and
-   * each section's bottom border is the divider beneath it. The table's top
-   * edge is the sticky nav's existing bottom rule, so the hero takes no top
-   * border (no doubled line); contact's bottom border closes the table. */
+  /* Table cell (ticket 100): 1px side borders make every section a cell.
+   * The table's top edge is the sticky nav's existing bottom rule, so the hero
+   * takes no top border (no doubled line). */
   border-inline: var(--border-width) solid var(--color-border);
-  border-block-end: var(--border-width) solid var(--color-border);
 }
 
-/* Section heading, shared by the content tickets (005/006). */
+/* Full-bleed horizontal divider (ticket 105): the cell's bottom rule spans the
+ * whole viewport instead of the column, passing under the rail/ruler overlays
+ * (higher z-index) like the inspiration's table rules. Centered at viewport
+ * midpoint — the column is centred inside the lane-padded content box, so half
+ * the lane total shifts the line back to true centre; its right edge lands
+ * exactly on the viewport edge in both lane modes (no overflow). Decorative,
+ * replaces the former border-block-end. */
+.section::after {
+  content: "";
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline-start: calc(50% + var(--lane-total) / 2);
+  inline-size: var(--bleed-width);
+  border-block-start: var(--border-width) solid var(--color-border);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+/* Section heading, shared by the content tickets (005/006). Ticket 106 moves
+ * it to the display scale measured from the inspiration (60px-class headline,
+ * tight leading/tracking) via the title tokens. */
 .section__title {
+  margin-block-start: var(--space-xl);
   margin-block-end: var(--space-lg);
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-title);
   font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-snug);
-  letter-spacing: var(--letter-spacing-tight);
+  line-height: var(--line-height-display);
+  letter-spacing: var(--letter-spacing-display);
 }
 
 /* Reserved media slot: holds its box before the asset lands, so the page does
- * not shift when a portrait/screenshot is dropped in later. */
+ * not shift when a portrait/screenshot is dropped in later. Sharp corners
+ * (radius retired in ticket 105 — rounded, dot-gridded empty slots read as
+ * unfinished instead of reserved). */
 .image-slot {
   border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-lg);
   background-color: var(--color-surface);
 }
 
@@ -159,16 +180,9 @@ code {
   border: 0;
 }
 
-/* Narrow exception (ticket 100): the rail collapses to icon mode, so the
- * reservation shrinks to the narrow rail lane. 768px is a media-condition
- * literal — CSS variables cannot appear there; the lane widths themselves stay
- * tokens. This is the repo's first breakpoint literal (006 avoided one with an
- * intrinsic flex wrap); the ticket explicitly sanctions it for lane widths. */
-@media (max-width: 768px) {
-  body {
-    padding-inline-end: calc(var(--lane-ruler) + var(--lane-rail-narrow));
-  }
-}
+/* The 768px lane collapse (ticket 100) now lives entirely in tokens.css: the
+ * media override re-points --lane-total, and the single body rule above
+ * consumes it in both modes. */
 
 /* CSS-level motion kill-switch, independent of the JS one wired in ticket 002. */
 @media (prefers-reduced-motion: reduce) {

@@ -15,6 +15,7 @@ import { initSmoothScroll } from "./motion/smooth-scroll.js";
 import { initGsapBridge } from "./motion/gsap-bridge.js";
 import { initScrollDriver } from "./motion/scroll-driver.js";
 import { initReveals } from "./motion/reveals.js";
+import { initEyebrows } from "./motion/eyebrows.js";
 import { initTicker } from "./motion/ticker.js";
 import { initRuler } from "./ruler/ruler.js";
 import { initRail } from "./rail/rail.js";
@@ -42,6 +43,7 @@ if (motion) {
 }
 
 initTicker(reducedMotion);
+initEyebrows();
 initRuler(driver);
 initRail();
 initNav();

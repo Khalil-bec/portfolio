@@ -34,13 +34,19 @@
   line-height: var(--line-height-snug);
 }
 
+/* Monochrome accent (ticket 105): white-on-white cannot carry a colour hover,
+ * so feedback is an underline that fades in (transparent by default, current
+ * colour on hover) — the transition has a real value to animate. */
 .project__link {
   color: var(--color-text);
-  transition: color var(--duration-fast) var(--ease-standard);
+  text-decoration-line: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: var(--underline-offset);
+  transition: text-decoration-color var(--duration-fast) var(--ease-standard);
 }
 
 .project__link:hover {
-  color: var(--color-accent);
+  text-decoration-color: currentColor;
 }
 
 /* Kshell's repo alias (`ksh`), a small code chip beside the linked name. */
@@ -68,6 +74,7 @@
 .project__label {
   flex: 0 0 auto;
   min-inline-size: var(--label-width);
+  font-family: var(--font-mono); /* ticket 106: micro-labels are mono */
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
   letter-spacing: var(--letter-spacing-wide);
@@ -110,21 +117,13 @@
   color: var(--color-text-subtle);
 }
 
-/* Reserved screenshot slot: fixed 16:10 box that holds its space empty. */
+/* Reserved screenshot slot: fixed 16:10 box that holds its space empty. Since
+ * ticket 105 the empty slot is a sharp hairline frame on a flat faint fill —
+ * the dot-grid placeholder read as unfinished rather than reserved. */
 .project__slot {
   position: relative;
   flex: 0 0 var(--slot-shot-width);
   inline-size: var(--slot-shot-width);
   aspect-ratio: var(--slot-shot-ratio);
   overflow: hidden;
-}
-
-/* Intentional placeholder: a faint dot grid drawn from tokens (no copy), so an
- * empty slot reads as reserved rather than broken. */
-.project__slot::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(var(--color-border) var(--border-width), transparent 0);
-  background-size: var(--space-md) var(--space-md);
 }
