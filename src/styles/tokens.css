@@ -97,6 +97,15 @@
   --eyebrow-top: 4rem;
   --overlay-bg: rgba(18, 19, 22, 0.85);
   --blur-radius: 8px;
+  /* Eyebrow right-side meta (ticket 111). Shown in the default state so the
+   * no-JS page keeps it (the narrow-mode query at the end of this file hides it
+   * without any scripting). Its longest candidate value — education's
+   * "Expected graduation: Summer 2027", 32 characters / 279px measured — needs
+   * more room than a 375px cell offers, so it goes with the rail's collapse at
+   * the same 768px boundary. The value is a display keyword rather than a length
+   * because a media condition cannot read a custom property: the switch has to
+   * live where that condition is already written, which is this file. */
+  --eyebrow-meta-display: block;
 
   /* Link hover underline offset (ticket 105): monochrome hover feedback on
    * project/contact links. */
@@ -202,12 +211,16 @@
   --z-ruler: 160;
 }
 
-/* Lane total under the collapsed-rail breakpoint (ticket 105): same 768px
- * media-condition literal as base.css's body-padding exception — a CSS variable
- * cannot be swapped inside a media query any other way, and the widths
- * themselves stay tokens. */
+/* Narrow mode (ticket 105/111): the switches that ride the collapsed-rail
+ * breakpoint live here, because a CSS variable cannot be swapped inside a media
+ * query any other way and this file is where the 768px condition is already
+ * written (rail.css carries the matching rules for the rail itself). Same
+ * literal as base.css's body-padding exception. */
 @media (max-width: 768px) {
   :root {
     --lane-total: calc(var(--lane-ruler) + var(--lane-rail-narrow));
+    /* The eyebrow's right meta goes with the rail (ticket 111): one narrow
+     * moment, one boundary. */
+    --eyebrow-meta-display: none;
   }
 }

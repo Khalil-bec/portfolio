@@ -16,15 +16,27 @@
 
 Why not the alternatives: a `640px` literal (option 2) buys only that 640–768px window and costs the repo its single-breakpoint discipline; `flex-wrap` (option 3) makes the pinned bar two rows tall on the narrowest screens (nav 102px + bar) and gives EN and FR different bar heights.
 
+**Measured on the inspiration (2026-10-17; `/tmp/opencode/inspo-eyebrow.mjs`, `inspo-eyebrow2.mjs` — one page resized 1440 → 375, so the disappearance threshold is measured on live layout):**
+
+- **Type = the bar's own.** The meta is `Geist Mono` 11px/500, `text-transform: uppercase`, `letter-spacing: 1.65px` — the same face, size, weight, case and tracking as the bar's left index. This ticket's first draft guessed a *smaller, sentence-case* value; the measurement corrects it, so ours sets no font size and no case at all: `.section__meta` inherits the bar's mono/uppercase/tracked type and changes only its ink.
+- **Ink = the faint tier.** `rgba(16, 16, 20, 0.42)`, identical to that bar's own `01` counter and one tier below its section name (`text-muted` = `rgba(16, 16, 20, 0.62)`). Ours takes `--color-text-subtle` (0.55), the tier the counter already uses, so the meta pairs with the index rather than with the name.
+- **Placement = the row's inline end.** The bar is a content-width strip with 1px top *and* bottom hairlines and `backdrop-blur-md`; its inner row is `flex items-center justify-between gap-4`, so the meta is flush with that row's *content* edge (measured: bar right 1359, meta right 1319, i.e. the 40px padding). Ours is a third flex child pushed by `margin-inline-start: auto`; the harness asserts its right edge against the bar's content box (±1px).
+- **Brevity is a constraint, not a coincidence.** Their per-section values are short ("Free & open source", "From the community"; the longest, on the first bar, is 35 characters ≈ 303px). Reusing existing strings, education's is 32 characters (≈279px at our `--font-size-xs` mono, measured) — comparable — and it is the longer of ours.
+- **Disappearance: 640px, not 768.** Markup is `hud-label hidden text-faint sm:block` — Tailwind's `sm`, matching §5's own "~640px". Measured visible at 700 (`w=303 x=372`) and hidden at 640. We reuse the repo's existing 768px narrow-mode query instead (the sanctioned boundary), so ours also disappears in the 640–768 window their design would still show it — the accepted cost of not introducing a second breakpoint literal.
+
+**Visual check (2026-10-17; `/tmp/opencode/s111-*.png`, all five bars at 1440 EN, plus FR and 375):** the judgement the decision asks for — does a partly-filled rule read as unfinished? It does not. Every bar opens identically (`NN /` + the section name, mono, tracked) and the meta sits at the far end in the faint tier, so an empty bar reads as a clean divider rather than as a component with a hole. The strongest adjacency — skills (empty) directly above education (filled), `s111-1440en-2-skills.png` — reads as editorial spacing, and the only two filled bars are each other's neighbours (education, contact), so no viewport shows a filled bar isolated among empties. **Kept; "empty everywhere" not needed.**
+
 **Not in scope:** new copy or new dictionary keys (excluded by the decision); the bar's sticky offset, blur, counter and name (106, unchanged); lane geometry / viewport centering (its own ticket); the rail; the ruler.
 
-**Status:** todo — unblocked (narrow-screen mechanism decided: option 1).
+**Status:** in-review.
 
-- [ ] The inspiration's right meta is measured first, and the delta recorded in the decisions log
-- [ ] Each intended section's bar renders its chosen existing string at the inline end, bound with `data-i18n` (no literal text in the HTML)
-- [ ] No new dictionary keys; EN and FR both resolve; a live language switch re-binds the meta
-- [ ] Only the sections with a defensible string show it; the rest keep a one-sided bar
-- [ ] Zero horizontal overflow and no clipping/truncation at 375 / 768 / 1440 in EN and FR
-- [ ] Reduced motion unaffected (the bar is sticky and has no JS)
-- [ ] The visual check judges the partly-filled rule: if it reads as unfinished, fall back to empty-everywhere and log it
-- [ ] Token gate clean; screenshot check; code review
+- [x] The inspiration's right meta is measured first, and the delta recorded in the decisions log
+- [x] Each intended section's bar renders its chosen existing string at the inline end, bound with `data-i18n` (no literal text in the HTML)
+- [x] No new dictionary keys; EN and FR both resolve; a live language switch re-binds the meta
+- [x] Only the sections with a defensible string show it; the rest keep a one-sided bar
+- [x] Zero horizontal overflow and no clipping/truncation at 375 / 768 / 1440 in EN and FR
+- [x] Reduced motion unaffected (the bar is sticky and has no JS)
+- [x] The visual check judges the partly-filled rule: it reads as complete, so the meta stays
+- [x] Token gate clean; screenshot check; code review
+
+**Verification (2026-10-17, `/tmp/opencode/qa-111.mjs`, 78 checks ALL GREEN):** 1440 EN, 375/640/768/769 EN, 1440 FR (context locale), 375 FR, 1440 reduced, plus a live EN→FR→EN switch. Each config asserts: zero horizontal overflow, zero console errors, exactly two bars carrying a `data-i18n`-bound meta (`education.graduation`, `contact.location`) and only those two, no bar overflowing internally, no meta overflowing itself, one uniform bar height across all five bars, and `aria-hidden` preserved on every bar. Additions per config: the metas are visible at 1440 and 769 and hidden at 768/640/375; the EN texts are the dictionary values verbatim; the meta's computed type is the bar's (12.48px mono / 500 / `ls 0.9984px` / uppercase) and its ink is `rgba(242, 241, 238, 0.55)`; its right edge lands on the bar's content box (1226 vs 1225, i.e. rounding) and it never approaches the name (764px of clear space); the FR texts are the FR dictionary values; the switch re-binds and restores both; reduced motion leaves the meta in place (it is CSS-only).

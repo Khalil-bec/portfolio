@@ -75,6 +75,22 @@ main {
   color: var(--color-text-muted);
 }
 
+/* Right-side meta (ticket 111): a decorative echo of a string the block below
+ * already carries, never new copy — the bar is aria-hidden, so the real heading
+ * is still announced exactly once. The inspiration sets its meta in the bar's
+ * own type and at its faintest tier: measured on getartcraft.com it is
+ * Geist Mono 11px/500, uppercase, ls 1.65px, ink 0.42 — the same face and ink
+ * as its `01` index digits, one tier below its section name (0.62). Ours
+ * inherits the bar's type (mono, uppercase, tracked) and takes the faint tier
+ * the drawn `/` already uses (--color-text-subtle). Pushed to the inline end;
+ * hidden by the narrow-mode switch in tokens.css, where the longest value could
+ * not fit a 375px cell. */
+.section__meta {
+  display: var(--eyebrow-meta-display);
+  margin-inline-start: auto;
+  color: var(--color-text-subtle);
+}
+
 /* --- Ticker ---------------------------------------------------------------
  * Default (no JS / reduced motion): a plain, readable, in-flow band showing the
  * tagline once. JS adds `.ticker--live` to turn it into a scrolling marquee.
