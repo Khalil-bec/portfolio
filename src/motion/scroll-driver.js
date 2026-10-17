@@ -62,9 +62,11 @@ export function initScrollDriver({ lenis, reducedMotion }) {
    * here — it follows the dictionaries live. Digits and `%` are chrome
    * (spec §Data, same sanction as `a11y.newTab`).
    *
-   * `text` is the canonical formatted string (the slider's `aria-valuetext`);
-   * the view gets the pieces too (ticket 109) because the visual readout is
-   * per-place digit drums and cannot parse the format back apart.
+   * `text` is the canonical formatted string (the slider's `aria-valuetext`).
+   * Since 113 the visual readout is per-place digit drums only — the inspiration
+   * shows no language tag — so the view consumes `french`/`percent` but not the
+   * tag itself; it survives here because the format (and the `aria-valuetext`)
+   * are 102's spec, and assistive tech keeps the full string.
    */
   function langTag(french) {
     const code = french ? "fr" : "en";
@@ -76,8 +78,8 @@ export function initScrollDriver({ lenis, reducedMotion }) {
     const french = document.documentElement.lang === "fr";
     const separator = french ? "\u00a0" : ""; // non-breaking space before % in French
     const value = Math.round(depth * 100);
-    const tag = langTag(french);
-    return { french, tag, percent: value, text: `${tag} ${value}${separator}%` };
+    const text = `${langTag(french)} ${value}${separator}%`;
+    return { french, percent: value, text };
   }
 
   /**

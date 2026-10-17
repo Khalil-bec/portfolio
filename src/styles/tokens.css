@@ -60,6 +60,39 @@
    * grade rows so the ticks and their numbers cannot drift apart. */
   --ruler-minor-step: 1%;
   --ruler-grade-step: 5%;
+
+  /* Ruler tick lengths + marker span (ticket 113 — the exact-scale pass).
+   * Ticks are the measured 20px/10px (the same 2:1 as 110's, at the lane's new
+   * 60px scale; the space-scale tokens hold no 20 or 10, so they get their own
+   * exact values). `grade-inset` rights the label column against the tick
+   * zone: 4px inboard of the major tick's tip, as measured on the inspiration.
+   * The marker's span is the measured linear-map window the travelling rule
+   * rides into: 60px clear of the nav at rest, 10px off the bottom edge at
+   * max — ruler.js completes the map by publishing the rule's offset as a px
+   * length (the `--eyebrow-top` pattern); CSS only reads. The narrow query at
+   * the end of this file flips tick/grade/lane to the 112-scale values (see
+   * its comment). */
+  --ruler-tick-major: 1.25rem;
+  --ruler-tick-minor: 0.625rem;
+  --ruler-grade-inset: calc(var(--ruler-tick-major) + var(--space-2xs));
+  --ruler-marker-top: 3.75rem;
+  --ruler-marker-bottom: 0.625rem;
+
+  /* Readout position around the rule (113's review — measured tip-to-tip on
+   * the inspiration, which does not centre its readout on the rule: hanging
+   * below, the row's top sits 4px under the rule's top; at the travel's end
+   * it flips above and hangs 2px clear of the rule top instead, so the row
+   * never leaves the window. ruler.js picks the side; CSS reads the tokens. */
+  --ruler-readout-gap: 0.25rem;
+  --ruler-readout-clear: 0.125rem;
+
+  /* The readout's display switch (ticket 113). The hanging readout row is wider
+   * than the narrow lane (a 32px lane against a ~42px row), so below 768 —
+   * where the inspiration mounts no ruler at all and our 102 keeper is a
+   * reduced stand-in — only the rule, the ticks and their grades remain; the
+   * spoken value survives in `aria-valuetext`, which was never on a screen. */
+  --ruler-readout-display: flex;
+
   --font-size-xs: 0.78rem;
   --font-size-sm: 0.875rem;
   --font-size-base: 1rem;
@@ -183,20 +216,21 @@
   --label-width: 8rem;
 
   /* Edge chrome (ticket 112: the reservation is gone). The right edge holds
-   * ONE fixed lane, the ruler's (102, scale 110; 32px wide since 110 — the
-   * scale's numbered grade column needs the widest grade (`100` = 17.8px at
-   * `--font-size-2xs`) plus the 8px major tick inside the content box — 28px
-   * left 0.2px of slack). Nothing reserves layout width any more: the column
-   * is a centred container and the lane overlays the right gutter exactly as
-   * the inspiration's does — the 2rem body padding plus the 1px frame border
-   * (33px) always exceed the 2rem lane when a frame is full-width, and above
-   * 1280px the gutter is 80px wider. The inspiration's own right band is not a
-   * persistent label list (its section list is the fixed name layer, v2
+   * ONE fixed lane, the ruler's (102, scale 110; since 113 at the inspiration's
+   * measured 60px). Nothing reserves layout width any more: the column is a
+   * centred container and the lane overlays the right gutter exactly as the
+   * inspiration's does. At 768-1280 the frame is full-width and their own lane
+   * grazes the content edge (27px overlap @1024 — tolerated, and mirrored
+   * here); below 768 the narrow query flips the lane+ticks back to the 112
+   * values, because there our 102 keeper rides a 33px gutter and the
+   * inspiration mounts nothing at all — a 60px lane would bury 27px of text
+   * for no fidelity gain. (112: the 2rem body padding plus the 1px frame
+   * border = 33px ≥ the narrow lane.) The inspiration's own right band is not
+   * a persistent label list (its section list is the fixed name layer, v2
    * ticket 114), so our 103/108 rail was retired with the reservation; the
    * ruler survives at narrow widths because it is our only scroll readout
-   * (102: the native bar is hidden in every mode) and it rides the padding
-   * gutter for free. */
-  --lane-ruler: 2rem;
+   * (102: the native bar is hidden in every mode). */
+  --lane-ruler: 3.75rem;
 
   /* Accessibility helper: size of a visually-hidden element. */
   --visually-hidden-size: 1px;
@@ -208,17 +242,24 @@
   --z-ruler: 160;
 }
 
-/* Narrow mode (ticket 105/111): the switches that ride the collapsed-rail
- * breakpoint live here, because a CSS variable cannot be swapped inside a media
- * query any other way and this file is where the 768px condition is already
- * written (it gates the rail-icon collapse there, retired with the rail in
- * ticket 112). The 112 geometry change needs no narrow switch of its own: the
- * centred column is the same model at every width, and the ruler overlays the
- * padding gutter at 375 exactly as it does in the gutter above. */
+/* Narrow mode (ticket 105/112/113): the switches that ride the 768px boundary
+ * live here, because a CSS variable cannot be swapped inside a media query any
+ * other way and this file is where the condition is already written. 112 broke
+ * its last lane switch (the rail died with the reservation); 113 adds the
+ * ruler's scale-back: the 60px exact lane and its 20/10 ticks are the
+ * inspiration's desktop chrome, which it unmounts below 768 entirely — our
+ * 102 keeper stays, so it keeps the 112-scale geometry that fits the 33px
+ * gutter with zero overlap, and the grade column rights itself against the
+ * smaller ticks (the 110-era alignment). */
 @media (max-width: 768px) {
   :root {
     /* The eyebrow's right meta goes with the collapsed edge (ticket 111): one
      * narrow moment, one boundary. */
     --eyebrow-meta-display: none;
+    --lane-ruler: 2rem;
+    --ruler-tick-major: var(--space-xs);
+    --ruler-tick-minor: var(--space-2xs);
+    --ruler-grade-inset: calc(var(--space-xs) + var(--border-width));
+    --ruler-readout-display: none;
   }
 }

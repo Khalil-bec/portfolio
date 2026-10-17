@@ -1,11 +1,18 @@
 /*
- * Ruler: document-space scale + readout + driver chrome (tickets 102, 109, 110).
+ * Ruler: document-space scale + travelling rule + hanging readout (tickets 102,
+ * 109, 110; exact-scale form since 113).
  *
- * Fixed overlay in the outer right-edge lane (`--lane-ruler`): a scale that is
- * as tall as the page and slides 1:1 with the scroll past this fixed window
- * (graduations every 1% of the document, numbered grades every 5%), a blue
- * position marker riding the handle, and a draggable thumb carrying the
- * page-depth readout (ticket 109 rebuilt it as upright rolling digit drums).
+ * Fixed overlay in the outer right-edge lane (`--lane-ruler`, the inspiration's
+ * measured 60px since 113): a scale that is as tall as the page and slides 1:1
+ * with the scroll past this fixed window (graduations every 1% of the document,
+ * numbered grades every 5%), and the depth marker — the inspiration's 1px blue
+ * rule spanning the lane — travelling a measured span while the readout hangs
+ * 4px below it (reviewed against them 113: their own readout sits under the
+ * rule, not on it) and flips above it at the travel's end so the row stays in
+ * the window (their max-scroll geometry, measured). The lane ITSELF is the
+ * slider (whole-lane drag, their crosshair cursor; keys handled by the scroll
+ * driver); the 110 thumb block was retired with 113, as was the border the
+ * lane used to draw at its inline start (they mount no separator there).
  * Under reduced motion there is no animation anywhere here — the driver just
  * repaints positions, and the scale's slide is position tracking, not a
  * transition. Design tokens only, consumed through var() (repo rule); the
@@ -22,20 +29,16 @@
   flex-direction: column;
   align-items: stretch;
   inline-size: var(--lane-ruler);
-  border-inline-start: var(--border-width) solid var(--color-border);
-}
-
-/* 0 / 100 bounds: digits are chrome, aria-hidden in the markup. They mark the
- * slider's range at the window's ends; the scale's own numbers ride the
- * document (ticket 110). Right-aligned to the grades' column so every number in
- * the lane shares one edge. */
-.ruler__bound {
-  padding-block: var(--space-2xs);
-  padding-inline-end: calc(var(--space-xs) + var(--border-width));
-  text-align: right;
-  font-family: var(--font-mono);
-  font-size: var(--font-size-xs);
-  color: var(--color-text-subtle);
+  /* Review note (113): the lane draws no separator against the content column
+   * — the inspiration mounts no line between the ruler and what sits at its
+   * inline start, the 102-era border retired at review. */
+  /* The whole lane is the drag surface (the inspiration's measured affordance):
+   * crosshair, and `touch-action: none` hands the lane's touches to the depth
+   * drag instead of native scrolling. */
+  cursor: crosshair;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 /* Window on the document (ticket 110). The lane IS the fixed window a
@@ -55,34 +58,41 @@
  * is the page height, the graduation gradient's percentage stops *are* document
  * positions, so the 1%/5% spacing needs no unit math at all.
  *
- * Graduations hang from the lane's right edge in two layers, sized to the tick
- * length (`--space-2xs` minors, `--space-xs` majors — the inspiration's 2:1
- * ratio) and confined to it with `background-size` / `no-repeat`, majors drawn
+ * Graduations hang from the lane's right edge in two layers, sized to the
+ * measured tick tokens (113: 20px majors / 10px minors — the inspiration's own
+ * 2:1 at its 60px lane; the narrow query scales them back to the 110 values)
+ * and confined to the edge with `background-size` / `no-repeat`, majors drawn
  * over minors. Colours are the 105/108 ramp in the inspiration's order
- * (its 0.4/0.8 → our 0.38/0.70). */
+ * (its 0.4/0.8 → our 0.38/0.70).
+ *
+ * The layer starts at the marker's top inset, not the lane's top edge: the
+ * inspiration's scale opens with its own headroom (measured +29px at rest), so
+ * its 0 grade and the resting rule meet inside the lane instead of slicing the
+ * first label at the clip edge. Ticks and grades share the offset, so the rule
+ * at rest sits exactly on the document's 0 position. */
 .ruler__scale {
   position: absolute;
-  inset-block-start: 0;
+  inset-block-start: var(--ruler-marker-top);
   inset-inline: 0;
   block-size: var(--page-height, 0);
   transform: translateY(var(--scale-offset, 0));
   background-image:
     repeating-linear-gradient(to bottom, var(--color-text-bright) 0 var(--border-width), transparent var(--border-width) var(--ruler-grade-step)),
     repeating-linear-gradient(to bottom, var(--color-border-strong) 0 var(--border-width), transparent var(--border-width) var(--ruler-minor-step));
-  background-size: var(--space-xs) 100%, var(--space-2xs) 100%;
+  background-size: var(--ruler-tick-major) 100%, var(--ruler-tick-minor) 100%;
   background-position: right top, right top;
   background-repeat: no-repeat, no-repeat;
 }
 
 /* Numbered grades (ticket 110): chrome rows every 5% of the document, centred
- * on their graduation and right-aligned just inboard of the major ticks — the
- * inspiration's labels sit the same way (right edge 4px from its major's tip;
- * ours 1px, because 32px of lane has to hold both). `inset-block-start` is a
- * percentage of the scale layer, i.e. a document position. */
+ * on their graduation and right-aligned inboard of the tick zone — the
+ * inspiration's labels sit just left of the majors (4px from the major's tip,
+ * measured). `inset-block-start` is a percentage of the scale layer, i.e. a
+ * document position. */
 .ruler__grade {
   position: absolute;
   inset-block-start: calc(var(--ruler-grade-index) * var(--ruler-grade-step));
-  inset-inline-end: calc(var(--space-xs) + var(--border-width));
+  inset-inline-end: var(--ruler-grade-inset);
   transform: translateY(-50%);
   font-family: var(--font-mono);
   font-size: var(--font-size-2xs);
@@ -91,73 +101,61 @@
   white-space: nowrap;
 }
 
-/* The grade the handle is sitting on: an opaque band over a number can only
- * ever show it cut in half, so the number is covered instead of slivered
- * (ruler.js decides which one from document positions). */
+/* The grade the readout passes over is covered (a number under the readout
+ * text would only ever mush into it, and under the 1px rule it reads as struck
+ * through, so the row is covered instead — ruler.js decides which one from
+ * document positions, retargeted at the hanging readout at 113's review) — the
+ * substitution the inspiration's readout makes for the label it sits on,
+ * 110's verified mechanism. */
 .ruler__grade.is-covered {
   visibility: hidden;
 }
 
-/* Position marker (ticket 110): the inspiration's blue is not a progress fill
- * but a 1px horizontal rule spanning the lane at the readout's top (measured
- * `[1380, 391, 60, 1]` in `rgb(45, 129, 255)`), so the fill that ticket 102
- * drew is replaced by that rule. It is positioned with the handle and painted
- * after it, so it reads as the handle's top edge. */
+/* Depth marker (110's mechanism, 113's form): the inspiration's own marker is
+ * not a progress fill or a thumb — a 1px horizontal rule spanning the lane
+ * (measured `[1380, 391, 60, 1]` in `rgb(45, 129, 255)`) that travels linearly
+ * with the scroll through a measured span (insets tokenised as
+ * `--ruler-marker-top/bottom`). Its offset is a complete px length published by
+ * ruler.js (the `--eyebrow-top` pattern), so no px math lives here. */
 .ruler__marker {
   position: absolute;
+  inset-block-start: var(--ruler-marker-offset, 0);
   inset-inline: 0;
   block-size: var(--border-width);
   background-color: var(--color-focus);
 }
 
-/* Thumb: full-lane handle, the slider. `touch-action: none` lets pointer drags
- * drive scroll from the thumb; touch anywhere else still scrolls natively. */
-.ruler__thumb {
-  position: absolute;
-  /* Since 110 the window spans the lane's content box, so the handle is exactly
-   * that box: full-lane grab area, and the readout's widest row (27.75px in FR)
-   * fits inside it with room instead of overhanging the viewport edge as the
-   * 28px-wide thumb did. */
-  inset-inline: 0;
-  block-size: fit-content;
-  padding-block: var(--space-xs);
-  border-block: var(--border-width) solid var(--color-border-strong);
-  border-radius: var(--radius-sm);
-  background-color: var(--color-surface);
-  cursor: grab;
-  touch-action: none;
-  user-select: none;
-  -webkit-user-select: none;
-}
-
-.ruler__thumb:active {
-  cursor: grabbing;
-}
-
-/* Readout (ticket 109): upright, two lines inside the thumb — the dict-sourced
- * tag over the value row. The value is one **digit drum** per decimal place: a
- * one-line window (`block-size` = `--ruler-drum-step`) over a strip of chrome
- * digits whose `transform` rolls the wanted line into the window. This replaces
- * the tilted `writing-mode: vertical-rl` text that read sideways. */
+/* Readout (109's drums, hanging below the rule since 113's review): the value
+ * row only — three digit drums + `%`, right-aligned into the grade-label
+ * column. Not centred on the rule as 113 first shipped: the inspiration's own
+ * readout hangs 4px below the rule's top (measured tip-to-tip: rule top
+ * 367.8 → row top 371.8), and at the travel's end, where the below row would
+ * leave the window, it flips above the rule — row bottom 2px clear of the rule
+ * top (their max-scroll geometry: rule top 1068, row 1054→1066, vp 1080).
+ * Both insets are tokens. The tag row of 102/109 retired with the thumb (the
+ * inspiration shows none; the driver's `aria-valuetext` keeps the full
+ * `FR 42 %` format). One **digit drum** per decimal place: a one-line window
+ * (`block-size` = `--ruler-drum-step`) over a strip of chrome digits whose
+ * `transform` rolls the wanted line into the window — the mechanism measured
+ * on the inspiration, whose readout columns roll the same way. */
 .ruler__readout {
-  display: flex;
-  flex-direction: column;
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-end: var(--ruler-grade-inset);
+  display: var(--ruler-readout-display);
   align-items: center;
+  transform: translateY(var(--ruler-readout-gap));
   font-family: var(--font-mono);
   font-size: var(--font-size-2xs);
   line-height: var(--line-height-tight);
   color: var(--color-text-bright);
 }
 
-/* Dict-sourced language tag (EN / FR) — the one part of the readout that is copy. */
-.ruler__tag {
-  letter-spacing: var(--letter-spacing-wide);
-  color: var(--color-text-subtle);
-}
-
-.ruler__value {
-  display: flex;
-  align-items: center;
+/* The end-of-travel flip (ruler.js toggles it when the below row would cross
+ * the marker's bottom travel line): the row's own `-100%` stays true to its
+ * rendered box, so `-100% - clear` lands the row bottom clear of the rule. */
+.ruler__readout.is-above {
+  transform: translateY(calc(-100% - var(--ruler-readout-clear)));
 }
 
 /* Window: exactly one strip line tall; the view sets the line index. */
@@ -167,11 +165,12 @@
   overflow: hidden;
 }
 
-/* Strip: one digit per line (`\n`-joined chrome glyphs, blanks kept by `pre`).
- * The line box and the window are both `--ruler-drum-step`, so the roll step,
- * the clip height and the geometry stay one value — a 1em line box is smaller
- * than the font's content area (~1.16em), which let the next digit's ink bleed
- * into the window at rest. */
+/* Strip: one digit per line (`\n`-joined chrome glyphs, zero-padded since 113
+ * — the inspiration's `078`, superseding 109's blank pad). The line box and the
+ * window are both `--ruler-drum-step`, so the roll step, the clip height and
+ * the geometry stay one value — a 1em line box is smaller than the font's
+ * content area (~1.16em), which let the next digit's ink bleed into the window
+ * at rest. */
 .ruler__strip {
   display: block;
   line-height: var(--ruler-drum-step);
