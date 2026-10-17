@@ -1,5 +1,5 @@
 /**
- * Side rail (ticket 103).
+ * Side rail (ticket 103; settle dynamics since 108).
  *
  * Persistent right-side stack of the five section names in the inner edge
  * lane (between the content and the ruler). The links are real in-page anchors
@@ -9,9 +9,17 @@
  *
  * The current section is tracked with an IntersectionObserver over the middle
  * viewport band (no per-frame layout reads) and surfaced twice: a visual
- * highlight plus `aria-current` on the active link. Under 768px the rail
- * collapses to icon mode — drawn dots, with the label text kept (font-size 0)
- * so assistive tech still announces every stop.
+ * highlight plus `aria-current` on the active link.
+ *
+ * Since ticket 108 the rail also carries the progress of the read: every
+ * section up to the furthest one reached is marked `data-discovered`, which
+ * rail.css paints as "settled" (at rest, one step brighter). Entries past that
+ * point stay gray and shifted. Discovery is monotonic — a section is never
+ * un-marked when the reader scrolls back up — and on a mid-page load or deep
+ * link the sections at or above the opening section start out settled.
+ *
+ * Under 768px the rail collapses to icon mode — drawn dots, with the label
+ * text kept (font-size 0) so assistive tech still announces every stop.
  */
 
 export function initRail() {
@@ -44,9 +52,15 @@ export function initRail() {
   const ratios = new Map();
   let current = null;
 
+  // Highest section index reached so far (ticket 108). A high-water mark, so
+  // discovery only ever advances: scrolling back up never re-grays a section
+  // the reader has already seen.
+  let discoveredUpto = -1;
+
   function setCurrent(id) {
     if (id === current) return;
     current = id;
+
     for (const [key, link] of byId) {
       if (key === id) {
         link.setAttribute("aria-current", "true");
@@ -54,6 +68,15 @@ export function initRail() {
         link.removeAttribute("aria-current");
       }
     }
+
+    // Settle the whole run up to the furthest section reached — not just the
+    // argmax winner — so fast scrolls and jumps over intermediate sections
+    // still mark them.
+    const upto = order.indexOf(id);
+    for (let i = discoveredUpto + 1; i <= upto; i++) {
+      byId.get(order[i]).setAttribute("data-discovered", "");
+    }
+    if (upto > discoveredUpto) discoveredUpto = upto;
   }
 
   const observer = new IntersectionObserver(
