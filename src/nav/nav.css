@@ -9,9 +9,11 @@
  * through var() (repo rule). Since ticket 107 the bar matches the
  * inspiration's chrome: ~48px tall, a translucent blurred band (same band
  * formula as the 106 brows), mono uppercase link labels, and links that draw
- * an inverted box on hover. On narrow screens the link list wraps onto extra
- * lines so every label stays visible; the page never overflows horizontally.
- * --eyebrow-top re-syncs to whatever height this reflows into
+ * an inverted box on hover. Since 117 the bar's left end hosts the traced
+ * brand mark as the home link (logo-only, their nav's own pattern); the list
+ * links carry projects→contact only. On narrow screens the link list wraps
+ * onto extra lines so every label stays visible; the page never overflows
+ * horizontally. --eyebrow-top re-syncs to whatever height this reflows into
  * (src/motion/eyebrows.js).
  */
 
@@ -60,6 +62,35 @@
 .nav__link:focus-visible {
   color: var(--color-accent-contrast);
   background-color: var(--color-accent);
+}
+
+/* The brand mark (ticket 117): the traced monogram replaces the wordmark slot
+ * at the bar's left end, the inspiration's logo-only pattern. A bare link —
+ * it takes NO inverted box on hover (their logo gets none); a quiet opacity
+ * step keeps it a link affordance, and the global :focus-visible ring in
+ * base.css covers keyboard reachability. The aria-label binds nav.hero, so
+ * EN/FR screen readers hear the jump target, and the href is #hero, whose
+ * smooth-scroll seam every # link already rides. */
+.nav__brand {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  color: var(--color-text);
+  transition: opacity var(--duration-fast) var(--ease-standard);
+}
+
+.nav__brand:hover {
+  opacity: var(--nav-brand-hover);
+}
+
+/* The mark's box comes entirely from the --nav-brand-size token: height set,
+ * width from the artwork's own 923:687 aspect (geometry of the traced path,
+ * a fixed fact — like the ruler's 2:1 tick ratio), so any future token step
+ * rescales the whole glyph. Ink via currentColor keeps the theme seam. */
+.nav__brand-mark {
+  block-size: var(--nav-brand-size);
+  inline-size: calc(var(--nav-brand-size) * 1.344);
+  fill: currentColor;
 }
 
 .lang-switch {

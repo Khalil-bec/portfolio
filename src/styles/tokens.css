@@ -280,6 +280,16 @@
    * clicks died on the track. Ours: names 150 < ruler 160 < nav 180. */
   --z-ruler: 160;
   --z-nav: 180;
+
+  /* Ticket 117 — the brand mark's glyph height in the nav bar (`inline-size`
+   * derives from it in nav.css: the mark's own 923:687 aspect is artwork
+   * geometry, like the ruler's 2:1 tick ratio). Narrow step lives in the
+   * query below; the mark never unmounts (their logo stays at every width). */
+  --nav-brand-size: 1.375rem;
+
+  /* Ticket 117 — the bare link's hover step (the review call: the value sits
+   * home with the other ink tiers, not inline in nav.css). */
+  --nav-brand-hover: 0.72;
 }
 
 /* Narrow mode (ticket 105/112/113): the switches that ride the 768px boundary
@@ -304,5 +314,7 @@
     /* The names layer leaves with the lane (114): no express list over the
      * narrow keeper — the nav links carry the jump affordance alone. */
     --names-display: none;
+    /* Ticket 117: the brand mark steps down with the bar. */
+    --nav-brand-size: 1.25rem;
   }
 }
