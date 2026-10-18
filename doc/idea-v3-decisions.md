@@ -120,3 +120,19 @@ tickets 116–121. Spec: `doc/idea-v3-spec.md`.
 - **Drift direction is the probe's truth**: chips travel *slower* than the content —
   a receding background plane — so `--chip-drift-px: 1px` (positive), factors 0.10–0.25;
   rings recede deeper at 0.05.
+
+## 2026-10-18 — ticket 119 (about promotion) — decisions recorded at review
+
+- **The hero cell ends exactly at one viewport** (spec §4's "#hero = first viewport only").
+  118's head formula couldn't deliver that without knowing the hero's in-flow sticky index
+  bar (whose height comes from content, not a token), so hero.js publishes
+  `--hero-index-h` on first paint + resize — the 106 measured-parameter precedent
+  (`--eyebrow-top`); tokens.css keeps only the 0px no-JS fallback (no-JS hero ≈ 41px taller,
+  tolerable). Under reduced motion the measurement still runs (only the backdrop drift is
+  gated off).
+- **The reserved portrait slot retired with the promotion**; its two tokens
+  (`--slot-portrait-ratio/width`) are deleted. The project-shot slot tokens stay (ticket 006
+  still reserves those slots).
+- **The about section = the 106 display title + the paragraph set + the languages line and
+  nothing else** — the number/eyebrow scaffold comes free from the section shell (CSS
+  counter), the name layer gains its 6th row by markup alone (name.js is row-count agnostic).

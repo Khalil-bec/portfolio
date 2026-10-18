@@ -39,4 +39,17 @@ grow by one: hero = Home, about = About.
 
 **Not in scope:** footer (121), intro (120); hero visuals (118 done).
 
-**Status:** todo.
+**Status:** done — implemented + both-axis review 2026-10-18 (standards PASS, zero hard
+violations; spec PASS on substance after the records landed). In-scope-by-necessity:
+`hero.js` publishes `--hero-index-h` (the sticky index bar is in-flow; the cell must end at
+one viewport; the 106 measured-parameter precedent) + the matching tokens.css 0px no-JS
+fallback — decisions recorded. The portrait slot's tokens deleted (zero consumers).
+
+**Verification:** qa-119 18/18 (6 names rows in order, about = 2nd section → counter 02,
+title/3 paragraphs/languages bound EN+FR, portrait + hero-about gone, hero = one viewport
+(950→900 after the index measurement), names current flips to #about at depth, zero
+overflow/errors 1440+375 EN/FR) + qa-118 29/29 rerun green (hero/ticker unaffected).
+Tops re-measured: hero 47 / projects 1512 / skills 3383 / education 4127 / contact 4577,
+maxScroll 4133 — contact 4577 > 4133, the clamp (contact flip) lives on, closed by the
+121 footer. Screenshots: v119-fold.png (01/HOME + express row), v119-about.png (02/ABOUT +
+03/PROJECTS), v119-375-about.png.
