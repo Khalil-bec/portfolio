@@ -53,4 +53,25 @@ GitHub CTA + mono meta row in the centred column, ticker bound to the skill name
 **Not in scope:** the intro overlay (120); the about promotion (119); the footer (121); the
 nav (117 done).
 
-**Status:** todo.
+**Status:** done — implemented + both-axis review 2026-10-18 (standards PASS: zero hard
+violations; spec PASS). Findings applied: AWS→**Prometheus** chip swap (simple-icons dropped
+the AWS mark; Prometheus is a tier-2 dict skill — logged in decisions); simple-icons
+provenance + CC0 noted in decisions; the backdrop's cell-scoped (not full-bleed) deviation
+logged in decisions; CTA token pair built as ink inversion (--color-text/--color-bg — the
+accent pair is value-identical; accent stays focus/ruler-only per 116 — logged);
+`--chip-drift-px` sign flipped POSITIVE (the probe's truth: chips travel slower than the
+content — receding plane); ring drift 0.05 added (was missing vs spec letter); NE CTA arrow
+added drawn purely with CSS borders (the cue-chevron technique, no text glyph escaping the
+dict seam); stale "tagline" comments refreshed (motion.css, ticker.js header); blank-line
+lint. Files beyond the ticket's listed runtime seam that the build required:
+`src/i18n/i18n.js` (the join mode) + `src/main.js` (the initHero wire-up) — judged
+in-scope-by-necessity by the spec review.
+
+**Verification:** qa-118 (29 checks: chips/rings counts, one-line name, CTA href/target/
+announce, meta text, ticker ARIA shape + skills.all source, zero errors both widths + FR
+switch rebind + zero overflow, drift factor exact at +0.18·400 = 72px, reduced-motion static
+(no counter non-live ticker), no-JS shell contract) — ALL GREEN; token gate clean after
+ring-anchor/unit-conversion tokenization; screenshots: 1440 EN/FR/RM + 375 EN
+(`/tmp/opencode/v118-*.png`); below-fold + names-layer + ruler snapshots unchanged
+(v118-about.png); tops re-measured: hero 47 / projects 1436 / skills 3307 / education 4051 /
+contact 4501, maxScroll 4057 — contact clamp still pending 121.

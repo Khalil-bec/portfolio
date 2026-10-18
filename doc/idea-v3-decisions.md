@@ -99,3 +99,24 @@ tickets 116–121. Spec: `doc/idea-v3-spec.md`.
   EN+FR+reduced+375, ruler lane mapping, names states, nav focus, ticker ARIA, token-gate
   pattern) — counts differ from the lost files by design; it is the new regression floor,
   extended per ticket.
+
+## 2026-10-18 — ticket 118 (hero reload) — decisions recorded at review
+
+- **The chip set's 13th member is Prometheus, not AWS**: simple-icons removed the AWS mark
+  (trademark takedown; `amazonaws` 404s on the current release). Prometheus is a tier-2 dict
+  skill ("Hands-on — worked with in real setups"), same DevOps family, so it takes the slot.
+- **Asset provenance + license**: the 13 chips are simple-icons files (fetched once, at
+  `simple-icons@15.22.0`, committed under `src/sections/hero/assets/`). The collection is
+  CC0; the underlying brand marks remain subject to their owners' trademark rules — used
+  here decoratively. No runtime external requests (the 007 contract).
+- **The backdrop is cell-scoped, not full-bleed**: the page lives in the bordered table
+  frame (112) — the inspo's viewport-bleed becomes the hero cell's own box, so the rings
+  and chips crop at the column edge exactly as the inspo crops at the viewport edge.
+- **The CTA is built as the ink inversion** (`--color-text` ground / `--color-bg` text) —
+  the ticket's `--color-accent`/`--color-accent-contrast` pair is value-identical
+  (`#f2f1ee` / `#121316`); accent keeps its 116-only focus/ruler job. The label's NE arrow
+  is drawn with border corners (the cue-chevron technique) — no glyph enters markup outside
+  the dictionary seam.
+- **Drift direction is the probe's truth**: chips travel *slower* than the content —
+  a receding background plane — so `--chip-drift-px: 1px` (positive), factors 0.10–0.25;
+  rings recede deeper at 0.05.
