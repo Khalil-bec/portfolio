@@ -29,7 +29,9 @@
  * letters ride the base size with a 1em box (their measured 16px line box);
  * the current row unclamps its size, grows the box around a 32px word and
  * takes the full ink tier — the stack rows stay muted, their measured 0.62
- * grey being our 0.6 tier. */
+ * grey being our 0.6 tier. The states are instant (no transition); the
+ * travel between them lives in name.js (115), whose flying letters carry
+ * inline styles only. */
 .names__row {
   position: absolute;
   inset-inline-end: var(--name-inset);
@@ -72,7 +74,10 @@
 
 /* Letters (chrome, aria-hidden): uppercase display words like the
  * inspiration's; weight 620 ≈ our semibold — our stack carries no width axis,
- * so their measured 118% stretch is dropped (logged in the ticket). */
+ * so their measured 118% stretch is dropped (logged in the ticket). Flying
+ * letters during the travel (115) carry inline styles only (fixed position,
+ * transform, muted ink); nothing transitions here — the settled form below
+ * is all this file owns. */
 .names__letters {
   display: flex;
   align-items: baseline;

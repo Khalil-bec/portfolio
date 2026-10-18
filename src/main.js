@@ -46,6 +46,7 @@ initTicker(reducedMotion);
 initEyebrows();
 initRuler(driver);
 // The names layer rides the same driver frame (114): it reads scrollY per
-// render and publishes state counters only.
-initNames(driver);
+// render and publishes state counters only; 115's letter travel respects the
+// same reduced-motion kill-switch (the initTicker precedent).
+initNames(driver, reducedMotion);
 initNav();

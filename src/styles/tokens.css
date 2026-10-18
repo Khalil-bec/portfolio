@@ -110,6 +110,14 @@
   --name-row-h: 1.5rem;
   --name-letter-line: 1;
 
+  /* Letter travel (ticket 115): the vertical train's cell — one 20px slot of
+   * the same grid the rows ride, centred on the lane's axis; the
+   * inspiration's columns measured 18.8–19.6px, rounded to the system's own
+   * 20px cell. JS reads it for the travel's positions (the marker-span
+   * pattern: the px completion is a measurement seam, ruler.js's
+   * `measurePx`). */
+  --name-transit-cell: 1.25rem;
+
   /* The names layer's display switch (114): the express list is the
    * inspiration's desktop chrome and it mounts nothing below 640 — our narrow
    * boundary is 768, where the nav mono links remain the jump affordance and
