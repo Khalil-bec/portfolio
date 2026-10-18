@@ -4,7 +4,8 @@
   },
   "nav": {
     "aria": "Primary navigation",
-    "hero": "About",
+    "hero": "Home",
+    "about": "About",
     "projects": "Projects",
     "skills": "Skills",
     "education": "Education",
@@ -25,9 +26,11 @@
     "name": "Mohamed Khalil BECHEIKH",
     "tagline": "**DevOps & Infrastructure** — Computer science student, equally fascinated by systems and applications.",
     "role": "DevOps & Infrastructure",
-    "cta": "GitHub",
-    "aboutTitle": "About",
-    "about": [
+    "cta": "GitHub"
+  },
+  "about": {
+    "title": "About",
+    "body": [
       "A computer science student at UPPA, working my way toward **DevOps and infrastructure**: automation, containerization, CI/CD, and everything that gets code into production without pain.",
       "What draws me in is the part nobody sees — understanding what actually happens underneath rather than copying commands from memory. I wrote my own command interpreter to know exactly what occurs when you type into a terminal.",
       "My three projects are built as evidence, not demos: each one solves a real infrastructure problem, and every piece was chosen and configured by hand."

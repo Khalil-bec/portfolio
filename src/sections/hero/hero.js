@@ -17,7 +17,28 @@ let lastPublished = -1;
 
 export function initHero(driver, reducedMotion) {
   const section = document.querySelector("[data-section='hero']");
-  if (!section || !driver || typeof driver.setView !== "function") return;
+  if (!section) return;
+
+  // The sticky index bar is in-flow (106), so it shares the cell's height. The
+  // head's min-height subtracts it, measured live, so the hero cell ends
+  // exactly at one viewport and the ticker band starts at the fold. Same
+  // layout-parameter pattern as --eyebrow-top: a runtime-measured number
+  // written to a custom property; tokens.css keeps only the 0px no-JS
+  // fallback, and a ResizeObserver re-syncs reflows (zoom, font swap).
+  const index = section.querySelector(".section__index");
+  if (index) {
+    const root = document.documentElement;
+    const write = () => root.style.setProperty(
+      "--hero-index-h", `${Math.ceil(index.getBoundingClientRect().height)}px`
+    );
+    write();
+    // No disconnect fn: hero registers once per load and main.js keeps no
+    // cleanup handles for any init module (the initNav precedent) — the
+    // observer dies with the page, not with a teardown nobody calls.
+    new ResizeObserver(write).observe(index);
+  }
+
+  if (!driver || typeof driver.setView !== "function") return;
   if (reducedMotion) return; // the static backdrop is the reduced experience
 
   driver.setView({

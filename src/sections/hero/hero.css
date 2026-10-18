@@ -3,11 +3,13 @@
  * the measured inspiration's dynamic head: rings + floating skill-logo chips
  * behind name + tagline + GitHub CTA + mono meta + cue).
  *
+ * (The about block left this file for src/sections/about/ at ticket 119 —
+ * the hero's first viewport carries the whole remaining height.)
  * Design tokens only, consumed through var() (repo rule): every chip's
  * geometry lives in tokens.css (the 13 --chip-<name> groups); this file only
  * maps the tokens onto the elements and draws with shared tokens. No media
- * query in here: the vw ceiling in min() keeps chips inside the box at every
- * width, and the about grid wraps intrinsically.
+ * query in here: the vw ceiling in min() keeps chips inside the box at
+ * every width.
  */
 
 .section--hero {
@@ -108,9 +110,15 @@
   gap: var(--hero-head-gap);
   /* Above the backdrop chips/rings, under the nav. */
   z-index: 1;
-  /* Leaves room for the sticky nav, the section padding and the section index
-   * so name + tagline + CTA + meta + cue stay inside the first viewport. */
-  min-block-size: calc(var(--hero-min-height) - var(--space-3xl) - var(--space-2xl));
+  /* Leaves room for the sticky nav, the section index and the hero cell's own
+   * block padding, so name + tagline + CTA + meta + cue stay inside the first
+   * viewport AND the cell itself ends exactly at one viewport (the ticker band
+   * starts right at the fold — 119's seat): the in-flow index bar's measured
+   * height comes back as --hero-index-h (hero.js, the 106 measured-parameter
+   * precedent; 0px is the no-JS fallback in tokens.css). */
+  min-block-size: calc(
+    var(--hero-min-height) - var(--section-gap) * 2 - var(--hero-index-h)
+  );
 }
 
 .hero__name {
@@ -204,42 +212,4 @@
   border-inline-end: var(--border-width) solid var(--color-text-subtle);
   border-block-end: var(--border-width) solid var(--color-text-subtle);
   transform: rotate(45deg);
-}
-
-/* --- About block --------------------------------------------------------- */
-
-.hero__about-title {
-  margin-block-end: var(--space-lg);
-  font-family: var(--font-mono); /* ticket 106: micro-labels are mono */
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
-  letter-spacing: var(--letter-spacing-wide);
-  text-transform: uppercase;
-  color: var(--color-text-subtle);
-}
-
-.hero__about-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-xl);
-  align-items: flex-start;
-}
-
-.hero__about-body {
-  display: flex;
-  flex: 1 1 var(--measure);
-  flex-direction: column;
-  gap: var(--space-md);
-  max-inline-size: var(--measure);
-}
-
-.hero__languages {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
-}
-
-.hero__portrait {
-  flex: 0 0 var(--slot-portrait-width);
-  aspect-ratio: var(--slot-portrait-ratio);
-  inline-size: var(--slot-portrait-width);
 }

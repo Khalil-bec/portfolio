@@ -4,7 +4,8 @@
   },
   "nav": {
     "aria": "Navigation principale",
-    "hero": "À propos",
+    "hero": "Accueil",
+    "about": "À propos",
     "projects": "Projets",
     "skills": "Compétences",
     "education": "Formation",
@@ -25,9 +26,11 @@
     "name": "Mohamed Khalil BECHEIKH",
     "tagline": "**DevOps & Infrastructure** — Étudiant en L3 informatique, passionné par les systèmes autant que par les applications.",
     "role": "DevOps & Infrastructure",
-    "cta": "GitHub",
-    "aboutTitle": "À propos",
-    "about": [
+    "cta": "GitHub"
+  },
+  "about": {
+    "title": "À propos",
+    "body": [
       "Étudiant en informatique à l'UPPA, je m'oriente vers le **DevOps et l'infrastructure** : automatisation, conteneurisation, CI/CD, et tout ce qui fait qu'un code arrive en production sans douleur.",
       "Ce qui m'attire, c'est la partie qu'on ne voit pas : comprendre ce qui se passe vraiment sous le capot plutôt que de recopier une commande. J'ai écrit mon propre interpréteur de commandes pour savoir exactement ce qui se passe quand on tape quelque chose dans un terminal.",
       "Mes trois projets sont construits comme des preuves, pas comme des démos : chacun résout un vrai problème d'infrastructure, et chaque brique est choisie et configurée à la main."

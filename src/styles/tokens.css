@@ -232,6 +232,11 @@
   /* Hero head v3 (ticket 118): the measured first-viewport. The column gap
    * shrinks from the head's old --space-lg to keep name + tagline + CTA + meta
    * + cue inside the cap. */
+  /* Runtime-measured (hero.js, 106 pattern): the hero's in-flow index bar
+   * height, subtracted from the head's cap so the cell ends at one viewport.
+   * 0px is the no-JS fallback (unmeasured). */
+  --hero-index-h: 0px;
+
   --hero-head-gap: var(--space-md);
 
   /* Rings: three hairline circles behind the head, centred on the column's
@@ -375,10 +380,8 @@
    * (base.css) draw it; --lane-total's other consumers are gone. */
   --bleed-width: 100vw;
 
-  /* Reserved media slots (ticket 005). Fixed aspect ratio + width so an empty
-   * slot already holds the space its asset will need later (no layout shift). */
-  --slot-portrait-ratio: 4 / 5;
-  --slot-portrait-width: 14rem;
+  /* Reserved media slot tokens: the project screenshots keep theirs below;
+   * the portrait slot retired at 119 (its slot retired with the promotion). */
 
   /* Reserved project screenshot slots (ticket 006). */
   --slot-shot-ratio: 16 / 10;

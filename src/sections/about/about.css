@@ -1,0 +1,19 @@
+/*
+ * About section (ticket 119): the hero's below-fold about block, promoted to
+ * its own section (the inspiration's structure; the user's brief — "the about
+ * section is just the paragraph, not the hero"). Copy binds from about.* (the
+ * relocated hero.* keys); the reserved portrait slot retired with the move.
+ * Design tokens only, consumed through var() (repo rule).
+ */
+
+.about__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  max-inline-size: var(--measure);
+}
+
+.about__languages {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}

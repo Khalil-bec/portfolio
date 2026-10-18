@@ -35,7 +35,7 @@
       copy in sync whenever a section is edited.
 
       Stylesheet order (load order): lenis (vendor utility) -> tokens -> base ->
-      nav (ticket 004) -> section css (document order, hero -> contact) ->
+      nav (ticket 004) -> section css (document order, hero/about/… -> contact) ->
       motion (numbering, reveal, ticker shell from ticket 003) ->
       ruler (fixed overlay, ticket 102). The rail that followed (tickets
       103/108) was retired in ticket 112 — the section list it duplicated is
@@ -55,6 +55,7 @@
     <link rel="stylesheet" href="src/styles/base.css" />
     <link rel="stylesheet" href="src/nav/nav.css" />
     <link rel="stylesheet" href="src/sections/hero/hero.css" />
+    <link rel="stylesheet" href="src/sections/about/about.css" />
     <link rel="stylesheet" href="src/sections/projects/projects.css" />
     <link rel="stylesheet" href="src/sections/skills/skills.css" />
     <link rel="stylesheet" href="src/sections/education/education.css" />
@@ -113,67 +114,54 @@
     <main id="main">
       <!-- inlined from src/sections/hero/hero.html -->
       <section id="hero" class="section section--hero" data-section="hero">
-      <span class="section__index" aria-hidden="true"><span class="section__num"></span><span class="section__name" data-i18n="nav.hero"></span></span>
+        <span class="section__index" aria-hidden="true"><span class="section__num"></span><span class="section__name" data-i18n="nav.hero"></span></span>
 
-      <!--
-        Backdrop (ticket 118): the measured inspiration's dynamic head — thin
-        concentric rings plus the floating skill-logo chips (13 simple-icons
-        glyphs, local assets, recoloured ink through currentColor + mask).
-        Decorative end to end: aria-hidden, no pointers, and geometry 100%
-        token-driven. The per-frame drift is CSS math off the --hero-scroll
-        counter (src/sections/hero/hero.js); with JS off or reduced motion the
-        counter never publishes and the backdrop sits static.
-      -->
-      <div class="hero__backdrop" aria-hidden="true">
-        <span class="hero__ring hero__ring--1"></span>
-        <span class="hero__ring hero__ring--2"></span>
-        <span class="hero__ring hero__ring--3"></span>
-        <span class="hero__chip" data-chip="docker"></span>
-        <span class="hero__chip" data-chip="kubernetes"></span>
-        <span class="hero__chip" data-chip="python"></span>
-        <span class="hero__chip" data-chip="linux"></span>
-        <span class="hero__chip" data-chip="github"></span>
-        <span class="hero__chip" data-chip="git"></span>
-        <span class="hero__chip" data-chip="terraform"></span>
-        <span class="hero__chip" data-chip="mysql"></span>
-        <span class="hero__chip" data-chip="grafana"></span>
-        <span class="hero__chip" data-chip="nginx"></span>
-        <span class="hero__chip" data-chip="flask"></span>
-        <span class="hero__chip" data-chip="ansible"></span>
-        <span class="hero__chip" data-chip="prometheus"></span>
-      </div>
-
-      <!-- Above the fold: name + tagline + GitHub CTA + mono meta + the scroll cue
-           (ticket 118). All copy is dict-bound; the meta row reuses
-           contact.location. -->
-      <div class="hero__head">
-        <h1 class="hero__name" data-i18n="hero.name"></h1>
-        <p class="hero__tagline" data-i18n="hero.tagline"></p>
-        <p class="hero__cta-row">
-          <a class="hero__cta" href="https://github.com/Khalil-bec" target="_blank" rel="noopener noreferrer"><span data-i18n="hero.cta"></span><span class="hero__cta-arrow" aria-hidden="true"></span><span class="visually-hidden" data-i18n="a11y.newTab"></span></a>
-        </p>
-        <p class="hero__meta">
-          <span data-i18n="contact.location"></span>
-          <span class="hero__meta-sep" aria-hidden="true"></span>
-          <span data-i18n="hero.role"></span>
-        </p>
-        <span class="hero__cue" aria-hidden="true"></span>
-      </div>
-
-      <!-- Below the fold: about paragraphs + human languages + reserved portrait. -->
-      <div class="hero__about">
-        <h2 class="hero__about-title" data-i18n="hero.aboutTitle"></h2>
-        <div class="hero__about-grid">
-          <div class="hero__about-body">
-            <p data-reveal data-i18n="hero.about[0]"></p>
-            <p data-reveal data-i18n="hero.about[1]"></p>
-            <p data-reveal data-i18n="hero.about[2]"></p>
-            <p class="hero__languages" data-reveal data-i18n="hero.languages"></p>
-          </div>
-          <div class="hero__portrait image-slot" aria-hidden="true" data-reveal></div>
+        <!--
+          Backdrop (ticket 118): the measured inspiration's dynamic head — thin
+          concentric rings plus the floating skill-logo chips (13 simple-icons
+          glyphs, local assets, recoloured ink through currentColor + mask).
+          Decorative end to end: aria-hidden, no pointers, and geometry 100%
+          token-driven. The per-frame drift is CSS math off the --hero-scroll
+          counter (src/sections/hero/hero.js); with JS off or reduced motion the
+          counter never publishes and the backdrop sits static.
+        -->
+        <div class="hero__backdrop" aria-hidden="true">
+          <span class="hero__ring hero__ring--1"></span>
+          <span class="hero__ring hero__ring--2"></span>
+          <span class="hero__ring hero__ring--3"></span>
+          <span class="hero__chip" data-chip="docker"></span>
+          <span class="hero__chip" data-chip="kubernetes"></span>
+          <span class="hero__chip" data-chip="python"></span>
+          <span class="hero__chip" data-chip="linux"></span>
+          <span class="hero__chip" data-chip="github"></span>
+          <span class="hero__chip" data-chip="git"></span>
+          <span class="hero__chip" data-chip="terraform"></span>
+          <span class="hero__chip" data-chip="mysql"></span>
+          <span class="hero__chip" data-chip="grafana"></span>
+          <span class="hero__chip" data-chip="nginx"></span>
+          <span class="hero__chip" data-chip="flask"></span>
+          <span class="hero__chip" data-chip="ansible"></span>
+          <span class="hero__chip" data-chip="prometheus"></span>
         </div>
-      </div>
-    </section>
+
+        <!-- Above the fold: name + tagline + GitHub CTA + mono meta + the scroll cue
+             (ticket 118). All copy is dict-bound; the meta row reuses
+             contact.location. -->
+        <div class="hero__head">
+          <h1 class="hero__name" data-i18n="hero.name"></h1>
+          <p class="hero__tagline" data-i18n="hero.tagline"></p>
+          <p class="hero__cta-row">
+            <a class="hero__cta" href="https://github.com/Khalil-bec" target="_blank" rel="noopener noreferrer"><span data-i18n="hero.cta"></span><span class="hero__cta-arrow" aria-hidden="true"></span><span class="visually-hidden" data-i18n="a11y.newTab"></span></a>
+          </p>
+          <p class="hero__meta">
+            <span data-i18n="contact.location"></span>
+            <span class="hero__meta-sep" aria-hidden="true"></span>
+            <span data-i18n="hero.role"></span>
+          </p>
+          <span class="hero__cue" aria-hidden="true"></span>
+        </div>
+
+      </section>
 
 
       <!--
@@ -187,6 +175,23 @@
         <div class="ticker__track" data-ticker-track></div>
         <span class="ticker__item" data-ticker-source data-i18n="skills.all" data-i18n-mode="join"></span>
       </div>
+
+      <!-- inlined from src/sections/about/about.html -->
+      <section id="about" class="section section--about" data-section="about">
+        <span class="section__index" aria-hidden="true"><span class="section__num"></span><span class="section__name" data-i18n="nav.about"></span></span>
+
+        <!-- Ticket 119: the about block promoted out of #hero — the paragraph set
+             (plus the human-languages line) and nothing else; the reserved portrait
+             slot retired with the move. Copy begins its paragraphs through the
+             about.* dictionary keys (the relocated hero.* ones). -->
+        <h2 class="section__title" data-i18n="about.title"></h2>
+        <div class="about__body">
+          <p data-reveal data-i18n="about.body[0]"></p>
+          <p data-reveal data-i18n="about.body[1]"></p>
+          <p data-reveal data-i18n="about.body[2]"></p>
+          <p class="about__languages" data-reveal data-i18n="about.languages"></p>
+        </div>
+      </section>
 
       <!-- inlined from src/sections/projects/projects.html -->
       <section id="projects" class="section section--projects" data-section="projects">
@@ -402,6 +407,7 @@
          layer hides <=768 (tokens.css) where the inspiration mounts nothing. -->
     <div class="names" data-names>
       <a class="names__row" data-name href="#hero" data-i18n="nav.hero" data-i18n-attr="aria-label=nav.hero"></a>
+      <a class="names__row" data-name href="#about" data-i18n="nav.about" data-i18n-attr="aria-label=nav.about"></a>
       <a class="names__row" data-name href="#projects" data-i18n="nav.projects" data-i18n-attr="aria-label=nav.projects"></a>
       <a class="names__row" data-name href="#skills" data-i18n="nav.skills" data-i18n-attr="aria-label=nav.skills"></a>
       <a class="names__row" data-name href="#education" data-i18n="nav.education" data-i18n-attr="aria-label=nav.education"></a>
