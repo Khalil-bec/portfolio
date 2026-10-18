@@ -229,6 +229,147 @@
   --section-min-height: 50svh;
   --hero-min-height: 100svh;
 
+  /* Hero head v3 (ticket 118): the measured first-viewport. The column gap
+   * shrinks from the head's old --space-lg to keep name + tagline + CTA + meta
+   * + cue inside the cap. */
+  --hero-head-gap: var(--space-md);
+
+  /* Rings: three hairline circles behind the head, centred on the column's
+   * first-viewport block; sizes are the drawn diameters, opacity steps keep
+   * the outer ones airier. */
+  /* Ring anchor: the head's optical centre (the type block's middle). */
+  --hero-ring-cx: 50%;
+  --hero-ring-cy: 42%;
+  --hero-ring-1: 26rem; /* min() caps keep every ring inside the cell at 375 */
+  --hero-ring-2: 44rem;
+  --hero-ring-3: 64rem;
+  --hero-ring-cap-1: 60vw;
+  --hero-ring-cap-2: 82vw;
+  --hero-ring-cap-3: 94vw;
+  --hero-ring-drift: 0.05; /* rings recede deeper than the chips */
+  --hero-ring-opacity-1: 0.9;
+  --hero-ring-opacity-2: 0.55;
+  --hero-ring-opacity-3: 0.3;
+
+  /* Chips: 13 skill-logo glyphs (local simple-icons assets, masked onto
+   * currentColor). Geometry per chip: x/y anchors (% of the hero's first
+   * viewport block), intrinsic size, blur (near the centre) and scroll-drift
+   * factor (unitless; CSS multiplies by px). Sizes clamp to a vw ceiling so
+   * narrow viewports can never overflow; anchors avoid the central type zone
+   * (x 30–70 / y 18–62 between them). Ink alpha tiers replace per-chip values. */
+  --chip-ink-soft: rgba(242, 241, 238, 0.13);
+  --chip-ink-mid: rgba(242, 241, 238, 0.24);
+  --chip-ink-bright: rgba(242, 241, 238, 0.4);
+  --chip-blur-soft: 8px;
+  --chip-blur-mid: 4px;
+  --chip-blur-sharp: 0px;
+  --chip-size-cap: 22vw; /* the vw ceiling that clamps sizes at narrow widths */
+  --chip-size-fallback: 7rem;
+  --chip-anchor-center: 50%;
+  /* --chip-drift-still is only the alias for an unmapped chip; the no-JS
+   * zero comes from --hero-scroll's own 0 fallback (hero.css). */
+  --chip-drift-still: 0;
+  /* Sign per the 2026-10-18 probe: the inspo's chips travel SLOWER than the
+   * content (a receding background plane), so the positive unit conversion
+   * makes counter * factor move the chip DOWN relative to its rest-in-content
+   * position as the page scrolls up. */
+  --chip-drift-px: 1px;
+  /* docker — edge chip: top-left, sharp. */
+  --chip-docker-x: 8%;
+  --chip-docker-y: 10%;
+  --chip-docker-size: 9rem;
+  --chip-docker-blur: var(--chip-blur-sharp);
+  --chip-docker-drift: 0.18;
+
+  /* kubernetes — edge chip: top-right, sharp. */
+  --chip-kubernetes-x: 92%;
+  --chip-kubernetes-y: 9%;
+  --chip-kubernetes-size: 8rem;
+  --chip-kubernetes-blur: var(--chip-blur-sharp);
+  --chip-kubernetes-drift: 0.14;
+
+  /* python — right edge, larger, slightly soft. */
+  --chip-python-x: 90%;
+  --chip-python-y: 54%;
+  --chip-python-size: 10rem;
+  --chip-python-blur: var(--chip-blur-mid);
+  --chip-python-drift: 0.16;
+
+  /* linux — left edge, largest, sharp. */
+  --chip-linux-x: 5%;
+  --chip-linux-y: 60%;
+  --chip-linux-size: 11rem;
+  --chip-linux-blur: var(--chip-blur-sharp);
+  --chip-linux-drift: 0.12;
+
+  /* github — bottom-left, fast drift. */
+  --chip-github-x: 22%;
+  --chip-github-y: 88%;
+  --chip-github-size: 7rem;
+  --chip-github-blur: var(--chip-blur-mid);
+  --chip-github-drift: 0.22;
+
+  /* git — top, centre-left, soft. */
+  --chip-git-x: 38%;
+  --chip-git-y: 7%;
+  --chip-git-size: 6.5rem;
+  --chip-git-blur: var(--chip-blur-soft);
+  --chip-git-drift: 0.2;
+
+  /* terraform — top, centre-right, soft. */
+  --chip-terraform-x: 62%;
+  --chip-terraform-y: 6%;
+  --chip-terraform-size: 5.5rem;
+  --chip-terraform-blur: var(--chip-blur-soft);
+  --chip-terraform-drift: 0.19;
+
+  /* mysql — bottom-right, slowest drift. */
+  --chip-mysql-x: 78%;
+  --chip-mysql-y: 92%;
+  --chip-mysql-size: 7.5rem;
+  --chip-mysql-blur: var(--chip-blur-mid);
+  --chip-mysql-drift: 0.15;
+
+  /* grafana — bottom-centre, soft, fastest drift. */
+  --chip-grafana-x: 46%;
+  --chip-grafana-y: 94%;
+  --chip-grafana-size: 6rem;
+  --chip-grafana-blur: var(--chip-blur-soft);
+  --chip-grafana-drift: 0.25;
+
+  /* nginx — left edge, mid-height. */
+  --chip-nginx-x: 12%;
+  --chip-nginx-y: 36%;
+  --chip-nginx-size: 6rem;
+  --chip-nginx-blur: var(--chip-blur-mid);
+  --chip-nginx-drift: 0.13;
+
+  /* flask — right edge, smallest, soft. */
+  --chip-flask-x: 84%;
+  --chip-flask-y: 34%;
+  --chip-flask-size: 5rem;
+  --chip-flask-blur: var(--chip-blur-soft);
+  --chip-flask-drift: 0.17;
+
+  /* ansible — bottom-left, fast drift. */
+  --chip-ansible-x: 28%;
+  --chip-ansible-y: 74%;
+  --chip-ansible-size: 7rem;
+  --chip-ansible-blur: var(--chip-blur-mid);
+  --chip-ansible-drift: 0.21;
+
+  /* prometheus — bottom-right, slowest. */
+  --chip-prometheus-x: 70%;
+  --chip-prometheus-y: 76%;
+  --chip-prometheus-size: 8rem;
+  --chip-prometheus-blur: var(--chip-blur-mid);
+  --chip-prometheus-drift: 0.1;
+
+  /* The GitHub CTA: the inspo's filled primary pill. */
+  --cta-pad-block: 0.875rem;
+  --cta-pad-inline: 2.25rem;
+  --cta-radius: var(--radius-pill);
+
   /* Full-bleed divider width (ticket 105; the edge overlays — the ruler since
    * 112 — sit under nothing: the rule passes beneath them). Section dividers
    * (base.css) draw it; --lane-total's other consumers are gone. */

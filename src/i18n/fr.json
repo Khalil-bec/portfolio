@@ -24,6 +24,8 @@
   "hero": {
     "name": "Mohamed Khalil BECHEIKH",
     "tagline": "**DevOps & Infrastructure** — Étudiant en L3 informatique, passionné par les systèmes autant que par les applications.",
+    "role": "DevOps & Infrastructure",
+    "cta": "GitHub",
     "aboutTitle": "À propos",
     "about": [
       "Étudiant en informatique à l'UPPA, je m'oriente vers le **DevOps et l'infrastructure** : automatisation, conteneurisation, CI/CD, et tout ce qui fait qu'un code arrive en production sans douleur.",
@@ -73,13 +75,46 @@
       },
       {
         "title": "Académique — coursework universitaire",
-        "items": ["C", "C++"],
+        "items": [
+          "C",
+          "C++"
+        ],
         "note": "Étudiés en cours, mais sans mise en pratique dans un projet personnel."
       },
       {
         "title": "En cours d'apprentissage",
-        "items": ["Terraform", "AWS", "Kubernetes"]
+        "items": [
+          "Terraform",
+          "AWS",
+          "Kubernetes"
+        ]
       }
+    ],
+    "all": [
+      "Python",
+      "Bash",
+      "Linux",
+      "Docker",
+      "Docker Compose",
+      "Flask",
+      "MySQL",
+      "SQL",
+      "Git",
+      "Nginx",
+      "GitHub Actions",
+      "Ansible",
+      "Traefik",
+      "Prometheus",
+      "Grafana",
+      "pytest",
+      "Uptime Kuma",
+      "node-exporter",
+      "mkcert / TLS",
+      "C",
+      "C++",
+      "Terraform",
+      "AWS",
+      "Kubernetes"
     ]
   },
   "projects": {

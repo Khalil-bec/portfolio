@@ -1,17 +1,18 @@
 /**
  * Marquee ticker (ticket 003).
  *
- * A CSS keyframe marquee — not GSAP — scrolling the active-language tagline, so
+ * A CSS keyframe marquee — not GSAP — scrolling the bound source item (since
+ * ticket 118: the skills.all list; before that, the tagline), so
  * it needs no frame loop of its own and dies with a single media query. The real
- * tagline text arrives with the i18n dictionaries (ticket 004); 003 only wires
+ * source text arrives with the i18n dictionaries (ticket 004); 003 only wires
  * the shell. The source element carries the `data-i18n` key; the clones copy its
- * text. `refreshTicker()` is the re-sync/re-measure hook that 004 calls after a
+ * key. `refreshTicker()` is the re-sync/re-measure hook that 004 calls after a
  * language switch, once the source element has been re-bound.
  *
  * Progressive enhancement:
  * - JS off / reduced motion: returns before building, so the source tagline stays
  *   a plain, readable, in-flow line (see motion.css).
- * - Empty tagline (003 alone, before 004 fills it): the ticker is hidden rather
+ * - Empty source (003 alone, before 004 fills it): the ticker is hidden rather
  *   than rendered as a bar of separator dots.
  * - Motion on with text: the marquee is an in-flow band directly under the hero
  *   (ticket 101) that scrolls away with the page; the clones are `aria-hidden`,

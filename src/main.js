@@ -21,6 +21,7 @@ import { initRuler } from "./ruler/ruler.js";
 import { initNames } from "./names/name.js";
 import { initI18n } from "./i18n/i18n.js";
 import { initNav } from "./nav/nav.js";
+import { initHero } from "./sections/hero/hero.js";
 
 const { lenis, reducedMotion } = initSmoothScroll();
 
@@ -49,4 +50,7 @@ initRuler(driver);
 // render and publishes state counters only; 115's letter travel respects the
 // same reduced-motion kill-switch (the initTicker precedent).
 initNames(driver, reducedMotion);
+// 118 joins the same frame for the hero backdrop's drift counter
+// (--hero-scroll; CSS owns the per-chip math, this only publishes).
+initHero(driver, reducedMotion);
 initNav();

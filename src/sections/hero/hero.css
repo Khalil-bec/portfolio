@@ -1,10 +1,13 @@
 /*
- * Hero section (content: ticket 005).
+ * Hero section (content: ticket 005; first viewport rebuilt for ticket 118 —
+ * the measured inspiration's dynamic head: rings + floating skill-logo chips
+ * behind name + tagline + GitHub CTA + mono meta + cue).
  *
- * First viewport is capped to identity (name + tagline + cue); the about block
- * and the reserved portrait sit below the fold within #hero. Design tokens only,
- * consumed through var() (repo rule). No media query: the about grid uses an
- * intrinsic flex wrap, so there is no breakpoint literal for the token gate.
+ * Design tokens only, consumed through var() (repo rule): every chip's
+ * geometry lives in tokens.css (the 13 --chip-<name> groups); this file only
+ * maps the tokens onto the elements and draws with shared tokens. No media
+ * query in here: the vw ceiling in min() keeps chips inside the box at every
+ * width, and the about grid wraps intrinsically.
  */
 
 .section--hero {
@@ -13,13 +16,100 @@
   gap: var(--section-gap);
 }
 
+/* --- Backdrop (118) ------------------------------------------------------ */
+/* Scoped to the hero cell (not full-bleed): our page lives in the bordered
+ * table frame (112), so the rings/chips stay inside the column the way every
+ * hairline on the page does — a documented deviation from the inspo's bleed.
+ * pointer-events: none so the floating glyphs never steal from the CTA. */
+.hero__backdrop {
+  position: absolute;
+  inset-block-start: 0;
+  inset-block-end: auto;
+  inset-inline: 0;
+  block-size: var(--hero-min-height);
+  z-index: 0;
+  pointer-events: none;
+  /* Edge chips clip at the cell edge exactly as the inspo's full-bleed
+   * backdrop clips at the viewport edge: the anchors near 90%+ plus half a
+   * glyph can cross the box at narrow widths, and the drift must never
+   * contribute page overflow. clip (not hidden) — no scroll container. */
+  overflow: clip;
+}
+
+.hero__ring {
+  position: absolute;
+  left: var(--hero-ring-cx);
+  top: var(--hero-ring-cy);
+  inline-size: min(var(--ring-size), var(--ring-cap));
+  block-size: min(var(--ring-size), var(--ring-cap));
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-pill);
+  /* centring transform composes the 0.05 recede drift (pure translations) */
+  transform: translate(
+    -50%,
+    calc(-50% + var(--hero-scroll, 0) * var(--hero-ring-drift) * var(--chip-drift-px))
+  );
+}
+
+.hero__ring--1 { --ring-size: var(--hero-ring-1); --ring-cap: var(--hero-ring-cap-1); opacity: var(--hero-ring-opacity-1); }
+.hero__ring--2 { --ring-size: var(--hero-ring-2); --ring-cap: var(--hero-ring-cap-2); opacity: var(--hero-ring-opacity-2); }
+.hero__ring--3 { --ring-size: var(--hero-ring-3); --ring-cap: var(--hero-ring-cap-3); opacity: var(--hero-ring-opacity-3); }
+
+/* A chip = the skill's glyph masked onto currentColor (recolorable ink),
+ * anchored at its token point inside the backdrop block, drifting up with
+ * scroll (the typed counter makes it depth, not time; publish happens in
+ * hero.js — under reduced motion / no JS the counter never changes and the
+ * calc stays at 0). Sizes clamp to a vw ceiling so narrow screens cannot
+ * overflow; anchors sit in %, half outside the box is impossible for sizes
+ * below the anchor's clearance (checked min 5% vs max 11rem ≈ 22vw cap). */
+.hero__chip {
+  position: absolute;
+  left: var(--chip-x, var(--chip-anchor-center));
+  top: var(--chip-y, var(--chip-anchor-center));
+  inline-size: min(var(--chip-size, var(--chip-size-fallback)), var(--chip-size-cap));
+  aspect-ratio: 1;
+  color: var(--chip-ink, var(--chip-ink-soft));
+  background-color: currentColor;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+  transform: translateY(
+    calc(var(--hero-scroll, 0) * var(--chip-drift, var(--chip-drift-still)) * var(--chip-drift-px))
+  );
+}
+
+/* Per-chip mapping: tokens in, one local alias each — no literals here. The
+ * mask urls are asset paths (data, like the favicon links), not design values. */
+.hero__chip[data-chip="docker"]      { --chip-x: var(--chip-docker-x);      --chip-y: var(--chip-docker-y);      --chip-size: var(--chip-docker-size);      --chip-blur: var(--chip-docker-blur);      --chip-drift: var(--chip-docker-drift);      --chip-ink: var(--chip-ink-bright); mask-image: url("assets/docker.svg"); }
+.hero__chip[data-chip="kubernetes"]  { --chip-x: var(--chip-kubernetes-x);  --chip-y: var(--chip-kubernetes-y);  --chip-size: var(--chip-kubernetes-size);  --chip-blur: var(--chip-kubernetes-blur);  --chip-drift: var(--chip-kubernetes-drift);  --chip-ink: var(--chip-ink-bright); mask-image: url("assets/kubernetes.svg"); }
+.hero__chip[data-chip="python"]      { --chip-x: var(--chip-python-x);      --chip-y: var(--chip-python-y);      --chip-size: var(--chip-python-size);      --chip-blur: var(--chip-python-blur);      --chip-drift: var(--chip-python-drift);      --chip-ink: var(--chip-ink-mid); mask-image: url("assets/python.svg"); }
+.hero__chip[data-chip="linux"]       { --chip-x: var(--chip-linux-x);       --chip-y: var(--chip-linux-y);       --chip-size: var(--chip-linux-size);       --chip-blur: var(--chip-linux-blur);       --chip-drift: var(--chip-linux-drift);       --chip-ink: var(--chip-ink-bright); mask-image: url("assets/linux.svg"); }
+.hero__chip[data-chip="github"]      { --chip-x: var(--chip-github-x);      --chip-y: var(--chip-github-y);      --chip-size: var(--chip-github-size);      --chip-blur: var(--chip-github-blur);      --chip-drift: var(--chip-github-drift);      --chip-ink: var(--chip-ink-soft); mask-image: url("assets/github.svg"); }
+.hero__chip[data-chip="git"]         { --chip-x: var(--chip-git-x);         --chip-y: var(--chip-git-y);         --chip-size: var(--chip-git-size);         --chip-blur: var(--chip-git-blur);         --chip-drift: var(--chip-git-drift);         --chip-ink: var(--chip-ink-soft); mask-image: url("assets/git.svg"); }
+.hero__chip[data-chip="terraform"]   { --chip-x: var(--chip-terraform-x);   --chip-y: var(--chip-terraform-y);   --chip-size: var(--chip-terraform-size);   --chip-blur: var(--chip-terraform-blur);   --chip-drift: var(--chip-terraform-drift);   --chip-ink: var(--chip-ink-soft); mask-image: url("assets/terraform.svg"); }
+.hero__chip[data-chip="mysql"]       { --chip-x: var(--chip-mysql-x);       --chip-y: var(--chip-mysql-y);       --chip-size: var(--chip-mysql-size);       --chip-blur: var(--chip-mysql-blur);       --chip-drift: var(--chip-mysql-drift);       --chip-ink: var(--chip-ink-mid); mask-image: url("assets/mysql.svg"); }
+.hero__chip[data-chip="grafana"]     { --chip-x: var(--chip-grafana-x);     --chip-y: var(--chip-grafana-y);     --chip-size: var(--chip-grafana-size);     --chip-blur: var(--chip-grafana-blur);     --chip-drift: var(--chip-grafana-drift);     --chip-ink: var(--chip-ink-soft); mask-image: url("assets/grafana.svg"); }
+.hero__chip[data-chip="nginx"]       { --chip-x: var(--chip-nginx-x);       --chip-y: var(--chip-nginx-y);       --chip-size: var(--chip-nginx-size);       --chip-blur: var(--chip-nginx-blur);       --chip-drift: var(--chip-nginx-drift);       --chip-ink: var(--chip-ink-mid); mask-image: url("assets/nginx.svg"); }
+.hero__chip[data-chip="flask"]       { --chip-x: var(--chip-flask-x);       --chip-y: var(--chip-flask-y);       --chip-size: var(--chip-flask-size);       --chip-blur: var(--chip-flask-blur);       --chip-drift: var(--chip-flask-drift);       --chip-ink: var(--chip-ink-soft); mask-image: url("assets/flask.svg"); }
+.hero__chip[data-chip="ansible"]     { --chip-x: var(--chip-ansible-x);     --chip-y: var(--chip-ansible-y);     --chip-size: var(--chip-ansible-size);     --chip-blur: var(--chip-ansible-blur);     --chip-drift: var(--chip-ansible-drift);     --chip-ink: var(--chip-ink-mid); mask-image: url("assets/ansible.svg"); }
+.hero__chip[data-chip="prometheus"]  { --chip-x: var(--chip-prometheus-x);  --chip-y: var(--chip-prometheus-y);  --chip-size: var(--chip-prometheus-size);  --chip-blur: var(--chip-prometheus-blur);  --chip-drift: var(--chip-prometheus-drift);  --chip-ink: var(--chip-ink-mid); mask-image: url("assets/prometheus.svg"); }
+
+.hero__chip {
+  filter: blur(var(--chip-blur, var(--chip-blur-sharp))); /* near-centre chips soften (tiered token) */
+}
+
+/* --- Head (118) ---------------------------------------------------------- */
+
 .hero__head {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: var(--space-lg);
+  align-items: center;
+  gap: var(--hero-head-gap);
+  /* Above the backdrop chips/rings, under the nav. */
+  z-index: 1;
   /* Leaves room for the sticky nav, the section padding and the section index
-   * so name + tagline + cue stay inside the first viewport. */
+   * so name + tagline + CTA + meta + cue stay inside the first viewport. */
   min-block-size: calc(var(--hero-min-height) - var(--space-3xl) - var(--space-2xl));
 }
 
@@ -28,12 +118,82 @@
   font-weight: var(--font-weight-bold);
   line-height: var(--line-height-tight);
   letter-spacing: var(--letter-spacing-tight);
+  text-align: center;
 }
 
 .hero__tagline {
   max-inline-size: var(--measure);
   font-size: var(--font-size-md);
   color: var(--color-text-muted);
+  text-align: center;
+}
+
+/* The GitHub CTA: the inspo's filled primary pill, mono-uppercase like the
+ * nav's links. Hover is the brand-mark's own ink-step (same token), and the
+ * global focus ring covers keyboard. The new-tab announce rides inside. */
+.hero__cta-row {
+  display: flex;
+  justify-content: center;
+}
+
+.hero__cta {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--cta-pad-block) var(--cta-pad-inline);
+  border-radius: var(--cta-radius);
+  background-color: var(--color-text);
+  color: var(--color-bg);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+  transition: opacity var(--duration-fast) var(--ease-standard);
+}
+
+.hero__cta:hover {
+  opacity: var(--nav-brand-hover);
+}
+
+/* The inspo's NE arrow, drawn like the cue chevron (border corner, no text
+ * glyph, aria-hidden markup span) so none of the CTA's characters escape the
+ * dictionary seam. */
+.hero__cta-arrow {
+  display: inline-block;
+  align-self: center;
+  inline-size: var(--space-sm);
+  block-size: var(--space-sm);
+  margin-inline-start: var(--space-sm);
+  border-inline-end: var(--border-width) solid var(--color-bg);
+  border-block-end: var(--border-width) solid var(--color-bg);
+  /* the drawn corner sits top-right; −45° leans it into the NE chevron (↗) —
+   * the cue chevron's own technique, pointed the other way */
+  transform: rotate(-45deg);
+}
+
+/* Mono metadata under the CTA (the inspo's micro row): location + role. */
+.hero__meta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+  color: var(--color-text-subtle);
+}
+
+/* Wrap between the two entries only — a location or role never breaks
+ * mid-phrase (the 375 sweep caught it). Narrow users: the entries stack. */
+.hero__meta > span {
+  white-space: nowrap;
+}
+
+.hero__meta-sep {
+  inline-size: var(--dot-size);
+  block-size: var(--dot-size);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-text-subtle);
 }
 
 /* Decorative down-chevron (no text): the cue that there is more to scroll. */

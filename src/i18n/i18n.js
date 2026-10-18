@@ -101,6 +101,18 @@ function toPlain(text) {
 function bind(root, dictionary) {
   for (const element of root.querySelectorAll("[data-i18n]")) {
     const value = resolve(dictionary, element.getAttribute("data-i18n"));
+
+    // Ticket 118 — `data-i18n-mode="join"`: an ARRAY bound as one text node,
+    // plain-markered like `-mode="text"`. Owned by the ticker's source item
+    // (the marquee consumes the flattened `skills.all` list); the tiers keep
+    // binding their own items — this mode only reads them. Any other non-string
+    // still falls through untouched.
+    if (Array.isArray(value)) {
+      if (element.getAttribute("data-i18n-mode") === "join") {
+        element.textContent = toPlain(value.join(" \u00B7 "));
+      }
+      continue;
+    }
     if (typeof value !== "string") continue;
 
     if (element.getAttribute("data-i18n-mode") === "text") {

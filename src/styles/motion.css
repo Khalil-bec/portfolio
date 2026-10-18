@@ -93,7 +93,7 @@ main {
 
 /* --- Ticker ---------------------------------------------------------------
  * Default (no JS / reduced motion): a plain, readable, in-flow band showing the
- * tagline once. JS adds `.ticker--live` to turn it into a scrolling marquee.
+ * source once. JS adds `.ticker--live` to turn it into a scrolling marquee.
  * The band sits in-flow directly under the hero and scrolls away with the page
  * (ticket 101). Since ticket 105 the dividers around it are full-bleed: the
  * rule above is the hero section's own `.section::after` line (the hero keeps
@@ -114,8 +114,9 @@ main {
   color: var(--color-text-muted);
 }
 
-/* Hidden until the tagline text exists (003 ships before the i18n dictionaries;
- * without text there is nothing meaningful to scroll). */
+/* Hidden until the source text exists (003 ships before the i18n dictionaries;
+ * since 118 the source is the skills.all list; without text there is nothing
+ * meaningful to scroll). */
 .ticker--idle {
   display: none;
 }

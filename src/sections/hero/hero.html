@@ -1,10 +1,48 @@
 <section id="hero" class="section section--hero" data-section="hero">
   <span class="section__index" aria-hidden="true"><span class="section__num"></span><span class="section__name" data-i18n="nav.hero"></span></span>
 
-  <!-- Above the fold: name + tagline + a decorative scroll cue. -->
+  <!--
+    Backdrop (ticket 118): the measured inspiration's dynamic head — thin
+    concentric rings plus the floating skill-logo chips (13 simple-icons
+    glyphs, local assets, recoloured ink through currentColor + mask).
+    Decorative end to end: aria-hidden, no pointers, and geometry 100%
+    token-driven. The per-frame drift is CSS math off the --hero-scroll
+    counter (src/sections/hero/hero.js); with JS off or reduced motion the
+    counter never publishes and the backdrop sits static.
+  -->
+  <div class="hero__backdrop" aria-hidden="true">
+    <span class="hero__ring hero__ring--1"></span>
+    <span class="hero__ring hero__ring--2"></span>
+    <span class="hero__ring hero__ring--3"></span>
+    <span class="hero__chip" data-chip="docker"></span>
+    <span class="hero__chip" data-chip="kubernetes"></span>
+    <span class="hero__chip" data-chip="python"></span>
+    <span class="hero__chip" data-chip="linux"></span>
+    <span class="hero__chip" data-chip="github"></span>
+    <span class="hero__chip" data-chip="git"></span>
+    <span class="hero__chip" data-chip="terraform"></span>
+    <span class="hero__chip" data-chip="mysql"></span>
+    <span class="hero__chip" data-chip="grafana"></span>
+    <span class="hero__chip" data-chip="nginx"></span>
+    <span class="hero__chip" data-chip="flask"></span>
+    <span class="hero__chip" data-chip="ansible"></span>
+    <span class="hero__chip" data-chip="prometheus"></span>
+  </div>
+
+  <!-- Above the fold: name + tagline + GitHub CTA + mono meta + the scroll cue
+       (ticket 118). All copy is dict-bound; the meta row reuses
+       contact.location. -->
   <div class="hero__head">
     <h1 class="hero__name" data-i18n="hero.name"></h1>
     <p class="hero__tagline" data-i18n="hero.tagline"></p>
+    <p class="hero__cta-row">
+      <a class="hero__cta" href="https://github.com/Khalil-bec" target="_blank" rel="noopener noreferrer"><span data-i18n="hero.cta"></span><span class="hero__cta-arrow" aria-hidden="true"></span><span class="visually-hidden" data-i18n="a11y.newTab"></span></a>
+    </p>
+    <p class="hero__meta">
+      <span data-i18n="contact.location"></span>
+      <span class="hero__meta-sep" aria-hidden="true"></span>
+      <span data-i18n="hero.role"></span>
+    </p>
     <span class="hero__cue" aria-hidden="true"></span>
   </div>
 
