@@ -34,4 +34,10 @@ unchanged on the right.
 **Not in scope:** dictionary value changes (`nav.hero` → Home happens in 119 with the about
 promotion); name layer (114 machinery); footer.
 
-**Status:** todo.
+**Status:** done — implemented + both-axis review 2026-10-18. Verified live: mark paints at
+1440 + 375 (27–30px box off the token), nav list = projects→contact only, aria binds
+nav.hero in EN/FR, brand is tab-stop 1 with the global focus ring, click rides the # seam to
+#hero top (landing y=47 = the section top behind the sticky bar — every anchor lands there;
+contact's 4501 > maxScroll 4057 remains the 121 fix), zero overflow/errors both widths EN/FR.
+Review: standards PASS (one judgement call closed — hover opacity tokenized as
+`--nav-brand-hover`), spec PASS (zero creep).
