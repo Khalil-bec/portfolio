@@ -18,6 +18,7 @@ import { initReveals } from "./motion/reveals.js";
 import { initEyebrows } from "./motion/eyebrows.js";
 import { initTicker } from "./motion/ticker.js";
 import { initRuler } from "./ruler/ruler.js";
+import { initNames } from "./names/name.js";
 import { initI18n } from "./i18n/i18n.js";
 import { initNav } from "./nav/nav.js";
 
@@ -44,4 +45,7 @@ if (motion) {
 initTicker(reducedMotion);
 initEyebrows();
 initRuler(driver);
+// The names layer rides the same driver frame (114): it reads scrollY per
+// render and publishes state counters only.
+initNames(driver);
 initNav();

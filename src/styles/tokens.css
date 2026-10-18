@@ -93,6 +93,29 @@
    * spoken value survives in `aria-valuetext`, which was never on a screen. */
   --ruler-readout-display: flex;
 
+  /* Fixed name layer (ticket 114): the measured row grid of the inspiration's
+   * two-stack section list. Rows right-align at the 56px inset with their
+   * letters ending on the ruler lane's edge (the anchor box overlaps the lane
+   * by its 4px padding, as theirs does); passed rows pin from the top at y=64
+   * and upcoming rows stack from a bottom inset of 24 — both stacks on one
+   * 20px pitch (theirs overlaps neighbouring 24px row boxes by 4px, ours
+   * does the same); the current word takes a 17px air below the passed stack
+   * and doubles its letters. name.js publishes only the state classes and
+   * unitless counters; name.css computes every px from these. */
+  --name-inset: 3.5rem;
+  --name-stack-top: 4rem;
+  --name-stack-bottom: 1.5rem;
+  --name-pitch: 1.25rem;
+  --name-word-gap: 1.0625rem;
+  --name-row-h: 1.5rem;
+  --name-letter-line: 1;
+
+  /* The names layer's display switch (114): the express list is the
+   * inspiration's desktop chrome and it mounts nothing below 640 — our narrow
+   * boundary is 768, where the nav mono links remain the jump affordance and
+   * the 102 only-readout ruler stays alone on the edge. */
+  --names-display: flex;
+
   --font-size-xs: 0.78rem;
   --font-size-sm: 0.875rem;
   --font-size-base: 1rem;
@@ -237,9 +260,18 @@
 
   /* Layers */
   --z-base: 1;
-  --z-eyebrow: 10; /* sticky brow: above flowing content, below the nav (100) */
-  --z-nav: 100;
+  --z-eyebrow: 10; /* sticky brow: above flowing content, below the fixed chrome */
+  /* The names layer (114): under the ruler lane, above the flowing content —
+   * theirs sits exactly one step under their ruler, 39 vs 40. */
+  --z-names: 150;
+  /* ...but the nav sits above the fixed right-edge chrome (114's finding —
+   * measured on the inspiration: their sticky header is z50 over their z40
+   * lane, so corner controls keep their hit targets while the lane owns the
+   * empty band). 113 had only the lane's 60px to weigh and left the nav under
+   * it; the language switch's hit centre sat 1.5px inside the lane and its
+   * clicks died on the track. Ours: names 150 < ruler 160 < nav 180. */
   --z-ruler: 160;
+  --z-nav: 180;
 }
 
 /* Narrow mode (ticket 105/112/113): the switches that ride the 768px boundary
@@ -261,5 +293,8 @@
     --ruler-tick-minor: var(--space-2xs);
     --ruler-grade-inset: calc(var(--space-xs) + var(--border-width));
     --ruler-readout-display: none;
+    /* The names layer leaves with the lane (114): no express list over the
+     * narrow keeper — the nav links carry the jump affordance alone. */
+    --names-display: none;
   }
 }

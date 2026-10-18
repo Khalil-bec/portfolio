@@ -28,6 +28,7 @@
 
 import { refreshTicker } from "../motion/ticker.js";
 import { refreshRuler } from "../ruler/ruler.js";
+import { refreshNames } from "../names/name.js";
 import { refreshReveals } from "../motion/reveals.js";
 
 const SUPPORTED = ["en", "fr"];
@@ -164,6 +165,7 @@ function applyLanguage(language, { persist }) {
 
   refreshTicker();
   refreshRuler();
+  refreshNames();
   refreshReveals();
 }
 

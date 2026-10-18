@@ -24,7 +24,7 @@ const PAGE_FRACTION = 0.88;
 /** Selectors whose native key behaviour must survive (activation, caret, choice). */
 const INTERACTIVE_SELECTOR = "a, button, input, select, textarea, [contenteditable='true'], [role='button']";
 
-let view = null;
+let views = [];
 
 function maxScroll() {
   const el = document.scrollingElement || document.documentElement;
@@ -83,24 +83,27 @@ export function initScrollDriver({ lenis, reducedMotion }) {
   }
 
   /**
-   * Push the current position into the ruler view (no-op before it mounts).
-   * One read of `scrollY` per frame feeds every derived value, so the ruler's
-   * document-space scale (ticket 110) translates by exactly the position the
-   * readout was computed from — two reads could land a frame apart and show as
-   * jitter between the scale and the handle. `pageHeight` is the height of the
-   * document the scale is measured against.
+   * Push the current position into the registered views (no-op before any
+   * mounts). One read of `scrollY` per frame feeds every derived value, so the
+   * ruler's document-space scale (ticket 110) translates by exactly the
+   * position the readout was computed from — two reads could land a frame
+   * apart and show as jitter between the scale and the handle. `pageHeight` is
+   * the height of the document the scale is measured against. Since 114 there
+   * is a second view (the fixed name layer); the payload is built once and
+   * handed to each, so no view's render order can fork the frame's position.
    */
   function frame() {
-    if (!view) return;
+    if (views.length === 0) return;
     const max = maxScroll();
     const scrollY = window.scrollY;
     const depth = max > 0 ? Math.min(Math.max(scrollY / max, 0), 1) : 0;
-    view.render({
+    const payload = {
       ratio: depth,
       scrollY,
       pageHeight: max + window.innerHeight,
       ...readoutParts(depth),
-    });
+    };
+    for (const view of views) view.render(payload);
   }
 
   /** Minimal rAF loop for the no-Lenis modes (reduced motion / load failure). */
@@ -173,9 +176,10 @@ export function initScrollDriver({ lenis, reducedMotion }) {
     maxScroll,
     frame,
     startLoop,
-    /** The ruler view registers here so `frame()` can render into it. */
+    /** Views register here so `frame()` can render into each (ruler 102;
+     * the names layer joined at 114 — appended, never replaced). */
     setView(next) {
-      view = next;
+      views.push(next);
     },
   };
 }

@@ -1,0 +1,93 @@
+/*
+ * Fixed name layer (ticket 114): the inspiration's two-stack section list.
+ *
+ * A fixed full-viewport overlay sitting under the ruler lane (`--z-names: 150`
+ * vs the ruler's 160 — theirs is exactly one step under, 39 vs 40) and closed
+ * to pointer events; the rows are real anchors (`smooth-scroll.js`'s global
+ * `#` click handling owns the jump, as on the nav). The geometry is token
+ * math, not JS output: name.js publishes state classes and two unitless
+ * counters (`--name-slot` per row, `--name-passed` on the layer — the
+ * `--ruler-drum-index` pattern), and this file computes every px from the
+ * measured tokens (rows right-aligned at the 56px inset, stacks pinned at
+ * top 64 / bottom 24, one 20px pitch for both stacks, the current word ~2×
+ * its stack letters with a 17px air below the passed stack). Their anchors
+ * at 20px pitch overlap 4px — the row box is 24px tall — ours reproduces
+ * that overlap as-is. Design tokens only; no transition anywhere on the
+ * layer (the states are instant; 115 owns the letter travel and its
+ * reduced-motion gate).
+ */
+
+.names {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-names);
+  display: var(--names-display);
+  pointer-events: none;
+}
+
+/* A row: the anchor box measured at 24px with its letters 4px inside. Small
+ * letters ride the base size with a 1em box (their measured 16px line box);
+ * the current row unclamps its size, grows the box around a 32px word and
+ * takes the full ink tier — the stack rows stay muted, their measured 0.62
+ * grey being our 0.6 tier. */
+.names__row {
+  position: absolute;
+  inset-inline-end: var(--name-inset);
+  display: flex;
+  align-items: center;
+  block-size: var(--name-row-h);
+  /* Their letters end 4px inside the anchor box — on the ruler lane's edge
+   * itself; the box alone hangs over the lane. */
+  padding-inline-end: var(--space-2xs);
+  pointer-events: auto;
+  /* Rows select as whole words (per-letter selection across the chrome spans
+   * would be broken UX), the cursor is the anchor's own. */
+  cursor: pointer;
+  color: var(--color-text-muted);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Passed: pinned to the top stack at the pitch grid, slot k from the top. */
+.names__row.is-passed {
+  inset-block-start: calc(var(--name-stack-top) + var(--name-slot) * var(--name-pitch));
+}
+
+/* Upcoming: stacked from the bottom edge at the same pitch, slot j counted
+ * from the last row upward (their settled form, exact at four depths:
+ * top = vh − 48 − 20·j). The layer's `100%` is its inset-0 box, their
+ * viewport-spanning overlay. */
+.names__row.is-upcoming {
+  inset-block-start: calc(100% - var(--name-stack-bottom) - var(--name-slot) * var(--name-pitch) - var(--name-row-h));
+}
+
+/* Current: one pitch past the counted passed rows plus the measured air, and
+ * the 2× word. The counter is the layer's; `calc` inherits it. */
+.names__row.is-current {
+  inset-block-start: calc(var(--name-stack-top) + var(--name-passed) * var(--name-pitch) + var(--name-word-gap));
+  block-size: auto;
+  padding-block: var(--space-2xs);
+  color: var(--color-text);
+}
+
+/* Letters (chrome, aria-hidden): uppercase display words like the
+ * inspiration's; weight 620 ≈ our semibold — our stack carries no width axis,
+ * so their measured 118% stretch is dropped (logged in the ticket). */
+.names__letters {
+  display: flex;
+  align-items: baseline;
+}
+
+.names__letter {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--name-letter-line);
+  text-transform: uppercase;
+  white-space: pre;
+}
+
+.names__row.is-current .names__letter {
+  font-size: var(--font-size-lg);
+}

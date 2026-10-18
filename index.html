@@ -58,6 +58,7 @@
     <link rel="stylesheet" href="src/sections/contact/contact.css" />
     <link rel="stylesheet" href="src/styles/motion.css" />
     <link rel="stylesheet" href="src/ruler/ruler.css" />
+    <link rel="stylesheet" href="src/names/name.css" />
   </head>
   <body>
     <!-- Static no-JS notice (ticket 102, sanctioned chrome): the ruler driver
@@ -324,6 +325,23 @@
           <span class="ruler__readout" data-ruler-readout></span>
         </div>
       </div>
+    </div>
+
+    <!-- Fixed name layer (ticket 114): one jump anchor per section, right
+         aligned in a two-stack row grid measured on the inspiration — passed
+         rows pin to the top, the current section's name renders ~2× its
+         letters below them, and upcoming rows stack from the bottom edge.
+         The rows are real anchors on the nav's own dict keys (the smooth
+         scroll seam owns the jump); their names are split into letter spans
+         by src/names/name.js (chrome, aria-hidden — the 115 letter travel's
+         substrate), so the rows ship empty like any dict-bound copy. The
+         layer hides <=768 (tokens.css) where the inspiration mounts nothing. -->
+    <div class="names" data-names>
+      <a class="names__row" data-name href="#hero" data-i18n="nav.hero" data-i18n-attr="aria-label=nav.hero"></a>
+      <a class="names__row" data-name href="#projects" data-i18n="nav.projects" data-i18n-attr="aria-label=nav.projects"></a>
+      <a class="names__row" data-name href="#skills" data-i18n="nav.skills" data-i18n-attr="aria-label=nav.skills"></a>
+      <a class="names__row" data-name href="#education" data-i18n="nav.education" data-i18n-attr="aria-label=nav.education"></a>
+      <a class="names__row" data-name href="#contact" data-i18n="nav.contact" data-i18n-attr="aria-label=nav.contact"></a>
     </div>
 
     <!-- Vendor classic scripts (UMD globals), deferred; then the module entry. -->
