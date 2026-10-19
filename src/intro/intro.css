@@ -1,0 +1,114 @@
+/*
+ * Load intro (tickets 120 + 122): the mark splits into its two letterforms and
+ * each is dragged into its own place inside the hero name.
+ *
+ * The stage is a child of #hero, absolutely covering the band — NOT a
+ * full-screen cover (ticket 122): the nav and the page chrome stay visible, no
+ * background is painted, and pointer events pass through. Only the hero's own
+ * content is gated, through the `html[data-intro]` states below.
+ *
+ * Ownership split: everything that TIMES lives in tokens.css (--intro-*, read
+ * by intro.js with readTimeToken); everything that SEQUENCES is intro.js's
+ * frame loop; everything that SETTLES is here. The gated elements' settled
+ * styles are their normal ones — the gate only withholds them — so a cleared
+ * attribute always leaves the finished page behind.
+ *
+ * Gating contract: `html[data-intro="run"]` hides the hero's content before
+ * first paint (boot guard in index.html); `[data-intro="bloom"]` starts the
+ * staggered reveal of tagline/CTA/meta/cue/backdrop/ticker; the attribute is
+ * dropped when the stage unmounts. Pages without JS (or reduced motion, where
+ * the guard never sets the flag) never carry it, so nothing is ever hidden by
+ * CSS alone.
+ */
+
+/* The stage: a measured canvas over the band. Children are positioned from
+ * intro.js's measurements (left/top/width/height/transform), so no geometry
+ * lives here beyond the ink and the layering. */
+.intro {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-hero-intro);
+  pointer-events: none;
+  overflow: clip;
+  /* Mounted before the dictionaries land: stay unpainted until intro.js has
+   * measured and written every box (`.is-ready`), so no default-sized SVG can
+   * flash at the stage's top-left during the bind. */
+  visibility: hidden;
+}
+
+.intro.is-ready {
+  visibility: visible;
+}
+
+/* The composite mark: centred on its measured seat by the same translate the
+ * module composes its scale into. */
+.intro__mark,
+.intro__letter {
+  position: absolute;
+  display: block;
+  transform-origin: 50% 50%;
+}
+
+.intro__mark svg,
+.intro__letter svg {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  fill: var(--color-text);
+}
+
+/* The mark carries the board's soft ink glow; the letterforms are the same ink
+ * without it, so the cross-fade at landing is a pure position + ink match. */
+.intro__mark svg {
+  filter: drop-shadow(0 0 var(--intro-glow-blur) var(--intro-glow-ink));
+}
+
+/* --- The gate -------------------------------------------------------------
+ * Run: the hero's own content is withheld (opacity only — every element keeps
+ * its settled box, so no layout shift and no scroll change). The name is NOT
+ * in this list: its parent must stay visible so the per-character fade-in and
+ * the K/B cross-fade can actually be seen; `.is-pending` / `.is-split` below
+ * hide it until the split lands. The backdrop and the ticker are part of the
+ * first viewport's bloom, so they wait too. */
+html[data-intro="run"] .hero__tagline,
+html[data-intro="run"] .hero__cta-row,
+html[data-intro="run"] .hero__meta,
+html[data-intro="run"] .hero__cue,
+html[data-intro="run"] .hero__backdrop,
+html[data-intro="run"] .ticker {
+  opacity: 0;
+}
+
+/* The name is assembled per character. Until intro.js splits it, the empty
+ * element must not flash; once split, each chrome span waits for its beat. */
+.hero__name.is-pending {
+  opacity: 0;
+}
+
+.hero__name.is-split .intro__char {
+  opacity: 0;
+  transition: opacity var(--intro-char-fade) var(--ease-standard);
+}
+
+.hero__name.is-split .intro__char.is-in {
+  opacity: 1;
+}
+
+/* Bloom: the name is landing; the rest of the first viewport arrives together
+ * as the last characters settle. */
+html[data-intro="bloom"] .hero__tagline,
+html[data-intro="bloom"] .hero__cta-row,
+html[data-intro="bloom"] .hero__meta,
+html[data-intro="bloom"] .hero__cue,
+html[data-intro="bloom"] .hero__backdrop,
+html[data-intro="bloom"] .ticker {
+  opacity: 1;
+  transition: opacity var(--intro-bloom) var(--ease-standard);
+}
+
+/* --- Failsafe ---------------------------------------------------------------
+ * If the module pipeline dies after the boot guard set data-intro="run" AND
+ * before intro.js mounts anything, the hero would stay hidden forever. The
+ * guard's own 3s timer rescues that exact window (see index.html); anything
+ * later than that is intro.js's own frame loop, whose settle path always runs.
+ */

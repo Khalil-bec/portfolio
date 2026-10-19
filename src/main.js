@@ -22,8 +22,30 @@ import { initNames } from "./names/name.js";
 import { initI18n } from "./i18n/i18n.js";
 import { initNav } from "./nav/nav.js";
 import { initHero } from "./sections/hero/hero.js";
+import { initIntro } from "./intro/intro.js";
+
 
 const { lenis, reducedMotion } = initSmoothScroll();
+
+/** Rescue a dead intro: drop every gate it may have stamped, so the settled
+ * hero is always readable even when the boot pipeline fails mid-way. */
+function abortIntro() {
+  document.documentElement.removeAttribute("data-intro");
+  document.querySelector(".intro")?.remove();
+  document.querySelector(".hero__name")?.classList.remove("is-pending", "is-split");
+}
+
+// The intro boots first (tickets 120 + 122): the boot guard in index.html set
+// html[data-intro="run"] before first paint; mounting the in-hero stage at the
+// module's first statements keeps the gated window as short as possible.
+// If anything in this boot pipeline dies, the head guard's 3s failsafe
+// re-reveals (see intro.css's failsafe note) — a stalled intro never wins.
+let intro = null;
+try {
+  intro = initIntro(reducedMotion);
+} catch (error) {
+  abortIntro();
+}
 
 // The scroll driver owns scroll position and keyboard scrolling (ticket 102);
 // its chrome frame rides the bridge loop when Lenis runs, or its own minimal
@@ -38,6 +60,14 @@ if (!lenis) driver.startLoop();
 // Bind the dictionaries first: the ticker source and the reveal rows then carry
 // their real text before either is measured.
 await initI18n();
+
+// The split measures the real <h1>, so the intro starts only once the name is
+// bound (ticket 122). A failure here must not leave the gate on.
+try {
+  intro?.start();
+} catch (error) {
+  abortIntro();
+}
 
 if (motion) {
   initReveals(motion.gsap, motion.ScrollTrigger);

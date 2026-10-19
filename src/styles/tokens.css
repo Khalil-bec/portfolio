@@ -232,17 +232,12 @@
   /* Hero head v3 (ticket 118): the measured first-viewport. The column gap
    * shrinks from the head's old --space-lg to keep name + tagline + CTA + meta
    * + cue inside the cap. */
-  /* Runtime-measured (hero.js, 106 pattern): the hero's in-flow index bar
-   * height, subtracted from the head's cap so the cell ends at one viewport.
-   * 0px is the no-JS fallback (unmeasured). */
-  --hero-index-h: 0px;
-
   --hero-head-gap: var(--space-md);
 
   /* Rings: three hairline circles behind the head, centred on the column's
    * first-viewport block; sizes are the drawn diameters, opacity steps keep
    * the outer ones airier. */
-  /* Ring anchor: the head's optical centre (the type block's middle). */
+  /* Ring anchor: the head's optical centre — also the orbit's pivot (123). */
   --hero-ring-cx: 50%;
   --hero-ring-cy: 42%;
   --hero-ring-1: 26rem; /* min() caps keep every ring inside the cell at 375 */
@@ -251,124 +246,148 @@
   --hero-ring-cap-1: 60vw;
   --hero-ring-cap-2: 82vw;
   --hero-ring-cap-3: 94vw;
-  --hero-ring-drift: 0.05; /* rings recede deeper than the chips */
   --hero-ring-opacity-1: 0.9;
   --hero-ring-opacity-2: 0.55;
   --hero-ring-opacity-3: 0.3;
+  /* The ring band (123): the hairline runs unbroken to --hero-ring-solid-angle,
+   * then fades to nothing by --hero-ring-fade-angle, so a rotating ring reads as
+   * a sweeping line rather than a still circle. */
+  --hero-ring-solid-angle: 300deg;
+  --hero-ring-fade-angle: 340deg;
+  /* Orbit (123): the backdrop turns as one wheel about the ring anchor as the
+   * page scrolls (degrees per scroll pixel). Each ring's own extra rate adds to
+   * the wheel's — the visible sweep is their sum, so no --hero-ring-spin-N may
+   * equal the wheel's negated value (that ring would stand still). */
+  --hero-orbit-spin: 0.03;
+  --hero-ring-spin-1: 0.03;
+  --hero-ring-spin-2: -0.06;
+  --hero-ring-spin-3: 0.015;
 
-  /* Chips: 13 skill-logo glyphs (local simple-icons assets, masked onto
-   * currentColor). Geometry per chip: x/y anchors (% of the hero's first
-   * viewport block), intrinsic size, blur (near the centre) and scroll-drift
-   * factor (unitless; CSS multiplies by px). Sizes clamp to a vw ceiling so
-   * narrow viewports can never overflow; anchors avoid the central type zone
-   * (x 30–70 / y 18–62 between them). Ink alpha tiers replace per-chip values. */
-  --chip-ink-soft: rgba(242, 241, 238, 0.13);
-  --chip-ink-mid: rgba(242, 241, 238, 0.24);
-  --chip-ink-bright: rgba(242, 241, 238, 0.4);
+  /* Chips: 13 skill-logo glyphs (local simple-icons assets, masked onto a
+   * colour). Geometry per chip: x/y anchors (% of the hero's first viewport
+   * block), intrinsic size and blur (near the centre). Sizes clamp to a vw
+   * ceiling so narrow viewports can never overflow; anchors avoid the central
+   * type zone (x 30–70 / y 18–62 between them). Ticket 123 gives every glyph
+   * its own official brand colour at one of three opacity tiers, so the
+   * backdrop reads as the tools themselves rather than a grey wash. */
+  --chip-opacity-soft: 0.45;
+  --chip-opacity-mid: 0.68;
+  --chip-opacity-bright: 0.92;
   --chip-blur-soft: 8px;
   --chip-blur-mid: 4px;
   --chip-blur-sharp: 0px;
   --chip-size-cap: 22vw; /* the vw ceiling that clamps sizes at narrow widths */
   --chip-size-fallback: 7rem;
   --chip-anchor-center: 50%;
-  /* --chip-drift-still is only the alias for an unmapped chip; the no-JS
-   * zero comes from --hero-scroll's own 0 fallback (hero.css). */
-  --chip-drift-still: 0;
-  /* Sign per the 2026-10-18 probe: the inspo's chips travel SLOWER than the
-   * content (a receding background plane), so the positive unit conversion
-   * makes counter * factor move the chip DOWN relative to its rest-in-content
-   * position as the page scrolls up. */
-  --chip-drift-px: 1px;
+  /* GitHub and Flask both ship near-black marks, invisible on the ink-dark
+   * ground, so each takes the site ink instead — the only legibility exception. */
+  --chip-color-docker: #2496ed;
+  --chip-color-kubernetes: #326ce5;
+  --chip-color-python: #3776ab;
+  --chip-color-linux: #fcc624;
+  --chip-color-github: var(--color-text);
+  --chip-color-git: #f05032;
+  --chip-color-terraform: #844fba;
+  --chip-color-mysql: #4479a1;
+  --chip-color-grafana: #f46800;
+  --chip-color-nginx: #009639;
+  --chip-color-flask: var(--color-text);
+  --chip-color-ansible: #ee0000;
+  --chip-color-prometheus: #e6522c;
   /* docker — edge chip: top-left, sharp. */
   --chip-docker-x: 8%;
   --chip-docker-y: 10%;
   --chip-docker-size: 9rem;
   --chip-docker-blur: var(--chip-blur-sharp);
-  --chip-docker-drift: 0.18;
 
   /* kubernetes — edge chip: top-right, sharp. */
   --chip-kubernetes-x: 92%;
   --chip-kubernetes-y: 9%;
   --chip-kubernetes-size: 8rem;
   --chip-kubernetes-blur: var(--chip-blur-sharp);
-  --chip-kubernetes-drift: 0.14;
 
   /* python — right edge, larger, slightly soft. */
   --chip-python-x: 90%;
   --chip-python-y: 54%;
   --chip-python-size: 10rem;
   --chip-python-blur: var(--chip-blur-mid);
-  --chip-python-drift: 0.16;
 
   /* linux — left edge, largest, sharp. */
   --chip-linux-x: 5%;
   --chip-linux-y: 60%;
   --chip-linux-size: 11rem;
   --chip-linux-blur: var(--chip-blur-sharp);
-  --chip-linux-drift: 0.12;
 
-  /* github — bottom-left, fast drift. */
+  /* github — bottom-left. */
   --chip-github-x: 22%;
   --chip-github-y: 88%;
   --chip-github-size: 7rem;
   --chip-github-blur: var(--chip-blur-mid);
-  --chip-github-drift: 0.22;
 
   /* git — top, centre-left, soft. */
   --chip-git-x: 38%;
   --chip-git-y: 7%;
   --chip-git-size: 6.5rem;
   --chip-git-blur: var(--chip-blur-soft);
-  --chip-git-drift: 0.2;
 
   /* terraform — top, centre-right, soft. */
   --chip-terraform-x: 62%;
   --chip-terraform-y: 6%;
   --chip-terraform-size: 5.5rem;
   --chip-terraform-blur: var(--chip-blur-soft);
-  --chip-terraform-drift: 0.19;
 
-  /* mysql — bottom-right, slowest drift. */
+  /* mysql — bottom-right. */
   --chip-mysql-x: 78%;
   --chip-mysql-y: 92%;
   --chip-mysql-size: 7.5rem;
   --chip-mysql-blur: var(--chip-blur-mid);
-  --chip-mysql-drift: 0.15;
 
-  /* grafana — bottom-centre, soft, fastest drift. */
+  /* grafana — bottom-centre, soft. */
   --chip-grafana-x: 46%;
   --chip-grafana-y: 94%;
   --chip-grafana-size: 6rem;
   --chip-grafana-blur: var(--chip-blur-soft);
-  --chip-grafana-drift: 0.25;
 
   /* nginx — left edge, mid-height. */
   --chip-nginx-x: 12%;
   --chip-nginx-y: 36%;
   --chip-nginx-size: 6rem;
   --chip-nginx-blur: var(--chip-blur-mid);
-  --chip-nginx-drift: 0.13;
 
   /* flask — right edge, smallest, soft. */
   --chip-flask-x: 84%;
   --chip-flask-y: 34%;
   --chip-flask-size: 5rem;
   --chip-flask-blur: var(--chip-blur-soft);
-  --chip-flask-drift: 0.17;
 
-  /* ansible — bottom-left, fast drift. */
+  /* ansible — bottom-left. */
   --chip-ansible-x: 28%;
   --chip-ansible-y: 74%;
   --chip-ansible-size: 7rem;
   --chip-ansible-blur: var(--chip-blur-mid);
-  --chip-ansible-drift: 0.21;
 
   /* prometheus — bottom-right, slowest. */
   --chip-prometheus-x: 70%;
   --chip-prometheus-y: 76%;
   --chip-prometheus-size: 8rem;
   --chip-prometheus-blur: var(--chip-blur-mid);
-  --chip-prometheus-drift: 0.1;
+
+  /* Load intro (tickets 120 + 122): the in-hero assembly. Every beat duration
+   * lives here — intro.js reads them with readTimeToken and owns the sequence;
+   * intro.css consumes the two that drive its reveals. The mark is sized from
+   * the title's cap height at run time, so no size token is needed: the mark
+   * is the placeholder for the word, then the two letterforms drag out of it
+   * with no scale change. */
+  --intro-mark-in: 0.3s;      /* mark fades/scales in */
+  --intro-hold: 0.25s;        /* the mark rests before it splits */
+  --intro-split: 0.25s;       /* mark dissolves as K and B take its seats */
+  --intro-drag: 0.7s;         /* each letterform's continuous drag home */
+  --intro-char-fade: 0.3s;    /* every other character's own fade-in */
+  --intro-char-stagger: 12ms; /* reading-order offset between characters */
+  --intro-glyph-fade: 0.25s;  /* stylized K/B cross-fade into the real ones */
+  --intro-bloom: 0.45s;       /* tagline/CTA/meta/cue/backdrop/ticker */
+  --intro-glow-ink: rgba(242, 241, 238, 0.28);
+  --intro-glow-blur: 2.5rem;
 
   /* The GitHub CTA: the inspo's filled primary pill. */
   --cta-pad-block: 0.875rem;
@@ -424,12 +443,18 @@
    * clicks died on the track. Ours: names 150 < ruler 160 < nav 180. */
   --z-ruler: 160;
   --z-nav: 180;
+  /* Hero-local stacking (ticket 122): backdrop < content < intro stage. Kept
+   * below the page chrome on purpose — the stage lives inside the hero, so a
+   * global tier here would lift it over the nav and ruler. */
+  --z-hero-backdrop: 0;
+  --z-hero-content: 1;
+  --z-hero-intro: 2;
 
   /* Ticket 117 — the brand mark's glyph height in the nav bar (`inline-size`
    * derives from it in nav.css: the mark's own 923:687 aspect is artwork
    * geometry, like the ruler's 2:1 tick ratio). Narrow step lives in the
    * query below; the mark never unmounts (their logo stays at every width). */
-  --nav-brand-size: 1.375rem;
+  --nav-brand-size: 1.25rem;
 
   /* Ticket 117 — the bare link's hover step (the review call: the value sits
    * home with the other ink tiers, not inline in nav.css). */
@@ -458,7 +483,8 @@
     /* The names layer leaves with the lane (114): no express list over the
      * narrow keeper — the nav links carry the jump affordance alone. */
     --names-display: none;
-    /* Ticket 117: the brand mark steps down with the bar. */
-    --nav-brand-size: 1.25rem;
+    /* Ticket 117: the brand mark steps down with the bar (122: one step
+     * smaller again — the approved mock-up's mark, not the oversized one). */
+    --nav-brand-size: 1.125rem;
   }
 }
