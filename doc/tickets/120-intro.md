@@ -46,4 +46,6 @@ or without JS.
 
 **Not in scope:** footer (121); any scroll-plane change (no lock).
 
-**Status:** todo.
+**Status:** amended by 122 — the full-screen overlay, `--z-intro`, 42vh letters and CSS-transition
+choreography described above were replaced by the in-hero stage and measured K/B drag. See
+`122-hero-correction.md` for the shipped behaviour.

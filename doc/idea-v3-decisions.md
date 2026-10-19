@@ -136,3 +136,61 @@ tickets 116–121. Spec: `doc/idea-v3-spec.md`.
 - **The about section = the 106 display title + the paragraph set + the languages line and
   nothing else** — the number/eyebrow scaffold comes free from the section shell (CSS
   counter), the name layer gains its 6th row by markup alone (name.js is row-count agnostic).
+
+## 2026-10-19 — ticket 122 (hero correction) — decisions recorded during implementation
+
+- **The hero leaves the table.** `#hero` drops `.section`: no 1280 column, side borders, index
+  bar or counter increment; `section.hero` is full-bleed and `.hero__column` re-establishes the
+  1280 + 2rem frame. The counter therefore starts at About (`01`), and the names layer loses its
+  Home row — the nav brand remains the home affordance. The hero's bottom rule is full-bleed
+  like every table divider; the ticker starts at the fold.
+- **The intro lives in the hero's title space**, not over the screen: the stage is
+  `position:absolute; inset:0` inside `#hero`, paints no background, ignores pointers, and only
+  the hero's own content is gated. The nav, ruler and names layer stay visible throughout.
+- **One gate element, many opacity states.** `html[data-intro="run"]` withholds the tagline,
+  CTA row, meta, cue, backdrop and ticker; the `<h1>` itself is deliberately NOT parent-opacity
+  gated, because that would mask the per-character fade and the K/B cross-fade. The name is
+  hidden by JS-stamped `.is-pending` before the bind and `.is-split` per character afterwards.
+  `data-intro="bloom"` releases the rest; `settle()` removes the attribute and the stage.
+- **The mark is cap-height sized**, not line-box sized: it reads as the word's placeholder, and
+  the two letterforms leave it at their real size with no scale change mid-drag.
+- **The K/B destinations are measured ink boxes** — canvas `actualBoundingBox*` metrics plus the
+  span's own rect — while their starts are translated onto the mark's left/right seats. Each
+  glyph is one uniform eased translate; nothing is modelled from a glyph table and the text is
+  never duplicated. The remaining characters stagger in reading order from the landing frame.
+- **No `innerHTML`:** the stage's three `<use>` pieces are built with `createElement(NS)`, and
+  the stage stays `visibility:hidden` until its measured boxes are written (`.is-ready`), so a
+  default-sized SVG cannot flash during the dictionary await.
+- **Abort is one helper:** `main.js`'s `abortIntro()` clears `data-intro`, removes the stage and
+  strips `.is-pending`/`.is-split`, so a throw at either boot seam leaves the settled name
+  readable. The 3s head failsafe still covers the pre-mount window.
+- **Review findings applied:** shared `readTimeToken` moved into `motion/tokens.js`; local
+  `--z-hero-*` tiers replace the stage/content/backdrop literals; `.intro__char` joins the BEM
+  family; timings/landed-at renamed away from "beats"; the ticket's line-height wording was
+  corrected to the cap-height decision.
+
+## 2026-10-19 — ticket 123 (hero orbit) — decisions recorded during implementation
+
+- **The chips carry their tools' own colours.** Each glyph's `background-color` is its official
+  simple-icons brand hex, held in `--chip-color-<name>`; the old per-chip ink alpha becomes one of
+  three element `opacity` tiers (`--chip-opacity-soft/mid/bright`), so the depth ordering survives
+  the recolour. GitHub (`#181717`) and Flask (`#000000`) are near-black — invisible on our ground —
+  so both take the site ink; that is the only exception, and it is deliberate.
+- **The wheel is one transform, not per-chip orbits.** `.hero__orbit` (a new inner wrapper, so the
+  backdrop keeps its axis-aligned `overflow: clip`) rotates the whole ring + chip group about the
+  head's optical centre (`--hero-ring-cx/cy`) at `--hero-orbit-spin` degrees per scroll pixel; a
+  chip's arc radius is therefore its distance from that centre, so edge chips swing wide and the
+  centre pair barely moves. Each chip counter-rotates by the same angle about its own centre, which
+  keeps its glyph upright. This is the closest cheap analogue to the reference's cards riding the
+  rings.
+- **Rings get their own spin, and the band must fade.** A circle centred on the pivot shows no
+  motion when turned, so each ring's conic mask fades the hairline out over its last 40°
+  (`--hero-ring-solid-angle/fade-angle`) and each ring adds a `--hero-ring-spin-N` rate. The visible
+  sweep is the *sum* of the wheel and the ring's own rate — the first pass had ring 2 at `−0.03`
+  against a `+0.03` wheel (net zero: a still ring); the review caught it and it is now `−0.06`. The
+  mask is applied to the border rather than to a masked background band, so the hairline keeps its
+  anti-aliasing; its opaque stop is `var(--color-text)` — a matte, not paint.
+- **Scroll-linked, no time term.** `hero.js` still publishes only the single `--hero-scroll` counter
+  (no JS change); every angle is CSS `calc()`. Reduced motion / no JS leave the counter unwritten,
+  so all transforms sit at their 0 fallback. Because the ring band's arc is always present, the
+  settled look changes in two ways versus 122 — the chip colours and the rings' fading arc — not one.
