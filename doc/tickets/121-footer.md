@@ -103,4 +103,4 @@ inside `maxScroll`.
   the 119 about precedent); the year stays static data with an inline comment. The bar-grid
   revision keeps the reference's structure, not its light palette or type.
 
-**Status:** in-review.
+**Status:** done (d04fa77).
