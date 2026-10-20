@@ -459,6 +459,20 @@
   /* Ticket 117 — the bare link's hover step (the review call: the value sits
    * home with the other ink tiers, not inline in nav.css). */
   --nav-brand-hover: 0.72;
+
+  /* Ticket 121 — the footer mark's glyph height (the nav mark's larger
+   * sibling; its inline-size derives from the artwork's 923:687 aspect in
+   * footer.css, the same completion the nav mark uses). */
+  --footer-mark-size: 2.625rem;
+
+  /* Ticket 121 (bar-grid revision) — the footer's three-cell grid and the
+   * min-height/padding that keep the band substantial enough to give the
+   * contact flip its final scroll room. The narrow query below flips the grid
+   * to one column and relaxes both values. */
+  --footer-grid-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr);
+  --footer-grid-min-block: 28rem;
+  --footer-cell-pad-block: var(--space-3xl);
+  --footer-cell-pad-end: var(--space-4xl);
 }
 
 /* Narrow mode (ticket 105/112/113): the switches that ride the 768px boundary
@@ -486,5 +500,11 @@
     /* Ticket 117: the brand mark steps down with the bar (122: one step
      * smaller again — the approved mock-up's mark, not the oversized one). */
     --nav-brand-size: 1.125rem;
+    /* Ticket 121: the footer stacks into bar-separated rows; the desktop
+     * min-height and generous cell padding would otherwise triple. */
+    --footer-grid-columns: minmax(0, 1fr);
+    --footer-grid-min-block: auto;
+    --footer-cell-pad-block: var(--space-lg);
+    --footer-cell-pad-end: var(--space-xl);
   }
 }

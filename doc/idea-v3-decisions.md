@@ -194,3 +194,81 @@ tickets 116–121. Spec: `doc/idea-v3-spec.md`.
   (no JS change); every angle is CSS `calc()`. Reduced motion / no JS leave the counter unwritten,
   so all transforms sit at their 0 fallback. Because the ring band's arc is always present, the
   settled look changes in two ways versus 122 — the chip colours and the rings' fading arc — not one.
+
+## 2026-10-19 — ticket 121 (footer) — decisions recorded during implementation
+
+- **Shape: full-bleed band, inner 1280 + 2rem frame.** The footer is a `<footer>` landmark outside
+  `<main>` (after `#contact`), not a `.section`: it takes no table side borders, no counter
+  increment and no name-layer row (the ruler's document scale still includes it). The full-bleed
+  band's inner box re-establishes the shared content frame with `max-inline-size:
+  var(--container-max)` + `padding-inline: var(--container-pad)` **inside** the box (the hero's
+  pattern, not the section's border-box frame) — the first pass put the padding on the band, which
+  lined the footer up with the table border 33px outside every section's text; the review caught it.
+  At 1440 the footer text starts at 112 (section text 113, the cell's 1px border) and at 375 at 32.
+- **Mark + email left.** The composite `#brand-mark` symbol is decorative (`aria-hidden`,
+  `focusable="false"`) and takes the `--footer-mark-size` 42px height with the artwork's 923:687
+  aspect (the nav mark's 1.344 completion). It is not a link: the nav already owns the home
+  affordance, and the ticket asks for brand identity, not a second home target. The mailto is the
+  005 data pattern — bare, same-tab, parameter-free — in mono with the underline-on-hover/focus
+  step.
+- **Two labelled columns.** `NAVIGATION` reuses all five `nav.*` keys (About → Contact) and
+  `ELSEWHERE` reuses `contact.githubLabel` / `contact.linkedinLabel`. The board abbreviated the
+  navigation column to three items for space; the ticket's "column items reuse `nav.*`" plus the
+  complete section set wins, so About and Education are present too. Each column is its own
+  `<nav aria-labelledby>` landmark (the first pass wrapped both in one nav labelled
+  "Navigation", which put the external profiles under the wrong landmark — both review axes
+  flagged it). External links keep the 005 contract (`_blank` + `noopener noreferrer` + the
+  localized visually-hidden announcement); the board's ↗ arrows are not reproduced because the
+  announcement already carries the semantics.
+- **Only two new dictionary keys:** `footer.navigation` (Navigation / Navigation) and
+  `footer.elsewhere` (Elsewhere / Ailleurs). The © bar reuses `hero.name` and `hero.role`; the
+  year is static `2026` data with an inline comment (the 005 favicon-comment precedent), not copy.
+  No `footer.js`: HTML + CSS only, the 119 about precedent.
+- **The contact flip finally lands.** `name.js` claims a section when its top crosses
+  `scrollY + 0.25·vh`; at max scroll that is `contact.top <= maxScroll + 0.25·vh`, equivalently
+  `docH >= contact.top + 0.75·vh`. Before 121 the page was 456px too short at 1440×900 (contact
+  4526, maxScroll 4082 → the layer stopped on Education). The footer's 377px (1440/1024/768) /
+  519px (375) clears it with margin: 1440 EN contact 4526 / maxScroll 4459 / trigger 4684;
+  1440 FR 4755 / 4688 / 4913; 375 EN 6451 / 6667 / 6870; 375 FR 6729 / 6945 / 7148. A live scroll
+  crosses `#education` → `#contact` in every config, and the ruler reports 100 at max with
+  `--scale-offset = -scrollY`.
+- **QA:** `/tmp/opencode/qa-121.mjs` — 198 checks green (1440/1024/768/375 EN, 1440+375 FR,
+  1440+375 reduced, keyboard sweep, partial-sync/stylesheet/dict source checks). No overflow or
+  console/page errors. Screenshots `/tmp/opencode/121-*-footer.png`.
+
+## 2026-10-19 — ticket 121 (footer) — bar-grid revision
+
+- **The user's reference wins over the first footer pass.** The reference footer is divided by
+  one-pixel bars: a bordered 1280 frame, then cells separated by the grid gutter, with a full-width
+  bottom strip. Our pass had the content but no bars, so the footer read as two loose columns. The
+  revision keeps our dark tokens and reimplements the structure: `.footer__inner` carries the two
+  outer rules; `.footer__grid` has `gap: var(--border-width)` over a `--color-border` background;
+  each `.footer__cell` paints `--color-bg` over it. Three columns at desktop
+  (`2fr 1fr 1fr`), one column below 768 via `--footer-grid-columns`; the gutters become horizontal
+  bars when the cells stack.
+- **Brand cell content:** the decorative composite mark, `hero.tagline` (the hero's own sentence,
+  rich binding keeps the role bold), and the bare mailto. This matches the reference's
+  logo + description + email stack without adding another copy key. The bottom bar then carries
+  the "made by" credit the user asked for: `footer.madeBy` + `hero.name` on the right, with
+  `© 2026` + `hero.name` on the left. `hero.role` is no longer repeated in the bar; it is already
+  the bold phrase in the tagline.
+- **One new dictionary key:** `footer.madeBy` (Made by / Fait par), alongside the first pass's
+  `footer.navigation` and `footer.elsewhere`. The © year stays static data with its inline
+  comment. No `footer.js`.
+- **Height is part of the ticket, not a spacer.** The follow-up request ("a bit more space in
+  length … between the link and the line above the credits") is answered with cell padding, not
+  a gap: desktop cells take the 6rem `--footer-cell-pad-block` at the top and the larger 9rem
+  `--footer-cell-pad-end` below the content, and the grid keeps a 28rem floor. The narrow query
+  drops the floor to auto and uses 1.5rem / 2.5rem for the cell's top/bottom padding, so the
+  stacked rows also get more air before the credits rule. Measured footer height: 517 at
+  1440/1024, 658 at 768 (stacked), 731 at 375 — versus 377 / 519 before. The extra document
+  height raises `maxScroll` by 140 at 1440 and 212 at 375, widening the contact-flip margin from
+  158 to 298 at 1440 and from 419 to 632 at 375 (trigger = maxScroll + 0.25·vh).
+- **Alignment survives the bars.** The inner frame's 1px side rules + 2rem cell padding put the
+  footer text at x=113 @1440 and x=33 @375, exactly the section content edge (the section's own
+  1px border included). The bottom bar shares that padding, so the credit line sits on the same
+  edge as the brand and nav cells.
+- **QA:** `/tmp/opencode/qa-121.mjs` — **246 checks green** (8 configs + keyboard + source-level
+  structure checks), including cell-gap geometry, bottom-bar placement, made-by copy, live EN→FR
+  switch, reduced motion, zero overflow/errors. Token gate on `footer.css` prints nothing.
+  Screenshots `/tmp/opencode/rev-*` (element + max-scroll + live-switch).

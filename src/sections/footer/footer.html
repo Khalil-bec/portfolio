@@ -1,0 +1,46 @@
+<footer id="footer" class="footer">
+  <!--
+    Footer (ticket 121, bar-grid revision). Full-bleed band with its own 1280
+    content column, like the inspiration; it is not a numbered table cell and
+    not a name-layer row (the footer is chrome, the ruler's document scale still
+    includes it). One-pixel grid gutters paint the bars between cells: three
+    columns on desktop, stacked rows on narrow screens. The mark, the mailto
+    address and the © year are data/chrome; every label comes from the
+    dictionaries. Outbound links follow the 005 contract (new tab + announce);
+    the email stays a bare same-tab mailto.
+  -->
+  <div class="footer__inner">
+    <div class="footer__grid">
+      <div class="footer__cell footer__brand">
+        <svg class="footer__mark" aria-hidden="true" focusable="false"><use href="#brand-mark"></use></svg>
+        <p class="footer__tagline" data-i18n="hero.tagline"></p>
+        <a class="footer__email" href="mailto:khalil.becheikh54@gmail.com">khalil.becheikh54@gmail.com</a>
+      </div>
+
+      <nav class="footer__cell footer__column" aria-labelledby="footer-navigation">
+        <h2 class="footer__heading" id="footer-navigation" data-i18n="footer.navigation"></h2>
+        <ul class="footer__list">
+          <li><a class="footer__link" href="#about" data-i18n="nav.about"></a></li>
+          <li><a class="footer__link" href="#projects" data-i18n="nav.projects"></a></li>
+          <li><a class="footer__link" href="#skills" data-i18n="nav.skills"></a></li>
+          <li><a class="footer__link" href="#education" data-i18n="nav.education"></a></li>
+          <li><a class="footer__link" href="#contact" data-i18n="nav.contact"></a></li>
+        </ul>
+      </nav>
+      <nav class="footer__cell footer__column" aria-labelledby="footer-elsewhere">
+        <h2 class="footer__heading" id="footer-elsewhere" data-i18n="footer.elsewhere"></h2>
+        <ul class="footer__list">
+          <li><a class="footer__link" href="https://github.com/Khalil-bec" target="_blank" rel="noopener noreferrer"><span data-i18n="contact.githubLabel"></span><span class="visually-hidden" data-i18n="a11y.newTab"></span></a></li>
+          <li><a class="footer__link" href="https://www.linkedin.com/in/becheikh-mohamed-khalil/" target="_blank" rel="noopener noreferrer"><span data-i18n="contact.linkedinLabel"></span><span class="visually-hidden" data-i18n="a11y.newTab"></span></a></li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- The year is static data, not translated copy (the 005 favicon-comment
+         precedent); the name and the made-by prefix reuse the dictionaries. -->
+    <div class="footer__bar">
+      <p class="footer__copy">© 2026 <span data-i18n="hero.name"></span></p>
+      <p class="footer__credits"><span data-i18n="footer.madeBy"></span> <span data-i18n="hero.name"></span></p>
+    </div>
+  </div>
+</footer>

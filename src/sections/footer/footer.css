@@ -1,0 +1,139 @@
+/*
+ * Footer (ticket 121, bar-grid revision).
+ *
+ * A full-bleed band whose inner 1280 frame carries side rules and a one-pixel
+ * grid gutter, so the cells read as the inspiration's bar-divided footer:
+ * a wide brand cell + NAVIGATION / ELSEWHERE on desktop, stacked rows on narrow
+ * screens. The mark, tagline and mailto sit left; a full-width © / made-by bar
+ * closes the page. The taller cell grid is also what gives the names layer's
+ * contact flip its final scroll room. Design tokens only (repo rule).
+ */
+
+/* The inner frame re-establishes the shared content frame and draws the outer
+ * side rules; the cells own their padding so the text lands on the section
+ * content edge (the cell's border included). */
+.footer__inner {
+  max-inline-size: var(--container-max);
+  margin-inline: auto;
+  border-inline: var(--border-width) solid var(--color-border);
+}
+
+/* The single-pixel gap is the bar. The grid's own background is the hairline colour;
+ * every cell paints the page ground over it, leaving only the gutters visible.
+ * The minimum height keeps the footer substantial on desktop; the narrow query
+ * in tokens.css drops it and relaxes the cell padding when the cells stack. */
+.footer__grid {
+  display: grid;
+  grid-template-columns: var(--footer-grid-columns);
+  gap: var(--border-width);
+  min-block-size: var(--footer-grid-min-block);
+  background-color: var(--color-border);
+}
+
+.footer__cell {
+  min-inline-size: 0;
+  padding-block-start: var(--footer-cell-pad-block);
+  padding-block-end: var(--footer-cell-pad-end);
+  padding-inline: var(--container-pad);
+  background-color: var(--color-bg);
+}
+
+.footer__brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-md);
+}
+
+/* Same artwork-aspect completion as the nav mark (ticket 117). The mark is
+ * decorative brand identity here — the nav owns the home link. */
+.footer__mark {
+  block-size: var(--footer-mark-size);
+  inline-size: calc(var(--footer-mark-size) * 1.344);
+  fill: currentColor;
+}
+
+/* The hero's sentence doubles as the footer's brand line (the reference's
+ * short description under the mark); the rich binding keeps the role bold. */
+.footer__tagline {
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-base);
+  color: var(--color-text-muted);
+}
+
+.footer__tagline strong {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
+}
+
+/* Shared micro-type: every footer label/link/bar line is the same mono step. */
+.footer__email,
+.footer__heading,
+.footer__link,
+.footer__bar {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+.footer__email {
+  margin-block-start: var(--space-xs);
+  color: var(--color-text-muted);
+  overflow-wrap: anywhere;
+  text-decoration-line: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: var(--underline-offset);
+  transition: color var(--duration-fast) var(--ease-standard),
+    text-decoration-color var(--duration-fast) var(--ease-standard);
+}
+
+.footer__email:hover,
+.footer__email:focus-visible {
+  color: var(--color-text);
+  text-decoration-color: currentColor;
+}
+
+.footer__column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.footer__heading {
+  text-transform: uppercase;
+  color: var(--color-text-subtle);
+}
+
+.footer__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+}
+
+.footer__link {
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  transition: color var(--duration-fast) var(--ease-standard);
+}
+
+.footer__link:hover,
+.footer__link:focus-visible {
+  color: var(--color-text);
+}
+
+/* The bottom strip is the last row of the inner frame: a hairline separates it
+ * from the cells, and its inline padding keeps the text on the same content
+ * edge as the brand/nav cells above. */
+.footer__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-xs) var(--space-lg);
+  padding-block: var(--space-lg);
+  padding-inline: var(--container-pad);
+  border-block-start: var(--border-width) solid var(--color-border);
+  text-transform: uppercase;
+  color: var(--color-text-subtle);
+}

@@ -173,5 +173,10 @@
     "linkedinLabel": "LinkedIn",
     "locationLabel": "Location",
     "location": "Pau, France"
+  },
+  "footer": {
+    "navigation": "Navigation",
+    "elsewhere": "Elsewhere",
+    "madeBy": "Made by"
   }
 }
