@@ -35,3 +35,5 @@
 **Not in scope:** the horizontal scroll events themselves; the readout (113); changes to 114's settled geometry (asserted unchanged).
 
 **Status:** implemented; QA green (qa-115 167 checks; qa-114 1070 / qa-113 591 / qa-112 373 regressions; token gate clean).
+
+**Superseded in part by 124 (2026-10-20, user request):** the travel is now **downward-only** (an upward handoff and any reversal snap to the settled states) and the train **reads forward from the top** (first letter topmost, exit in reading order) — the measured bottom-up order and the unmeasured `EXIT_BOTTOM` mirror retired with it.
