@@ -21,8 +21,28 @@ function prefersReducedMotion() {
   return reducedMotionQuery.matches;
 }
 
-/** Move DOM focus to an anchor target without fighting Lenis' own scrolling. */
-function focusAnchorTarget(hash) {
+/** A load-time landing (a `#hash` deep link) keeps its focus but must not draw
+ * the global ring around the whole target — a section, the footer, any hash
+ * target — on every refresh (ticket 124). The marker lasts only while the
+ * element holds focus: moving away (Tab, a click elsewhere) restores the
+ * normal ring behaviour. */
+function silenceLandingRing(target) {
+  target.classList.add("is-silent-landing");
+  target.addEventListener(
+    "blur",
+    () => target.classList.remove("is-silent-landing"),
+    { once: true },
+  );
+}
+
+/** Move DOM focus to an anchor target without fighting Lenis' own scrolling.
+ *
+ * `silent` marks a load-time landing (a `#hash` deep link): focus still moves,
+ * so the browser's sequential-focus starting point continues *inside* the
+ * target and the first Tab is not thrown back to the top of the document — but
+ * the target's ring is suppressed while it holds that focus. A
+ * keyboard-activated jump is not silent and keeps its ring. */
+function focusAnchorTarget(hash, silent = false) {
   let id;
   try {
     id = decodeURIComponent(hash.slice(1));
@@ -38,6 +58,7 @@ function focusAnchorTarget(hash) {
     target.setAttribute("tabindex", "-1");
   }
   target.focus({ preventScroll: true });
+  if (silent) silenceLandingRing(target);
 }
 
 /** Delegate anchor clicks: let Lenis scroll, then move focus to the target. */
@@ -70,13 +91,16 @@ export function initSmoothScroll() {
   // path too, where jumps are instant but still deserve sensible focus.
   document.addEventListener("click", onDocumentClick);
 
-  // A deep link (`/#contact`) lands with the viewport at the target but focus on
-  // <body>; move focus there too so keyboard users continue from where they are.
-  // Back/forward history navigation is deliberately out of scope: Lenis does not
-  // restore scroll on it, so focusing the target then would point off-screen
-  // (deferred from ticket 002; logged in doc/idea-v1-decisions.md).
+  // A deep link (`/#contact`) lands with the viewport at the target and
+  // <body> focused: move focus there silently, so keyboard users continue from
+  // where they are. Silent = no ring around the target on every load and
+  // reload of a hash URL (ticket 124); the target is `tabindex="-1"` and the
+  // exemption lasts only while it holds focus.
+  // Back/forward history navigation is deliberately out of scope: Lenis does
+  // not restore scroll on it, so focusing the target then would point
+  // off-screen (deferred from ticket 002; logged in doc/idea-v1-decisions.md).
   if (window.location.hash && window.location.hash !== "#") {
-    requestAnimationFrame(() => focusAnchorTarget(window.location.hash));
+    requestAnimationFrame(() => focusAnchorTarget(window.location.hash, true));
   }
 
   if (prefersReducedMotion() || typeof window.Lenis !== "function") {

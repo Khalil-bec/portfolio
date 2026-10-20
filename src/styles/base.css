@@ -95,6 +95,14 @@ code {
   outline-offset: var(--focus-ring-offset);
 }
 
+/* A `#hash` page load focuses its target (a section, the footer, …) so Tab
+ * continues inside it; that landing is silent — no ring around the whole
+ * target on every refresh (ticket 124). A keyboard-activated jump is not
+ * marked and still rings. */
+.is-silent-landing:focus-visible {
+  outline: none;
+}
+
 /* Shared section shell. Sections give the scaffold enough height to be
  * scrollable and testable before real content lands (tickets 005/006). */
 .section {

@@ -10,16 +10,22 @@
  * still ahead stack from the bottom edge (`--name-stack-bottom`). Rows stay
  * in place while the page scrolls beneath.
  *
- * The travel (ticket 115, measured on the inspiration with a fine Y-sweep):
- * at a one-step handoff the changing word's letters leave their row and ride
- * a **vertical train through the lane's column**, rising exactly **1:1 with
- * scroll** (it freezes mid-flight at idle — pure Y-mapping, no time term).
- * The word reads **forward from the bottom**: the first letter sits lowest,
- * the last letter topmost, on one 20px `--name-transit-cell` pitch, centred
- * on the lane's axis. Each letter leaves the train the frame its rendered
- * train-Y crosses the exit line (~0.4·vh upward), easing on a short
+ * The travel (ticket 115, measured on the inspiration with a fine Y-sweep;
+ * tickets 124 made it one-way and flipped the train's reading order): at a
+ * one-step handoff **while scrolling down** the changing word's letters leave
+ * their row and ride a **vertical train through the lane's column**, rising
+ * exactly **1:1 with scroll** (it freezes mid-flight at idle — pure Y-mapping,
+ * no time term). The word reads **forward from the top**: the first letter sits
+ * on top, the last at the bottom, on one 20px `--name-transit-cell` pitch,
+ * centred on the lane's axis. Each letter leaves the train the frame its
+ * rendered train-Y crosses the exit line (~0.4·vh), easing on a short
  * time-based morph into its target position — so the arrival is staggered by
- * geometry alone (the topmost letter crosses first), exactly as measured.
+ * geometry alone (the topmost letter — the word's first — crosses first) and
+ * lands in reading order.
+ *
+ * Scrolling **up** is never dynamic (124): no train spawns, and any train still
+ * in the air snaps to its settled layout the moment the scroll reverses, so the
+ * word that was current simply takes its place in the bottom stack.
  *
  * Mechanics: settled rows stay 114's token math — the row anchors and every
  * class/counter publish exactly as before. Only the flying letters move:
@@ -45,11 +51,12 @@
  *
  * Snap paths: a multi-step scrub never flies (letters take the settled
  * states directly); a handoff interrupting an active flight snaps it first
- * and reflys from clean state; resize and font loads re-measure, so a
- * resize snaps flights too (targets would be stale); the language switch
- * re-splits the letters through `refreshNames()`. The whole travel is gated
- * off under `prefers-reduced-motion` (handoffs stay 114's instant states)
- * and when the layer is unmounted (≤768 / `--names-display: none`).
+ * and reflys from clean state; an upward move snaps whatever is in the air
+ * (124); resize and font loads re-measure, so a resize snaps flights too
+ * (targets would be stale); the language switch re-splits the letters through
+ * `refreshNames()`. The whole travel is gated off under
+ * `prefers-reduced-motion` (handoffs stay 114's instant states) and when the
+ * layer is unmounted (≤768 / `--names-display: none`).
  */
 
 /** The current-state trigger: a section's top crossing the viewport's lower
@@ -59,14 +66,13 @@ const TRIGGER = 0.25;
 
 /**
  * The travel's tuning constants (115, measured on the inspiration — tuning
- * constants, not tokens: the keyboard-step precedent). Upward travel's exit
- * band measured between 339 and 484 on a 1080 viewport → 0.4·vh; downward
- * travel (scrolling back) mirrors it unmeasured at 0.55·vh, logged in the
- * ticket. Converge/exit are short time-based settles; everything between
- * them is scroll-locked (measured 1:1, frozen at idle).
+ * constants, not tokens: the keyboard-step precedent). The exit band measured
+ * between 339 and 484 on a 1080 viewport → 0.4·vh; the travel is downward-only
+ * (124), so there is no mirror line for the way back. Converge/exit are short
+ * time-based settles; everything between them is scroll-locked (measured 1:1,
+ * frozen at idle).
  */
 const EXIT_TOP = 0.4;
-const EXIT_BOTTOM = 0.55;
 const CONVERGE_MS = 240;
 const EXIT_MS = 380;
 
@@ -179,6 +185,8 @@ function initNamesInternal(driver, reducedMotion) {
     // Sentinel: -99 never equals a real index/count, so the first frame
     // writes the states (the driver's `pageHeight: -1` pattern).
     lastCurrent: -99,
+    // Sentinel: null until the first frame has published a position.
+    lastScrollY: null,
     reducedMotion: Boolean(reducedMotion),
   };
 
@@ -200,14 +208,13 @@ function initNamesInternal(driver, reducedMotion) {
   /** Spawn one word's train. Everything the flight needs is measured here —
    * no modelled glyph metrics: spawn rects (old layout), target rects (new
    * layout), the lane's axis and the cell pitch (tokens). */
-  const spawnFlight = (row, dir, spawns, targets, spawnY) => {
+  const spawnFlight = (row, spawns, targets, spawnY) => {
     const count = Math.min(spawns.length, targets.length);
     if (count === 0) return;
     const cell = measurePx(layer, "--name-transit-cell");
     const laneCenter = window.innerWidth - measurePx(layer, "--lane-ruler") / 2;
     flights.set(row, {
       row,
-      dir, // "up": page moving down; "down": page moving back up
       spawnY,
       cell,
       laneCenter,
@@ -230,7 +237,7 @@ function initNamesInternal(driver, reducedMotion) {
           tx: t.left,
           ty: t.top,
           tw: t.width,
-          slot: count - 1 - j, // topmost slot = the word's last letter
+          slot: j, // reads forward from the top: first letter topmost
           exited: false,
           exitStart: 0,
           fx: 0,
@@ -256,8 +263,8 @@ function initNamesInternal(driver, reducedMotion) {
     }
     const finished = [];
     for (const rec of flights.values()) {
-      const rise = scrollY - rec.spawnY; // the train rides the page 1:1 (up AND back down)
-      const exitLine = rec.dir === "up" ? EXIT_TOP * vh : EXIT_BOTTOM * vh;
+      const rise = scrollY - rec.spawnY; // the train rides the page 1:1
+      const exitLine = EXIT_TOP * vh;
       for (const letter of rec.letters) {
         if (letter.exited) {
           // Exit morph: ease the box from the train cell to the target, with
@@ -277,8 +284,7 @@ function initNamesInternal(driver, reducedMotion) {
           // locked to Y until it crosses the exit line.
           const trainY = rec.trainTop0 + letter.slot * rec.cell - rise;
           const trainX = rec.laneCenter - letter.sw / 2;
-          const crossed =
-            rec.dir === "up" ? trainY <= exitLine : trainY >= exitLine;
+          const crossed = trainY <= exitLine;
           if (crossed) {
             letter.exited = true;
             letter.exitStart = now;
@@ -326,6 +332,14 @@ function initNamesInternal(driver, reducedMotion) {
   driver.setView({
     render({ scrollY }) {
       const vh = window.innerHeight;
+      // Travel is downward-only (124): any upward step lands whatever is in
+      // the air before the frame computes anything, so a frozen train never
+      // rides back down. No epsilon — a slow drag arrives in sub-pixel deltas,
+      // and every one of them is still an upward move.
+      if (state.lastScrollY !== null && scrollY < state.lastScrollY) {
+        completeFlights();
+      }
+      state.lastScrollY = scrollY;
       updateFlights(scrollY, vh, performance.now());
 
       // The current slot is the deepest section whose top has crossed the
@@ -338,28 +352,28 @@ function initNamesInternal(driver, reducedMotion) {
       if (current === state.lastCurrent) return;
 
       const delta = current - state.lastCurrent; // the sentinel's first frame computes a scrub-sized jump
-      if (Math.abs(delta) === 1 && flightable()) {
-        // A one-step handoff flies both changing words (115). An older flight
-        // still in the air snaps first — its targets are stale once this
-        // flip's states land. Reads first (old layout), then the class flip,
-        // then the target reads — the flip's writes fall through to the
-        // browser's forced sync layout on the first rect read, one reflow
-        // per phase.
+      if (delta === 1 && flightable()) {
+        // A one-step handoff downward flies both changing words (115). An
+        // upward handoff never flies (124): it takes the settle branch below.
+        // An older flight still in the air snaps first — its targets are
+        // stale once this flip's states land. Reads first (old layout), then
+        // the class flip, then the target reads — the flip's writes fall
+        // through to the browser's forced sync layout on the first rect read,
+        // one reflow per phase.
         if (flights.size > 0) completeFlights();
-        const outRow = delta > 0 ? rows[state.lastCurrent] : rows[current + 1];
+        const outRow = rows[state.lastCurrent];
         const inRow = rows[current];
         const outOld = readLetters(outRow);
         const inOld = readLetters(inRow);
         publishStates(layer, rows, current);
         const outNew = readLetters(outRow);
         const inNew = readLetters(inRow);
-        const dir = delta > 0 ? "up" : "down";
-        if (outOld.length && outNew.length) spawnFlight(outRow, dir, outOld, outNew, scrollY);
-        if (inOld.length && inNew.length) spawnFlight(inRow, dir, inOld, inNew, scrollY);
+        if (outOld.length && outNew.length) spawnFlight(outRow, outOld, outNew, scrollY);
+        if (inOld.length && inNew.length) spawnFlight(inRow, inOld, inNew, scrollY);
       } else {
-        // Scrub (or the sentinel first frame, or the travel gated off):
-        // letters take the settled states directly (114's behaviour); any
-        // active flight snaps rather than fly on stale targets.
+        // Scrub, an upward handoff, the sentinel first frame, or the travel
+        // gated off: letters take the settled states directly (114's
+        // behaviour); any active flight snaps rather than fly on stale targets.
         completeFlights();
         publishStates(layer, rows, current);
       }
