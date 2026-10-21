@@ -72,6 +72,26 @@ inside `maxScroll`.
   Every new link is keyboard-reachable/focus-visible, EN↔FR flips every string, and `<html lang>`
   follows.
 - **Geometry (trigger = maxScroll + 0.25·vh; margin = trigger − contact top):**
+  - **Superseded in part by 129 (2026-10-21):** the trigger above came from 114's
+    `TRIGGER = 0.25` (a section became current once its top reached the top
+    quarter of the viewport), so the footer had to be long enough for
+    `contact.top ≤ maxScroll + 0.25·vh` for the contact flip to land. Under
+    129's occupancy rule the requirement **relaxes**: at max scroll the named
+    bands measure education **0 px** and contact **383 / 383 / 242 / 81 px**
+    (1440 / 1024 / 768 / 375 — the gap is the footer's height below the
+    viewport), so contact is the only named band on screen and is current at
+    every width. The footer's height now only has to stay **shorter than the
+    viewport**; its measured 517 / 517 / 658 / 731 px all do. The footer was
+    also sized for its own reasons (the bar-divided shape + credits), which
+    this ticket did not change.
+  - **Superseded in part by 130 (2026-10-21):** the trigger moved again — the
+    live rule is now the **reached** rule (the last section whose top has
+    entered the viewport), so contact becomes current at `contact.top − vh`
+    rather than at the midpoint of its band. The requirement relaxes further
+    and the measurements above are unchanged: at max scroll education
+    measures **0 px** and contact **383 / 383 / 242 / 81 px** (1440 / 1024 /
+    768 / 375), so contact is the only named band on screen and is current at
+    every width.
   | View | contact top | footer top | docH | maxScroll | trigger | margin |
   | --- | --- | --- | --- | --- | --- | --- |
   | 1440×900 EN | 4526 | 4982 | 5499 | 4599 | 4824 | 298 |

@@ -272,3 +272,249 @@ tickets 116–121. Spec: `doc/idea-v3-spec.md`.
   structure checks), including cell-gap geometry, bottom-bar placement, made-by copy, live EN→FR
   switch, reduced motion, zero overflow/errors. Token gate on `footer.css` prints nothing.
   Screenshots `/tmp/opencode/rev-*` (element + max-scroll + live-switch).
+
+## 2026-10-20 — final verification gate (tickets 125–128)
+
+- **The harness becomes repo tooling, not `/tmp` folklore.** The v3 per-ticket scripts were
+  mostly gone; the gate now lives in `tools/qa` behind `npm ci && npm run verify` (dev-only
+  Playwright 1.64.1 + Lighthouse 13.5.0). Nothing under `src/` imports it and no runtime
+  dependency ships. Red baseline: 7 failures / 99 passes; final: **106 / 0**.
+- **Mobile performance is not an intro-only problem.** Skipping the intro ≤768 (user call)
+  lifted the median to 76–81, not over 90. The LCP element is JS-bound text; Lighthouse's
+  *observed* LCP was 135 ms but its simulated LCP was 3.5 s, because the simulation charged
+  the bind for the full module + vendor path. Three fixes, all measured:
+  1. **Critical path split** — `main.js` statically imports only i18n; the intro, motion
+     modules and vendor scripts load after the bind. `modulepreload` only covers `main.js` +
+     `i18n.js`. Language-switch motion refreshes are dynamic imports (already cached).
+  2. **Language-invariant `<h1>` fallback** — the name is identical in EN and FR, so the
+     initial HTML can carry it without a language flash; i18n still rebinds `hero.name`.
+     This is the one copy-rule exception, recorded in `AGENTS.md`, ticket 126 and here.
+  3. **Pre-paint space reservation** — the ticker band reserves its live height through
+     `data-motion`, and the wrapped nav list reserves its measured 2/3/4-row height
+     (`--nav-list-h-2/3/4`) from the first frame. The boot guard also publishes an early
+     `lang` hint so the FR nav height is right before the dictionary binds.
+  Final mobile: **97/97/97**, LCP 2259 ms, CLS 0.056; desktop **98**, a11y **100**.
+- **Names target size is a real AA fix, not an audit waiver.** Pitch 20 → 24 px
+  (`--name-pitch: 1.5rem`); no stack retune was needed. `minGap=0`, rows 24 px, desktop
+  a11y 100, `qa-124` 69/69 travel regression green.
+- **The final gate keeps the v1 thresholds.** Mobile performance > 90 and LCP < 2.5 s,
+  desktop perf ≥ 95, both a11y 100; three mobile runs, median used. The reproducible
+  command, the report and the screenshots are the evidence; `doc/acceptance-criteria.md`
+  maps every v1 item (including the v3 amendments and the fallback exception).
+- **Token gate amendment:** `@media` prelude lengths are not tokenizable (custom properties
+  are illegal in media queries), so they are stripped before the literal scan. Everything
+  else still has to come from `tokens.css`.
+
+
+## 2026-10-21 — the names layer's current title follows the section in view (ticket 129)
+
+- **The report:** the vertical titles in the ruler lane trailed the page by one
+  section — the ruler showed **education** while the contact section was
+  already on screen, and **contact** only once the footer was in view. The
+  user's call: "i want all the titles proportional to when you reach its
+  section", and **no footer row** — contact holds through the footer.
+- **The cause was one fixed viewport offset.** 114's `TRIGGER = 0.25` made a
+  section current only once its **top** had risen into the top quarter of the
+  viewport. A section's top enters the viewport a whole viewport before that
+  line, so every title trailed the content by up to a quarter screen — and the
+  short end sections (education 450 px, contact 456 px) could not catch up
+  before the footer. Measured: `education @ fully-in-view` (scrollY 3626)
+  showed skills; `contact @ fully-in-view` (4082) showed education.
+- **The rule is now occupancy, not an offset:** the current row is the section
+  whose band covers **the most of the screen**; a tie goes to the **later
+  section in document order** (the one being scrolled into on the way down),
+  so the handover lands at the halfway point. Before the first named section
+  is on screen (the hero, which has no row of its own since 119) the first row
+  stays current — the layer's behaviour since 114, unchanged here.
+  `measureTops` became `measureBands` (top *and* bottom, whole-px, re-measured
+  on resize / font load / language switch).
+- **Why occupancy and not a different offset.** Any fixed line trades one
+  error for the other: a lower line makes the title trail (the reported bug),
+  a higher one makes it announce a section that is only peeking in at the
+  bottom edge. Occupancy ties the title to what is actually on the screen, and
+  that is what "proportional to when you reach its section" means in practice.
+  The hero is the one place no named section is on screen, and it has no row
+  of its own to name. Occupancy also fixed the end of the page: contact now
+  holds from scrollY 4076 to the end (4599), covering the footer with no
+  footer row.
+- **The 115 travel is untouched** — it still spawns at the state flip and
+  still rides 1:1 with scroll. The handover happens 225 px earlier in the
+  scroll: the contact handover moves from scrollY 4301 to 4076, so the
+  distance from the handover to the page's end grows from **298 px to 523 px**
+  (max scroll 4599) — more scroll in which a train can finish its exit. The
+  exit geometry itself is unchanged (the 0.4·vh line, viewport-relative).
+  Measured: 16 letters airborne on the downward education → contact handover
+  (scrollY 4095).
+- **The rule became a pure seam.** `currentSection(bands, scrollY, vh)` —
+  bands in, index out — so the selection rule is reasoned about on its own
+  instead of living inline in the render callback. `measureTops` became
+  `measureBands` to feed it. The QA harness re-implements the rule
+  independently — it asserts the *documented* rule, so it is a second
+  implementation, not a call into this one.
+- **Two further consequences, recorded where they live.** Tickets 114 and 115
+  stated the `0.25·vh` offset as the live rule and are now marked superseded
+  in part. Ticket 121's **footer-length requirement** was derived from the
+  same trigger (`contact.top ≤ maxScroll + 0.25·vh`, margin 298 at 1440); under
+  the occupancy rule it **relaxes** — at max scroll education measures **0 px**
+  and contact **383 / 383 / 242 / 81 px** (1440 / 1024 / 768 / 375), so contact
+  is the only named band on screen and is current at every width, and the
+  footer now only has to stay shorter than the viewport (measured 517 / 517 /
+  658 / 731). 121 is marked superseded in part.
+- **A harness defect surfaced and was fixed — and it invalidated the earlier
+  green numbers.** `i18n.keys-resolve` required every bound key to be a
+  string, but `skills.all` is an array bound with `data-i18n-mode="join"`
+  (118's ticker source), so the audit could never pass against the committed
+  markup. The check is now mode-aware. The defect belongs to **125's** audit,
+  not to 129's logic; it is recorded in `doc/tickets/125-verification-harness.md`
+  and the fix rides the same uncommitted batch (the gate cannot be green
+  without it). Consequence worth stating plainly: **the 106/0 figures recorded
+  for 125 and 128 are not reproducible against the harness as it now stands**
+  — the harness grew from 106 checks at the 128 gate to 146 in the same
+  uncommitted batch, and the mode-blind audit was added in that growth without
+  its green baseline being re-run. The current green figure is **158/0** on
+  the full gate (`npm run verify`), **148/0** with `verify:fast` — the 10
+  Lighthouse and screenshot checks are the difference.
+- **The new checks were validated against the bug, not just against the new
+  code.** Restoring 114's `0.25·vh` trigger turns the gate red at exactly the
+  reported depths (`#education@3626 got=#skills`, `#contact@4082 got=#education`)
+  in EN and FR, at 1440 and 1024. The sampled depths are each section centred
+  in the viewport **and** each section fully in view — the latter is where the
+  old rule named the previous section, so a regression to the old trigger
+  cannot pass. **Depth 0 is sampled too**: the hero is the one place no named
+  section is on screen, and there the expected value is the *first* row (the
+  layer's behaviour since 114) — asserted, not assumed.
+- **Evidence:** probe sweep at 1440×900 + 1024×800 — the current row is the
+  section in view at every depth (rest/about → `#about`, projects, skills,
+  education, contact, footer → `#contact`); harness **158 / 0** full gate
+  (148 / 0 fast) — the harness grew by **12**: eight new checks
+  (`names.current-section-*` and `names.current-visible-*` at 1440 and 1024,
+  ×900, × EN + FR) plus four incidental `settle.names-*` settle checks;
+  Lighthouse unchanged (mobile 97/97/97, LCP 2257/2258 ms, a11y 100;
+  desktop 98, a11y 100); 114's geometry invariants re-verified at 1440 + 1024
+  in EN and FR. Tickets 114, 115 and 121 are marked **superseded in part by
+  129** so their recorded trigger is history, not the live rule.
+
+## 2026-10-21 — the names layer's title follows the section you have reached (ticket 130)
+
+- **The rule changed again, and the reference settled it.** The user rejected
+  129's occupancy rule — "i want the section title in the scroll ruler to
+  appear just when i discover the section not at its middle" — and pointed at
+  the reference. So the reference was measured directly rather than inferred.
+  On getartcraft.com (1440×900, dark) the names layer is a `fixed inset-0`
+  overlay; each section word is a run of per-letter spans whose `transform`
+  matrix carries the state — **scale 0.4706 + warm gray** at rest, **scale 1 +
+  full ink** when current, anything between while the word is in flight. The
+  handover is therefore **the flight's spawn** (the moment the incoming word's
+  letters leave the resting scale), not the moment the word has finished
+  settling: the reference's flight is scroll-linked and long (~800 px), so its
+  *visual* settle lags the *state* flip by about that much.
+- **The measured spawn depths, against the sections' bands** (`hero 49–901,
+  features 943–3497, ownership 3497–4152, made-with 4152–4693, start
+  4693–5199`):
+
+  | Incoming word | Flight spawns | The section's top enters the viewport | Visible at the spawn |
+  | --- | --- | --- | --- |
+  | FEATURES | 129 | 43 | 86 px (9.6 %) |
+  | OWNERSHIP | 2644 | 2597 | 47 px (5.2 %) |
+  | COMMUNITY | 3273 | 3252 | 21 px (2.3 %) |
+  | GET STARTED | 3813 | 3793 | 20 px (2.2 %) |
+
+  **The reference hands over at discovery** — 20–86 px after the section's top
+  crosses the viewport's bottom edge, with the new section filling 2–10 % of
+  the screen. Never at the middle, never later. (Each spawn was read from the
+  word's own letter range in the overlay, so a flight in progress could not be
+  mistaken for another word's.)
+- **The live rule:** the current row is **the section the page has reached** —
+  the last one in document order whose top has entered the viewport
+  (`top ≤ scrollY + vh`). The title names a section the moment it is
+  discovered, and it never trails the page. Before the first named section is
+  reached (the hero, which has no row of its own since 119) the first row
+  stands in — the layer's behaviour since 114, unchanged. 129's occupancy rule
+  is **superseded by 130**; its reasoning and measurements stay as the record
+  of what was tried.
+- **A latent bug closed on the way:** `measureBands()` returned
+  `{top: 0, bottom: 0}` for a section the markup does not have. Under the
+  reached rule such a band satisfies `top ≤ scrollY + vh` on every frame and
+  would win the state — so a missing section is now a **null** band, which the
+  rule skips.
+- **The travel is untouched:** 115's flight still spawns at the state flip and
+  still rides 1:1 with scroll; only the flip's depth moved. Every handover
+  moves **450 px earlier** than under 129 (675 px earlier than under 114's
+  `0.25·vh` trigger), so the distance from the last handover to the page's end
+  grows **523 px → 973 px** — more scroll in which a train can finish its
+  exit. The exit geometry itself (the 0.4·vh line) is unchanged. No CSS, token
+  or markup change.
+- **Evidence:** the current row is the section reached at every sampled depth,
+  and it flips **exactly at the boundary** — one pixel before the section's top
+  crosses the viewport's bottom edge the previous section is still named, at
+  that pixel the new one is. The reported failure reads correctly now: at
+  scrollY 4082 (contact fully in view) the title is `#contact` — under 114's
+  trigger, and under 129's occupancy rule, it was `#education`. Harness
+  **148 / 0** fast; the 129 checks were rewritten for the new rule
+  (`names.current-section-*` now samples **the flip boundary and the pixel
+  before it**; `names.current-visible-*` became `names.current-reached-*` —
+  the title must never name a section the page has not reached, the hero's
+  first-row fallback being the documented exception) and were **validated
+  against both old rules**: restoring 129's occupancy rule reddens the gate at
+  every boundary (`#contact@3626 got=#education want=#contact`), restoring
+  114's `0.25·vh` trigger reddens it at the reported depth
+  (`#contact@4082 got=#education want=#contact`) — EN + FR, 1440 + 1024.
+  Visual QA approved (0 failures; 1440/1024/375 × EN/FR + reduced). The
+  travel still flies: 16–20 letters airborne at each handover.
+
+## 2026-10-21 — the 125–130 batch: the review pass and what it found
+
+- **The batch was reviewed as a whole** (the `code-review` skill, two parallel
+  read-only sub-agents against `5ea37c0`: one Standards axis, one Spec axis).
+  The Standards axis found no hard violation in the shipped code, but three
+  comment-level stalenesses and four judgement calls; the Spec axis found the
+  acceptance ledger stale, `doc/status.md` missing twelve rows, a mislabelled
+  table in ticket 130, and two behaviours that looked wrong. What follows is
+  what was **changed**, and why.
+- **A real defect the review did not see, found by measuring.** The nav
+  reservation (ticket 126) mapped the list's row count to widths that were
+  never measured. EN wraps to two rows until 529 px and to four rows below
+  359 px, and the reservation covered neither: the sticky bar **grew 33 px
+  after the dictionary bound** at 521–529 px and at ≤358 px. The boundaries are
+  now measured per language (EN 4/3/2/1 rows at 359/376/530, FR 4/3/2/1 at
+  376/393/565), each edge keeping the taller reservation one pixel longer than
+  measured — under-reserving moves the page, over-reserving only leaves the bar
+  a row taller at that single width. The new `nav.reservation-{en,fr}` check
+  measures the bar's height across the bind at every boundary and is
+  **validated against the bug**: restoring the old mapping reddens the gate at
+  320 px, 358 px and 529 px in EN.
+- **The harness was more comfortable than the tree deserved.** `i18n.v1-survival`
+  **passed vacuously** when the v1 commit was unavailable — a check that cannot
+  run is not a pass, and it now fails loudly. `architecture.local-assets` only
+  scanned the static `<script src>` tags, so after 126 moved the vendor scripts
+  off the document it could no longer see them at all; it now reads the
+  injected paths out of `main.js` and asserts each is a local file under
+  `vendor/`, and it scans every `src/**/*.js` for an import of the QA tooling
+  or a `node_modules` package — the "no runtime dependency ships" half of
+  ticket 125's contract, which nothing asserted before.
+- **The names rule's fallback could name a row that does not exist.**
+  `currentSection()` fell back to row 0 even when row 0's section was missing
+  from the markup, while the rule's own contract says a missing section takes
+  its row out of the running. It now stands in the first row that *has* a
+  section, and returns −1 when no row has one. `measureBands()` also carried a
+  `bottom` field that only 129's occupancy rule ever read; the band is the
+  section's **top** edge now, and the bottom edge retires with the rule that
+  needed it.
+- **The critical path is now fault-tolerant.** The ten motion modules were
+  awaited with `Promise.all` — one rejected import left an unhandled rejection
+  and none of the modules after it initialised. They are awaited with
+  `Promise.allSettled`, and each module's init runs inside its own guard, so a
+  module that fails to load or throws degrades to "that feature is absent" (the
+  copy has already painted) instead of taking the page down.
+- **The ledger was stale and the history was split.** `doc/acceptance-criteria.md`
+  still said 106/0 and had no row for the names rule; it now carries the current
+  figures (162/0 full, 152/0 fast) and a row for the reached rule, and it
+  names the *reproducible* harness checks instead of the `/tmp` scripts that
+  are gone. `doc/status.md` becomes the table alone and `doc/status-log.md`
+  takes the narrative — the long history was costing every session context.
+  The log is committed, not ignored: it is the only home of that history.
+- **The corrections in the ticket files were corrections of the record, not of
+  the code.** Ticket 130's handover table was labelled one section off (the
+  pairs are projects/skills/education/contact, and **about has no handover** —
+  it is the first row and stands in from scrollY 0); the "450 px earlier" and
+  "675 px earlier" figures were right and are now labelled correctly.

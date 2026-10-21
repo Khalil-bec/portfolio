@@ -19,8 +19,9 @@ grow by one: hero = Home, about = About.
   grid (the "just the paragraph" brief).
 - Name layer: six rows in index.html (hero/projects/skills/education/contact + about in
   document order); ruler + section tops re-measured post-reflow (the tops change: hero loses
-  its below-fold height); `name.js` needs no code change (rows are markup-driven; measureTops
-  reads `data-name` rows).
+  its below-fold height); `name.js` needs no code change (rows are markup-driven; `measureTops`
+  reads `data-name` rows — renamed `measureBands` in 129, which measured each section's band
+  as top + bottom; 130 retired the bottom edge, which only 129's occupancy rule read).
 - Section numbering: `section__num` renders from the order — verify with the existing eyebrow
   mechanism (no JS change expected).
 - The `contact` flip check advances (4501 vs 4231 status noted; the footer finishes it in 121).

@@ -52,6 +52,14 @@ Full-bleed `#hero` head matching the probed inspiration structure:
   section's source; the ticker consumes `skills.all`). Single new dict array, both languages.
 - The scroll cue chevron stays (v1's affordance).
 
+> **Amendment 126 (2026-10-20):** the `<h1>` carries the pre-boot name
+> `Mohamed Khalil BECHEIKH`. It is identical in EN and FR, so the fallback is
+> safe before the dictionary arrives; `data-i18n="hero.name"` still owns the key
+> and i18n rebinds it. Without a text node in the initial HTML, Lighthouse's
+> simulation charged the JS bind for the whole module/vendor path and kept
+> mobile LCP at ~3.5 s. This is one of two recorded copy-rule exceptions (the
+> other is the document `<title>`, which is language-invariant too).
+
 ## 4. About (ticket 119)
 
 Promoted into its own section between the ticker and `#projects`: the name-layer rows,
@@ -79,6 +87,13 @@ allows motion (else: nothing — the settled page shows). Four beats, tokenised 
 No scroll lock, no pointer interception, replays every load (the inspiration's behaviour).
 Under reduced motion the overlay never injects and no reveal classes are added.
 
+> **Amendment 126 (2026-10-20, user decision):** the intro is desktop-only. The
+> boot guard returns before setting `data-intro` when
+> `matchMedia("(min-width: 769px)")` is false, so ≤768 the hero is the first
+> paint and no overlay is created. This follows the existing mobile policy
+> (letter travel already stops at 768) and keeps the mobile LCP path clear.
+> Above 768 nothing changes.
+
 ## 6. Footer (ticket 121)
 
 New section after `#contact` (partial `src/sections/footer/`): the mark + the mailto email in
@@ -93,6 +108,13 @@ maxScroll/section-tops recorded in `doc/idea-v2-decisions.md`'s successor note (
 file) for the harnesses.
 
 ## 7. Verification plan (all tickets)
+
+> **Amendment 125/128 (2026-10-20):** the ad-hoc `/tmp/opencode` harnesses are
+> replaced by the repo command `npm ci && npm run verify` (dev-only Playwright +
+> Lighthouse). It runs the static audits, the 1440/1024/768/375 × EN/FR runtime
+> matrix, reduced motion, no-JS, vendor failure, keyboard, deep links, Lighthouse
+> and the screenshot sweep in one pass. The final evidence is
+> `doc/acceptance-criteria.md` and `qa-out/report.json`.
 
 Per ticket: token gate (`grep`-audited literal colours/sizes outside tokens.css), the fresh
 baseline harness (`/tmp/opencode/qa-baseline.mjs` — rebuilt 2026-10-18) extended with
