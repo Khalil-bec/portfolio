@@ -41,6 +41,17 @@ None — static files only, no backend, no network API. The interaction surface 
 
 ## Acceptance criteria
 
+> **Final-gate annotation (2026-10-20, refreshed 2026-10-21):** this is the original
+> v1 contract. Four
+> items were deliberately amended by v3 (ticker/About placement, footer after
+> contact, ticker copy = skills, portrait slot retired); the current tree is
+> verified in [`doc/acceptance-criteria.md`](../acceptance-criteria.md) (the
+> ledger's own figures are the current ones — 106/106 was the figure at this
+> gate and has since grown with the harness; mobile 97, desktop 98, a11y 100).
+> The copy-rule exceptions are the two language-invariant pre-boot fallbacks
+> (the hero `<h1>` from ticket 126 and the document `<title>`). The boxes below
+> stay unchecked as history; the ledger is the source of truth.
+
 - [ ] Section order is hero → projects → skills → education → contact; contact is last.
 - [ ] All FR/EN copy matches `doc/content.md` faithfully; no hardcoded text in HTML except `data-i18n` keys.
 - [ ] EN/FR switch is visible, flips every string, persists across reload, defaults from browser language, updates `<html lang>`.

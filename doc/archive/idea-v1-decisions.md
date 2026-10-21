@@ -278,4 +278,29 @@ Append-only log. Earlier decisions live in `doc/idea-v0-decisions.md`. New entri
 - **Sanctioned ruler/rail aria-label i18n keys + `EN 42% / FR 42 %` (nbsp) readout format** (FR typography, same chrome precedent).
 - **Applied to:** spec §§Scope-3/4, Data, Acceptance; tickets 100 (lane/icon-mode checkbox), 102 (touch, noscript, `%` format checkboxes), 103 (icon mode, aria-key sanction checkboxes), 104 (format + noscript view-source checkboxes). 101 untouched. Not committed — never commit without explicit approval.
 
+## 2026-10-20 — final gate (v3 phase)
 
+- The current phase logs decisions in `doc/idea-v3-decisions.md`; the 125–128
+  entry there covers the repo QA harness, the mobile critical-path/LCP fix, the
+  language-invariant `<h1>` fallback exception, the names pitch, and the token
+  gate's media-query exclusion. This file stays as the v1 contract.
+
+## 2026-10-21 — names layer current-title rule (v3 phase)
+
+- Ticket 129's decision is logged in `doc/idea-v3-decisions.md` (the current
+  phase's log): the vertical titles now name the section the viewport is
+  looking at — the section covering the most of the screen — instead of
+  trailing it by one section under 114's fixed `TRIGGER = 0.25` offset. This
+  file stays as the v1 contract; nothing in the v1 spec changes.
+
+## 2026-10-21 — names layer current-title rule, corrected (v3 phase)
+
+- Ticket 130's decision is logged in `doc/idea-v3-decisions.md` (the current
+  phase's log): the vertical titles now name the section the page has
+  **reached** — the last one whose top has entered the viewport — so the
+  title appears the moment a section is discovered, not at its middle. The
+  rule was measured on the reference (getartcraft.com): its incoming word's
+  flight spawns 20–86 px after the section's top crosses the viewport's
+  bottom edge. This supersedes 129's occupancy rule, whose entry above stays
+  as the record of what was tried. This file stays as the v1 contract;
+  nothing in the v1 spec changes.
