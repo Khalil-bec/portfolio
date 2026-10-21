@@ -49,6 +49,19 @@
  * inline styles (the ruler marker's JS-driven chrome precedent); the settled
  * geometry lives in `name.css` as token math.
  *
+ * **Which section is current (ticket 130):** the section the page has
+ * **reached** — the last one in document order whose top has entered the
+ * viewport (`top ≤ scrollY + vh`). The title therefore names a section the
+ * moment it is *discovered* (its top crosses the viewport's bottom edge),
+ * not once it has taken over the screen. Measured on the inspiration
+ * (getartcraft.com, 1440×900): its incoming word's flight spawns 20–86 px
+ * after the section's top enters the viewport — the new section fills 2–10 %
+ * of the screen at the handover, never the middle and never later. Before
+ * the first named section is on screen (the hero, which has no row of its own
+ * since 119) the first row stays current — the layer's behaviour since 114,
+ * unchanged here. The rule lives in `currentSection()` (pure: bands in,
+ * index out).
+ *
  * Snap paths: a multi-step scrub never flies (letters take the settled
  * states directly); a handoff interrupting an active flight snaps it first
  * and reflys from clean state; an upward move snaps whatever is in the air
@@ -59,13 +72,7 @@
  * layer is unmounted (≤768 / `--names-display: none`).
  */
 
-/** The current-state trigger: a section's top crossing the viewport's lower
- * quarter claims the current slot. Tuning constant, not a CSS token (the
- * driver's keyboard-step precedent, ticket 102). */
-const TRIGGER = 0.25;
-
-/**
- * The travel's tuning constants (115, measured on the inspiration — tuning
+/** The travel's tuning constants (115, measured on the inspiration — tuning
  * constants, not tokens: the keyboard-step precedent). The exit band measured
  * between 339 and 484 on a 1080 viewport → 0.4·vh; the travel is downward-only
  * (124), so there is no mirror line for the way back. Converge/exit are short
@@ -96,15 +103,46 @@ function splitLetters(row) {
   row.replaceChildren(wrap);
 }
 
-/** Each section's document-space top (the resize/measurement seam, not design;
+/** The current row's index: the section the page has **reached** — the last
+ *  one in document order whose top has entered the viewport (`top ≤ scrollY +
+ *  vh`). The title names a section the moment it is *discovered* — its top
+ *  crosses the viewport's bottom edge — which is where the inspiration hands
+ *  over: measured there, the incoming word's flight spawns 20–86 px after
+ *  the section's top enters the viewport (the new section filling 2–10 % of
+ *  the screen), so the title never waits for the section to reach the middle
+ *  of the screen and never trails it. Before any named section is reached the
+ *  first row that *has* a section stands in — the hero has no row of its own
+ *  since 119, and a row whose section the markup lacks takes no part in the
+ *  rule at all. Returns -1 when no row has a section (nothing is current).
+ *  Pure: bands in, index out, so the rule can be reasoned about on its own.
+ *  The QA harness re-implements the rule independently (it asserts the
+ *  DOCUMENTED rule, not this function — it cannot import it, so it is a second
+ *  implementation, not a shared one). */
+function currentSection(bands, scrollY, vh) {
+  const reached = scrollY + vh;
+  let current = -1;
+  for (let i = 0; i < bands.length; i += 1) {
+    const band = bands[i];
+    if (!band) continue; // a section the markup does not have takes its row out of the running
+    if (current === -1) current = i; // the first row that has a section stands in
+    if (band.top <= reached) current = i;
+  }
+  return current;
+}
+
+/** Each section's document band (the resize/measurement seam, not design;
  * measured whole-px so a fractional Lenis offset cannot flip a comparison on
  * its own — the same rounding stance the driver's scale took at 110). The
- * markup guarantees the ids, and a missing section only disables that row's
- * trigger, not the page. */
-function measureTops(rows) {
+ * markup guarantees the ids, and a missing section is a null band: it takes
+ * that row out of the running, not the page (and it can never win the rule).
+ * The band is the section's *top* edge only — 129's occupancy rule also read
+ * the bottom edge; the reached rule does not, so that field retires with it. */
+function measureBands(rows) {
   return rows.map((row) => {
     const section = document.getElementById(row.getAttribute("href").slice(1));
-    return section ? Math.round(section.getBoundingClientRect().top + window.scrollY) : 0;
+    if (!section) return null;
+    const rect = section.getBoundingClientRect();
+    return { top: Math.round(rect.top + window.scrollY) };
   });
 }
 
@@ -181,7 +219,7 @@ function initNamesInternal(driver, reducedMotion) {
   const flights = new Map();
 
   const state = {
-    tops: measureTops(rows),
+    bands: measureBands(rows),
     // Sentinel: -99 never equals a real index/count, so the first frame
     // writes the states (the driver's `pageHeight: -1` pattern).
     lastCurrent: -99,
@@ -324,7 +362,7 @@ function initNamesInternal(driver, reducedMotion) {
   // flight's targets) — so both first snap any active flights.
   const remeasure = () => {
     completeFlights();
-    state.tops = measureTops(rows);
+    state.bands = measureBands(rows);
   };
   window.addEventListener("resize", remeasure);
   if (document.fonts?.ready) document.fonts.ready.then(remeasure).catch(() => {});
@@ -342,13 +380,9 @@ function initNamesInternal(driver, reducedMotion) {
       state.lastScrollY = scrollY;
       updateFlights(scrollY, vh, performance.now());
 
-      // The current slot is the deepest section whose top has crossed the
-      // trigger line; a resize re-measures (and re-renders) itself.
-      const trigger = scrollY + TRIGGER * vh;
-      let current = 0; // the first section is current before anything crosses
-      for (let i = 1; i < state.tops.length; i += 1) {
-        if (state.tops[i] <= trigger) current = i;
-      }
+      // The current slot is the section the page has reached (ticket 130) —
+      // the rule lives in `currentSection()`.
+      const current = currentSection(state.bands, scrollY, vh);
       if (current === state.lastCurrent) return;
 
       const delta = current - state.lastCurrent; // the sentinel's first frame computes a scrub-sized jump
@@ -387,7 +421,7 @@ function initNamesInternal(driver, reducedMotion) {
     refresh() {
       completeFlights();
       rows.forEach(splitLetters);
-      state.tops = measureTops(rows);
+      state.bands = measureBands(rows);
       // Force the next frame to republish the states.
       state.lastCurrent = -99;
     },
