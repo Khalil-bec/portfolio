@@ -126,3 +126,53 @@
   background-color: var(--color-accent);
   color: var(--color-accent-contrast);
 }
+
+/* Ticket 126 — reserve the wrapped link list before the dictionaries bind.
+ * The bar is sticky and in flow; an empty one-row list growing to two/three/
+ * four rows after the bind pushes <main> down (the dominant mobile CLS). The
+ * `lang` hint in index.html makes the FR steps correct on the first frame.
+ *
+ * Measured wrap boundaries (Playwright, the shipped fonts): EN 4 rows ≤358,
+ * 3 rows 359–375, 2 rows 376–529, 1 row from 530; FR 4 rows ≤375, 3 rows
+ * 376–392, 2 rows 393–564, 1 row from 565. Each edge keeps the taller
+ * reservation one pixel longer than measured, so a wrap that lands one pixel
+ * later is still covered — under-reserving moves the page (the CLS this
+ * reservation exists to prevent), over-reserving only leaves the bar a row
+ * taller at that single width. */
+@media (max-width: 359px) {
+  .nav__list {
+    min-block-size: var(--nav-list-h-4);
+  }
+}
+
+@media (min-width: 360px) and (max-width: 376px) {
+  .nav__list {
+    min-block-size: var(--nav-list-h-3);
+  }
+
+  html:lang(fr) .nav__list {
+    min-block-size: var(--nav-list-h-4);
+  }
+}
+
+@media (min-width: 377px) and (max-width: 393px) {
+  .nav__list {
+    min-block-size: var(--nav-list-h-2);
+  }
+
+  html:lang(fr) .nav__list {
+    min-block-size: var(--nav-list-h-3);
+  }
+}
+
+@media (min-width: 394px) and (max-width: 530px) {
+  .nav__list {
+    min-block-size: var(--nav-list-h-2);
+  }
+}
+
+@media (min-width: 531px) and (max-width: 565px) {
+  html:lang(fr) .nav__list {
+    min-block-size: var(--nav-list-h-2);
+  }
+}

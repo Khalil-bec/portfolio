@@ -23,6 +23,12 @@
          no build step. -->
     <link rel="preload" href="src/i18n/en.json" as="fetch" type="application/json" crossorigin="anonymous" />
     <link rel="preload" href="src/i18n/fr.json" as="fetch" type="application/json" crossorigin="anonymous" />
+    <!-- Critical module graph (ticket 126). main.js statically imports only the
+         i18n engine; everything else is a post-paint dynamic import. Starting
+         these two with the HTML parse is enough to keep the dictionary bind
+         off the discovery path without pulling the motion shell into LCP. -->
+    <link rel="modulepreload" href="src/main.js" />
+    <link rel="modulepreload" href="src/i18n/i18n.js" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Mohamed Khalil Becheikh" />
     <meta property="og:image" content="og-image.png" />
@@ -43,11 +49,12 @@
       The vendor sheet
       only styles Lenis' own hooks; it does not compete with the tokens.
 
-      Scripts: vendored classic libs (UMD globals) are loaded, deferred, before
-      the single ES-module entry (src/main.js) — gsap -> ScrollTrigger -> lenis.
-      ScrollTrigger needs `gsap` to register itself, and ticket 003's bridge wires
-      Lenis into ScrollTrigger, so this order matters. Deferred classics run in
-      document order ahead of the module, so the globals exist by execution time.
+      Scripts: the single ES-module entry (src/main.js) is the only script tag.
+      It binds the dictionaries first, then inserts the vendored classic libs
+      (UMD globals) in the required order — gsap -> ScrollTrigger, Lenis
+      alongside — before the motion modules initialise. This keeps ~140 KiB of
+      vendor JS off the LCP path (ticket 126). ScrollTrigger needs `gsap` to
+      register itself, and ticket 003's bridge wires Lenis into ScrollTrigger.
     -->
 
     <link rel="stylesheet" href="vendor/lenis-1.3.27.min.css" />
@@ -70,11 +77,40 @@
          no overlay). intro.js relays every state flip off the overlay's own
          animation boundaries; if the module pipeline dies past this point,
          this failsafe re-reveals after 3s — but only if the overlay never
-         mounted (a mounted overlay means the event chain owns the page). -->
+         mounted (a mounted overlay means the event chain owns the page).
+         Ticket 126: the intro is a desktop-scale moment; below the 769px
+         desktop edge (the same narrow mode 115 uses) it never gates the hero,
+         so the tagline is the first paint on phones and mobile LCP stays
+         under the performance criterion.
+         The same guard publishes two pre-paint facts the CSS uses to reserve
+         settled space before the dictionaries bind: data-motion (JS + motion
+         allowed; the ticker band can reserve its live height) and the early
+         `lang` hint (so the nav's language-specific wrapped height is right
+         from the first frame). i18n remains the owner of both later. -->
     <script>
       (function () {
         var root = document.documentElement;
+        try {
+          var stored = localStorage.getItem("mkb-portfolio:lang");
+          var primary =
+            (navigator.languages && navigator.languages[0]) ||
+            navigator.language ||
+            "";
+          // Mirror i18n's stored-language rule: only en/fr are valid, otherwise
+          // the browser's primary language decides. This must match
+          // src/i18n/i18n.js readStoredLanguage/detectLanguage so the nav's
+          // reserved FR height is right from the first frame (ticket 126).
+          var validStored = stored === "en" || stored === "fr";
+          var preferred = validStored ? stored : primary;
+          if (preferred.toLowerCase().indexOf("fr") === 0) {
+            root.lang = "fr";
+          }
+        } catch (error) {
+          /* private mode / blocked storage: keep the en default */
+        }
         if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        root.setAttribute("data-motion", "run");
+        if (!window.matchMedia("(min-width: 769px)").matches) return;
         root.setAttribute("data-intro", "run");
         setTimeout(function () {
           if (
@@ -185,7 +221,13 @@
                chrome spans by src/intro/intro.js during the load intro (ticket
                122); the element's text is never replaced. -->
           <div class="hero__head">
-            <h1 class="hero__name" data-i18n="hero.name"></h1>
+            <!-- The name is the LCP element. It is language-invariant
+                 ("Mohamed Khalil BECHEIKH" in both dictionaries), so the
+                 pre-boot fallback is safe in either language; i18n still owns
+                 the key and re-binds it. Without a text node here the first
+                 paint had no LCP candidate and Lighthouse simulated the JS
+                 bind at 3.5 s on mobile (ticket 126). -->
+            <h1 class="hero__name" data-i18n="hero.name">Mohamed Khalil BECHEIKH</h1>
             <p class="hero__tagline" data-i18n="hero.tagline"></p>
             <p class="hero__cta-row">
               <a class="hero__cta" href="https://github.com/Khalil-bec" target="_blank" rel="noopener noreferrer"><span data-i18n="hero.cta"></span><span class="hero__cta-arrow" aria-hidden="true"></span><span class="visually-hidden" data-i18n="a11y.newTab"></span></a>
@@ -499,10 +541,10 @@
       <a class="names__row" data-name href="#contact" data-i18n="nav.contact" data-i18n-attr="aria-label=nav.contact"></a>
     </div>
 
-    <!-- Vendor classic scripts (UMD globals), deferred; then the module entry. -->
-    <script defer src="vendor/gsap-3.15.0.min.js"></script>
-    <script defer src="vendor/ScrollTrigger-3.15.0.min.js"></script>
-    <script defer src="vendor/lenis-1.3.27.min.js"></script>
+    <!-- Critical entry (ticket 126): binds the dictionaries, then loads the
+         intro and (after that) the vendor scripts + motion shell. Keeping the
+         vendor tags out of the document means neither their download nor their
+         execution can delay the LCP text. -->
     <script type="module" src="src/main.js"></script>
   </body>
 </html>

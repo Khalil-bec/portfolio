@@ -7,9 +7,11 @@
  * gsap.ticker time is in seconds while Lenis.raf expects milliseconds, hence the
  * `* 1000`.
  *
- * GSAP and ScrollTrigger are vendored classic scripts (UMD globals) loaded,
- * deferred, before the single ES-module entry, so `window.gsap` and
- * `window.ScrollTrigger` exist by the time this runs.
+ * GSAP and ScrollTrigger are vendored classic scripts (UMD globals). Ticket
+ * 126 moved them off the document's critical path: `main.js` injects them
+ * after the first paint, GSAP before its plugin, so `window.gsap` and
+ * `window.ScrollTrigger` exist by the time this runs — and the fallback loop
+ * below covers the case where they never arrive.
  */
 
 /**

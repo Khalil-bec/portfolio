@@ -460,6 +460,15 @@
    * home with the other ink tiers, not inline in nav.css). */
   --nav-brand-hover: 0.72;
 
+  /* Ticket 126 — settled heights of the wrapped nav link list, reserved
+   * before the dictionaries bind so the sticky bar never grows after first
+   * paint. Measured: EN 4 rows ≤358, 3 rows 359-375, 2 rows 376-529; FR 4 rows
+   * ≤375, 3 rows 376-392, 2 rows 393-564. */
+  --nav-list-h-2: 3.7rem;
+  --nav-list-h-3: 5.8rem;
+  --nav-list-h-4: 7.9rem;
+
+
   /* Ticket 121 — the footer mark's glyph height (the nav mark's larger
    * sibling; its inline-size derives from the artwork's 923:687 aspect in
    * footer.css, the same completion the nav mark uses). */

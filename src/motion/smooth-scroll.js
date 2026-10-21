@@ -76,10 +76,9 @@ function onDocumentClick(event) {
 /**
  * Initialise the smooth-scroll foundation.
  *
- * Returns `{ lenis, reducedMotion }` so later tickets can add the ScrollTrigger
- * bridge without re-plumbing vendor loading. When reduced motion is requested
- * (or Lenis failed to load) Lenis is never constructed: anchor jumps stay
- * instant and the CSS fallback in base.css holds.
+ * Returns `{ lenis }`; the caller owns the reduced-motion query. When reduced
+ * motion is requested (or Lenis failed to load) Lenis is never constructed:
+ * anchor jumps stay instant and the CSS fallback in base.css holds.
  *
  * `prefers-reduced-motion` is read once, at init. A user who loads with reduce
  * on and later turns it off keeps instant jumps until reload; the reverse
@@ -104,7 +103,7 @@ export function initSmoothScroll() {
   }
 
   if (prefersReducedMotion() || typeof window.Lenis !== "function") {
-    return { lenis: null, reducedMotion: prefersReducedMotion() };
+    return { lenis: null };
   }
 
   const lenis = new window.Lenis({
@@ -112,5 +111,5 @@ export function initSmoothScroll() {
     anchors: true,
   });
 
-  return { lenis, reducedMotion: false };
+  return { lenis };
 }

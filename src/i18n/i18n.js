@@ -26,11 +26,6 @@
  * in doc/idea-v1-decisions.md.
  */
 
-import { refreshTicker } from "../motion/ticker.js";
-import { refreshRuler } from "../ruler/ruler.js";
-import { refreshNames } from "../names/name.js";
-import { refreshReveals } from "../motion/reveals.js";
-
 const SUPPORTED = ["en", "fr"];
 const DEFAULT_LANGUAGE = "en";
 const STORAGE_KEY = "mkb-portfolio:lang";
@@ -164,6 +159,24 @@ function detectLanguage() {
   return preferred.toLowerCase().startsWith("fr") ? "fr" : DEFAULT_LANGUAGE;
 }
 
+/** Re-measure the motion modules after a user switch. Loaded on demand
+ * (ticket 126): the first bind is the LCP paint and must not wait for the
+ * ticker/ruler/names/reveals graph. On a switch those modules are already in
+ * the module cache, so this is a microtask, not a network hop. */
+function refreshMotion() {
+  Promise.allSettled([
+    import("../motion/ticker.js"),
+    import("../ruler/ruler.js"),
+    import("../names/name.js"),
+    import("../motion/reveals.js"),
+  ]).then(([ticker, ruler, names, reveals]) => {
+    if (ticker.status === "fulfilled") ticker.value.refreshTicker();
+    if (ruler.status === "fulfilled") ruler.value.refreshRuler();
+    if (names.status === "fulfilled") names.value.refreshNames();
+    if (reveals.status === "fulfilled") reveals.value.refreshReveals();
+  });
+}
+
 function applyLanguage(language, { persist }) {
   if (!SUPPORTED.includes(language)) return;
 
@@ -175,10 +188,7 @@ function applyLanguage(language, { persist }) {
   updateSwitch();
   if (persist) persistLanguage(language);
 
-  refreshTicker();
-  refreshRuler();
-  refreshNames();
-  refreshReveals();
+  if (persist) refreshMotion();
 }
 
 /** Switch language and remember the choice (called by the language switch). */

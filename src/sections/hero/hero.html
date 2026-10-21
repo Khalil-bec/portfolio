@@ -46,7 +46,13 @@
          src/intro/intro.js during the load intro (ticket 122); the element's
          text is never replaced. -->
     <div class="hero__head">
-      <h1 class="hero__name" data-i18n="hero.name"></h1>
+      <!-- The name is the LCP element. It is language-invariant
+           ("Mohamed Khalil BECHEIKH" in both dictionaries), so the
+           pre-boot fallback is safe in either language; i18n still owns
+           the key and re-binds it. Without a text node here the first
+           paint had no LCP candidate and Lighthouse simulated the JS
+           bind at 3.5 s on mobile (ticket 126). -->
+      <h1 class="hero__name" data-i18n="hero.name">Mohamed Khalil BECHEIKH</h1>
       <p class="hero__tagline" data-i18n="hero.tagline"></p>
       <p class="hero__cta-row">
         <a class="hero__cta" href="https://github.com/Khalil-bec" target="_blank" rel="noopener noreferrer"><span data-i18n="hero.cta"></span><span class="hero__cta-arrow" aria-hidden="true"></span><span class="visually-hidden" data-i18n="a11y.newTab"></span></a>

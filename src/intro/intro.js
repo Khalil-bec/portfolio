@@ -145,8 +145,9 @@ export function initIntro(reducedMotion) {
     return null;
   }
 
-  // The name is dict-bound and the stage mounts before the dictionaries land:
-  // keep the (still empty) element hidden so a late bind can never flash.
+  // The stage mounts after the dictionaries bind (ticket 126 critical path);
+  // the CSS gate in intro.css keeps the name hidden from first paint until
+  // this split lands, so a late bind can never flash.
   name.classList.add("is-pending");
 
   const stage = buildStage();

@@ -85,6 +85,14 @@ html[data-intro="run"] .ticker {
   opacity: 0;
 }
 
+/* Ticket 126: the stage now mounts after the dictionary bind (critical path),
+ * so the name must be gated from the first frame here. `.is-split` hands it
+ * over to the per-character fade; the name's box never changes (opacity only),
+ * so the intro still measures the settled element. */
+html[data-intro="run"] .hero__name:not(.is-split) {
+  opacity: 0;
+}
+
 .hero__name.is-split .intro__char {
   opacity: 0;
   transition: opacity var(--intro-char-fade) var(--ease-standard);

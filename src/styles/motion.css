@@ -126,6 +126,15 @@ main {
  * Full-bleed geometry comes from the base .ticker rule (viewport-wide since
  * the reservation's retirement, 112); only the surface fill and clipping are
  * live-only. */
+/* Ticket 126 — the live band's height is reserved from the first frame when
+ * motion is allowed. The boot guard publishes `data-motion` before the paint,
+ * so this rule (a flex row, no wrapping) holds the band at its live height
+ * from the very first frame: without it the pre-init source copy would lay
+ * out as a wrapped block and collapse to the marquee's single line when
+ * initTicker ran, shifting the page. `:not(.ticker--idle)` keeps the
+ * empty-source hide later in the file winning. Reduced motion / no JS never
+ * gets `data-motion`, so the source stays a plain wrapped line there. */
+html[data-motion="run"] .ticker:not(.ticker--idle),
 .ticker--live {
   display: flex;
   align-items: center;
@@ -145,6 +154,7 @@ main {
   display: flex;
 }
 
+html[data-motion="run"] .ticker__item,
 .ticker--live .ticker__item {
   display: inline-flex;
   align-items: center;
