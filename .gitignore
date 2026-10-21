@@ -10,6 +10,10 @@ Thumbs.db
 # Local QA captures from the screenshot-check step — never committed
 .screenshots/
 
+# QA harness output (screenshots + JSON report) and dev-only tooling
+qa-out/
+node_modules/
+
 # Superpowers brainstorm harness (visual-companion boards + server state);
 # session-scoped tooling, never committed
 .superpowers/
