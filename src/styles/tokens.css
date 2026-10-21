@@ -97,15 +97,18 @@
    * two-stack section list. Rows right-align at the 56px inset with their
    * letters ending on the ruler lane's edge (the anchor box overlaps the lane
    * by its 4px padding, as theirs does); passed rows pin from the top at y=64
-   * and upcoming rows stack from a bottom inset of 24 — both stacks on one
-   * 20px pitch (theirs overlaps neighbouring 24px row boxes by 4px, ours
-   * does the same); the current word takes a 17px air below the passed stack
-   * and doubles its letters. name.js publishes only the state classes and
-   * unitless counters; name.css computes every px from these. */
+   * and upcoming rows stack from a bottom inset of 24. Tickets 114/127: the
+   * row box is 24px and the pitch is 24px so the targets touch — the
+   * reference's 20px pitch overlaps 24px boxes by 4px and fails WCAG 2.5.8.
+   * The current word takes a 17px air below the passed stack and doubles its
+   * letters. name.js publishes only the state classes and unitless counters;
+   * name.css computes every px from these. */
   --name-inset: 3.5rem;
   --name-stack-top: 4rem;
   --name-stack-bottom: 1.5rem;
-  --name-pitch: 1.25rem;
+  /* Ticket 127: 1.25rem (20px) recreated the reference's 4px target overlap;
+   * matching the row height clears Lighthouse target-size (desktop a11y 100). */
+  --name-pitch: 1.5rem;
   --name-word-gap: 1.0625rem;
   --name-row-h: 1.5rem;
   --name-letter-line: 1;
@@ -462,12 +465,10 @@
 
   /* Ticket 126 — settled heights of the wrapped nav link list, reserved
    * before the dictionaries bind so the sticky bar never grows after first
-   * paint. Measured: EN 4 rows ≤358, 3 rows 359-375, 2 rows 376-529; FR 4 rows
-   * ≤375, 3 rows 376-392, 2 rows 393-564. */
+   * paint. Measured: 2 rows at 401–520, 3 rows at 375 EN, 4 rows at 375 FR. */
   --nav-list-h-2: 3.7rem;
   --nav-list-h-3: 5.8rem;
   --nav-list-h-4: 7.9rem;
-
 
   /* Ticket 121 — the footer mark's glyph height (the nav mark's larger
    * sibling; its inline-size derives from the artwork's 923:687 aspect in

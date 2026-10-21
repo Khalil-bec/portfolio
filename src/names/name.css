@@ -9,12 +9,12 @@
  * counters (`--name-slot` per row, `--name-passed` on the layer — the
  * `--ruler-drum-index` pattern), and this file computes every px from the
  * measured tokens (rows right-aligned at the 56px inset, stacks pinned at
- * top 64 / bottom 24, one 20px pitch for both stacks, the current word ~2×
- * its stack letters with a 17px air below the passed stack). Their anchors
- * at 20px pitch overlap 4px — the row box is 24px tall — ours reproduces
- * that overlap as-is. Design tokens only; no transition anywhere on the
- * layer (the states are instant; 115 owns the letter travel and its
- * reduced-motion gate).
+ * top 64 / bottom 24, one 24px pitch for both stacks, the current word ~2×
+ * its stack letters with a 17px air below the passed stack). The 24px pitch
+ * matches the 24px row box so targets touch; the reference's 20px pitch
+ * overlapped by 4px and failed WCAG 2.5.8 (ticket 127). Design tokens only;
+ * no transition anywhere on the layer (the states are instant; 115 owns the
+ * letter travel and its reduced-motion gate).
  */
 
 .names {
