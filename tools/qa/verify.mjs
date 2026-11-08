@@ -1159,6 +1159,122 @@ async function heroChipAudits() {
   }
 }
 
+/**
+ * Ticket 133: the narrow names label. At 375 and 390 (phone profile), EN and
+ * FR, the label must name exactly the section the page has reached — the
+ * documented rule re-implemented here from its wording (the last section
+ * whose top has entered the viewport), with NO stand-in on the hero: before
+ * any section is reached the label is empty. Checked at each boundary pixel
+ * and the pixel before it. It must sit in the ruler lane, below the nav.
+ * Then the media swap: resizing across 768 leaves exactly one names surface
+ * rendered, both ways.
+ */
+async function namesNarrowAudits() {
+  // Its sheet stays off the critical path (133's FCP finding): index.html
+  // must not link it; name.js inserts it after first paint.
+  const index = await read("index.html");
+  add(
+    "names.narrow-sheet-deferred",
+    !/<link[^>]+name-narrow\.css/.test(index) && /data-names-narrow[^>]*\bhidden\b/.test(index),
+    "name-narrow.css must not be a render-blocking <link>; the label ships hidden",
+  );
+
+  for (const width of [375, 390]) {
+    for (const locale of ["en-US", "fr-FR"]) {
+      const tag = `${width}-${locale.slice(0, 2)}`;
+      const session = await openPage({ device: "iPhone 13", locale });
+      const { page } = session;
+      await page.setViewportSize({ width, height: 664 });
+      await settle(page, `names-narrow-${tag}`);
+      const result = await page.evaluate(async () => {
+        const rows = [...document.querySelectorAll("[data-name]")];
+        const bands = rows.map((row) => {
+          const section = document.getElementById(row.getAttribute("href").slice(1));
+          if (!section) return null;
+          return {
+            word: row.getAttribute("aria-label"),
+            top: Math.round(section.getBoundingClientRect().top + window.scrollY),
+          };
+        });
+        const frame = () =>
+          new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)));
+        const settleScroll = async (target) => {
+          window.scrollTo(0, target);
+          let last = -1;
+          for (let i = 0; i < 60; i += 1) {
+            await frame();
+            if (window.scrollY === last) break;
+            last = window.scrollY;
+          }
+          // Past the whole cross-fade: out, swap, back in — twice
+          // --names-narrow-fade (150 ms) plus a margin.
+          await new Promise((done) => setTimeout(done, 450));
+          return window.scrollY;
+        };
+        const vh = window.innerHeight;
+        const max = document.documentElement.scrollHeight - vh;
+        const positions = [0];
+        for (const band of bands) {
+          if (!band) continue;
+          positions.push(band.top - vh, band.top - vh - 1);
+        }
+        positions.push(max);
+        const label = document.querySelector("[data-names-narrow]");
+        const nav = document.querySelector(".nav").getBoundingClientRect();
+        const lane = parseFloat(getComputedStyle(document.querySelector(".ruler")).inlineSize);
+        const mismatches = [];
+        const misplaced = [];
+        for (const target of positions) {
+          const y = await settleScroll(Math.max(0, Math.min(target, max)));
+          let want = "";
+          for (const band of bands) if (band && band.top <= y + vh) want = band.word;
+          const shown = label.classList.contains("is-shown") && getComputedStyle(label).opacity === "1";
+          const got = shown ? label.textContent.trim() : "";
+          if (got !== want) mismatches.push(`@${y} got="${got}" want="${want}"`);
+          if (shown) {
+            const rect = label.getBoundingClientRect();
+            if (rect.left < innerWidth - lane - 0.5 || rect.right > innerWidth + 0.5 || rect.top < nav.bottom) {
+              misplaced.push(`@${y} [${Math.round(rect.left)},${Math.round(rect.top)},${Math.round(rect.right)}]`);
+            }
+          }
+        }
+        return { mismatches, misplaced, checked: positions.length };
+      });
+      add(
+        `names.narrow-${tag}`,
+        result.mismatches.length === 0,
+        result.mismatches.length ? result.mismatches.slice(0, 4).join(" | ") : `${result.checked} depths`,
+      );
+      add(`names.narrow-lane-${tag}`, result.misplaced.length === 0, result.misplaced.slice(0, 3).join(" | "));
+      add(`names.narrow-errors-${tag}`, session.pageErrors.length === 0, session.pageErrors[0] ?? "");
+      await session.context.close();
+    }
+  }
+
+  // The swap: one surface at a time, both directions, no reload.
+  const session = await openPage({ width: 1440, height: 900 });
+  const { page } = session;
+  await settle(page, "names-swap");
+  await page.evaluate(() => window.scrollTo(0, document.getElementById("skills").offsetTop));
+  await page.waitForTimeout(800);
+  const surfaces = () =>
+    page.evaluate(() => ({
+      layer: getComputedStyle(document.querySelector("[data-names]")).display !== "none",
+      narrow: getComputedStyle(document.querySelector("[data-names-narrow]")).display !== "none",
+    }));
+  const steps = [];
+  for (const width of [1440, 375, 769, 768, 1440]) {
+    await page.setViewportSize({ width, height: 800 });
+    await page.waitForTimeout(400);
+    const state = await surfaces();
+    const ok = width > 768 ? state.layer && !state.narrow : !state.layer && state.narrow;
+    steps.push(`${width}:${ok ? "ok" : JSON.stringify(state)}`);
+  }
+  add("names.narrow-swap", steps.every((step) => step.endsWith(":ok")), steps.join(" "));
+  add("names.narrow-swap-errors", session.pageErrors.length === 0, session.pageErrors[0] ?? "");
+  await session.context.close();
+}
+
 /* ------------------------------------------------------------ lighthouse --- */
 
 async function lighthouseAudits() {
@@ -1230,6 +1346,7 @@ try {
   await navOneRowAudits();
   await navMenuAudits();
   await heroChipAudits();
+  await namesNarrowAudits();
   if (!SKIP_LH) lighthouse = await lighthouseAudits();
   if (!SKIP_SHOTS) await screenshots();
 } finally {

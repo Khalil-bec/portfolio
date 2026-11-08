@@ -127,6 +127,22 @@
    * the 102 only-readout ruler stays alone on the edge. */
   --names-display: flex;
 
+  /* Ticket 133: the narrow names label — the reached section's word, set as
+   * an upright letter column in the phone ruler's lane (one letter per
+   * --name-transit-cell, first letter on top: the 115/124 train's reading
+   * order). It is the narrow block's surface; above 768 it never renders.
+   * It sits over the ruler's ticks and grades on an opaque ground (113's
+   * readout precedent) and under the nav and its 132 panel, so it takes its
+   * own tier between the ruler (160) and the nav (180). The swap is a short
+   * cross-fade; reduced motion swaps instantly. */
+  --names-narrow-display: none;
+  --names-narrow-top: calc(var(--eyebrow-top) + var(--space-sm));
+  --names-narrow-pad: var(--space-2xs);
+  --names-narrow-fade: var(--duration-fast);
+  /* The column's pitch: each upright glyph advances 1em, the tracking adds
+   * the rest of the 20px cell (`em` resolves where the word uses it). */
+  --names-narrow-tracking: calc(var(--name-transit-cell) - 1em);
+
   --font-size-xs: 0.78rem;
   --font-size-sm: 0.875rem;
   --font-size-base: 1rem;
@@ -451,6 +467,7 @@
    * it; the language switch's hit centre sat 1.5px inside the lane and its
    * clicks died on the track. Ours: names 150 < ruler 160 < nav 180. */
   --z-ruler: 160;
+  --z-names-narrow: 170; /* 133: over the narrow ruler, under the nav */
   --z-nav: 180;
   /* Hero-local stacking (ticket 122): backdrop < content < intro stage. Kept
    * below the page chrome on purpose — the stage lives inside the hero, so a
@@ -519,6 +536,9 @@
     /* The names layer leaves with the lane (114): no express list over the
      * narrow keeper — the nav links carry the jump affordance alone. */
     --names-display: none;
+    /* Ticket 133: …and its narrow form takes over — one reached word in the
+     * lane, no list, no travel. */
+    --names-narrow-display: block;
     /* Ticket 131: the chips step down with the phone. At 22vw every chip
      * clamps to ~22 % of a phone's width (83px at 375) against 10–12 % for the
      * largest chips on desktop, so the backdrop crowded the type. 13 chips,

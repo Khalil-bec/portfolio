@@ -527,6 +527,16 @@
       <a class="names__row" data-name href="#education" data-i18n="nav.education" data-i18n-attr="aria-label=nav.education"></a>
       <a class="names__row" data-name href="#contact" data-i18n="nav.contact" data-i18n-attr="aria-label=nav.contact"></a>
     </div>
+    <!-- Ticket 133: the narrow form of the names layer — one label in the
+         phone ruler's lane naming the section the page has reached (130's
+         rule). Chrome: aria-hidden and no pointer events (the headings and
+         the 132 menu carry structure and navigation); name.js fills it from
+         the rows' bound labels, so no copy lives here. `hidden` until
+         name.js loads its sheet (src/names/name-narrow.css) after first
+         paint — the rules stay off the critical path. -->
+    <div class="names-narrow" data-names-narrow aria-hidden="true" hidden>
+      <span class="names-narrow__word"></span>
+    </div>
 
     <!-- Critical entry (ticket 126): binds the dictionaries, then loads the
          intro and (after that) the vendor scripts + motion shell. Keeping the

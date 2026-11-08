@@ -70,6 +70,16 @@
  * `refreshNames()`. The whole travel is gated off under
  * `prefers-reduced-motion` (handoffs stay 114's instant states) and when the
  * layer is unmounted (≤768 / `--names-display: none`).
+ *
+ * **The narrow form (ticket 133):** at ≤768 the layer above is unmounted and
+ * `[data-names-narrow]` takes over — one label in the phone ruler's lane
+ * naming the section the page has reached. Same rule, same bands, same bound
+ * labels; one difference: the hero has no stand-in there (the label stays
+ * empty until a section's top has actually entered the viewport), because a
+ * lone word naming a section nobody has seen yet would be wrong. The label is
+ * driven every frame at every width — CSS alone decides which surface shows
+ * (`--names-display` / `--names-narrow-display`), so rotating or resizing
+ * across 768 needs no swap logic and leaves no stale state.
  */
 
 /** The travel's tuning constants (115, measured on the inspiration — tuning
@@ -191,6 +201,76 @@ function clearFlight(el) {
   el.style.color = "";
 }
 
+/** The narrow label's section (133): the current row only once its section
+ * has really been reached — the stand-in row of `currentSection()` (the hero,
+ * where nothing is reached yet) yields -1, the empty label. */
+function reachedSection(bands, current, scrollY, vh) {
+  if (current < 0) return -1;
+  const band = bands[current];
+  return band && band.top <= scrollY + vh ? current : -1;
+}
+
+/** The narrow label (133): show the reached row's bound name, cross-fading
+ * between words (the `--names-narrow-fade` token, read as a duration) and
+ * swapping instantly under reduced motion or from the empty state. Returns
+ * `set(index)` and `reset()` (the language switch re-reads the words). */
+function createNarrowLabel(rows, reducedMotion) {
+  const label = document.querySelector("[data-names-narrow]");
+  const word = label?.querySelector(".names-narrow__word");
+  if (!label || !word) return { set() {}, reset() {} };
+
+  // The label's sheet is off the critical path (it cost first paint a round
+  // trip when it lived in name.css): insert it now, on the motion path. Until
+  // it lands the markup's `hidden` keeps the bare element out of the layout;
+  // the sheet's `display` then takes over, and the driver's next frame paints
+  // whatever state the label already holds.
+  if (!document.querySelector('link[href$="names/name-narrow.css"]')) {
+    const sheet = document.createElement("link");
+    sheet.rel = "stylesheet";
+    sheet.href = "src/names/name-narrow.css";
+    document.head.append(sheet);
+  }
+
+  let shown = -1;
+  let pending = 0;
+  const nameOf = (index) =>
+    rows[index].getAttribute("aria-label") || rows[index].textContent || "";
+  const fadeMs = () => {
+    const raw = getComputedStyle(label).getPropertyValue("--names-narrow-fade").trim();
+    const value = parseFloat(raw);
+    if (Number.isNaN(value)) return 0;
+    return raw.endsWith("ms") ? value : value * 1000;
+  };
+  const show = (index) => {
+    word.textContent = nameOf(index);
+    label.classList.add("is-shown");
+  };
+
+  return {
+    set(index) {
+      if (index === shown) return;
+      const from = shown;
+      shown = index;
+      window.clearTimeout(pending);
+      if (index < 0) {
+        label.classList.remove("is-shown");
+        return;
+      }
+      if (reducedMotion || from < 0 || !label.classList.contains("is-shown")) {
+        show(index);
+        return;
+      }
+      // Cross-fade: out, swap the word, back in.
+      label.classList.remove("is-shown");
+      pending = window.setTimeout(() => show(index), fadeMs());
+    },
+    reset() {
+      window.clearTimeout(pending);
+      if (shown >= 0) show(shown);
+    },
+  };
+}
+
 /** Republish 114's state classes + unitless counters (pure CSS inputs). */
 function publishStates(layer, rows, current) {
   layer.style.setProperty("--name-passed", String(current));
@@ -212,6 +292,7 @@ function initNamesInternal(driver, reducedMotion) {
   if (rows.length === 0) return null;
 
   rows.forEach(splitLetters);
+  const narrow = createNarrowLabel(rows, reducedMotion);
 
   /** Active flights: row → engine record (a one-word train). Two trains can
    * coexist — on a one-step handoff both the leaving and the arriving word
@@ -383,6 +464,10 @@ function initNamesInternal(driver, reducedMotion) {
       // The current slot is the section the page has reached (ticket 130) —
       // the rule lives in `currentSection()`.
       const current = currentSection(state.bands, scrollY, vh);
+      // The narrow label (133) runs before the early return: its reached
+      // test can change while `current` does not (the hero's stand-in row
+      // becoming the reached one).
+      narrow.set(reachedSection(state.bands, current, scrollY, vh));
       if (current === state.lastCurrent) return;
 
       const delta = current - state.lastCurrent; // the sentinel's first frame computes a scrub-sized jump
@@ -422,6 +507,7 @@ function initNamesInternal(driver, reducedMotion) {
       completeFlights();
       rows.forEach(splitLetters);
       state.bands = measureBands(rows);
+      narrow.reset(); // the shown word in the new language
       // Force the next frame to republish the states.
       state.lastCurrent = -99;
     },

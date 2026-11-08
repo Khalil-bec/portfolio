@@ -1,0 +1,62 @@
+/*
+ * The names layer's narrow form (ticket 133) — its own sheet, off the
+ * critical path. The label never shows before name.js runs (it is transparent
+ * until name.js marks it `is-shown`), so nothing here may block first paint:
+ * name.js inserts this sheet when it initialises, on the motion path after
+ * the copy has painted (126's split). The markup carries `hidden` until then,
+ * so the bare element takes no space; `display` below overrides it.
+ *
+ * Measured reason (2026-11-08): the same rules inside name.css (4.1 KB → 5–6
+ * KB) cost mobile Lighthouse one simulated round trip on first paint — FCP
+ * 1816 → 1958 ms, performance 97 → 96. A 1.2 KB comment alone did the same,
+ * so it was the render-blocking bytes, not the rules.
+ */
+
+/* One label in the phone ruler's lane, pinned under the nav: the section the
+ * page has reached (130's rule, computed in name.js). The box is the lane's
+ * full width on the page ground, so the ruler's ticks and grades pass beneath
+ * it (113's readout precedent) and the travelling rule slips behind. Chrome:
+ * aria-hidden in the markup, no pointer events. `is-shown` is the only state
+ * name.js writes; the fade is a token (reduced motion: base.css's kill-switch
+ * plus name.js swapping without the fade). */
+.names-narrow {
+  position: fixed;
+  inset-block-start: var(--names-narrow-top);
+  inset-inline-end: 0;
+  z-index: var(--z-names-narrow);
+  display: var(--names-narrow-display);
+  inline-size: var(--lane-ruler);
+  padding-block: var(--names-narrow-pad);
+  background-color: var(--color-bg);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--names-narrow-fade) var(--ease-standard);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.names-narrow.is-shown {
+  opacity: 1;
+}
+
+/* The word: an upright column (nothing in the chrome reads sideways — 109's
+ * rule), first letter on top, one --name-transit-cell per letter (the glyph's
+ * 1em advance + the remainder as letter-spacing), centred on the lane's axis.
+ * The desktop letters' face, weight and case, in the current word's ink. */
+.names-narrow__word {
+  display: block;
+  /* Physical on purpose: the word's own writing mode is vertical, so its
+   * logical inline margins would run along the column, not across the lane.
+   * Its physical width is its one line box; auto side margins centre it. */
+  margin: 0 auto;
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--name-letter-line);
+  letter-spacing: var(--names-narrow-tracking);
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--color-text);
+}
