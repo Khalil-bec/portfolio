@@ -1,7 +1,6 @@
 # 133: Names on phones — the reached title rides the narrow ruler
 
-**Status:** `in-review` (2026-11-08) — implemented, screenshot-checked,
-self-reviewed; awaiting the user's look and commit approval.
+**Status:** `done` (2026-11-08) — `690419b`. Reviewed, approved.
 
 **Why (phone pass, 2026-11-08):**
 

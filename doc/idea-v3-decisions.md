@@ -574,3 +574,21 @@ tickets 116–121. Spec: `doc/idea-v3-spec.md`.
   0.056 → 0.092 with the one-row bar. Now 0.053 mobile, 0.009 desktop.
   Any future change to the bar's height must keep this calc in step — the
   `hero.fallback-height-*` check fails if it drifts.
+
+## 2026-11-08 — ticket 133 (names on phones) — decisions recorded during implementation
+
+- **No stand-in on phones.** The desktop layer names its first row on the
+  hero (114's behaviour); the narrow label stays empty until a section has
+  actually been reached — a lone word naming an unseen section would be wrong.
+- **CSS picks the surface.** The label runs at every width; `--names-display`
+  and `--names-narrow-display` decide what renders, so crossing 768 needs no
+  media listener and leaves no stale state.
+- **The upright column uses the desktop names' face** (sans semibold), not
+  mono, so the phone word matches the word it stands in for.
+- **Non-critical chrome CSS loads after paint.** The label's rules cost one
+  simulated round trip on FCP when they sat in render-blocking `name.css`
+  (1816 → 1958 ms, perf 97 → 96; a 1.2 KB comment did the same). They live in
+  `name-narrow.css`, inserted by `name.js`; the element ships `hidden`. Worth
+  remembering: the render-blocking CSS sits near a step in Lighthouse's
+  simulation — new rules that are invisible until JS runs belong in a
+  deferred sheet.

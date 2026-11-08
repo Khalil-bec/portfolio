@@ -62,4 +62,4 @@ A ticket only reaches `done` after the user approves the commit (see
 | 130 | Names layer — the title names the section you have reached | 129 | `done` | `a00debd` | The reached rule, measured on the reference; 129's occupancy rule retires with it. |
 | 131 | Hero chips step down on phones | 130 | `done` | `7b8d071` | Narrow cap 22vw → 14vw (user pick). 176/0; mobile 97, a11y 100. Reviewed, approved. |
 | 132 | Nav — one row on phones, menu button | 130 | `done` | `1e43568` | Popover panel ≤768; bar 47px everywhere; exact --eyebrow-top fallback. 204/0, mobile 97, CLS 0.053. Reviewed, approved. |
-| 133 | Names on phones — reached title on the narrow ruler | 132 | `todo` | — | Current section only, upright letter column; reuses 130's rule. |
+| 133 | Names on phones — reached title on the narrow ruler | 132 | `done` | `690419b` | Reached word as an upright column in the lane; deferred sheet. 224/0, mobile 97, CLS 0.053. Reviewed, approved. |
