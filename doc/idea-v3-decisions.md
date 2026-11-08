@@ -518,3 +518,41 @@ tickets 116–121. Spec: `doc/idea-v3-spec.md`.
   pairs are projects/skills/education/contact, and **about has no handover** —
   it is the first row and stands in from scrollY 0); the "450 px earlier" and
   "675 px earlier" figures were right and are now labelled correctly.
+
+## 2026-11-08 — the phone pass: three narrow-mode reversals (tickets 131–133)
+
+- **How it was seen.** The live GitHub Pages site was loaded under Playwright
+  device emulation (Pixel 7, iPhone 13: `isMobile`, `hasTouch`, real DPR). The
+  harness had only ever resized a desktop viewport to 375, which carries none
+  of those; 131 adds device descriptors to the narrow screenshot pass. Only
+  Chromium is installed, so WebKit/iOS Safari is still unverified.
+- **Hero chips (131).** The 22vw cap lets a chip take ~22 % of a phone's width
+  against ~10 % on desktop. The user confirmed on a real phone that the chips
+  stay behind the type, so this is scale, not stacking. User call: smaller
+  only — all 13 chips, same anchors; the narrow cap drops to 13–15vw, value
+  picked at the screenshot check.
+- **Nav (132).** 126 accepted the wrapped list and reserved each measured row
+  count. User call: reverse it — one-row bar on phones (mark, EN/FR, menu
+  button) and a disclosure panel for the four links; the row-count
+  reservation retires. Desktop bar unchanged.
+- **Names on phones (133).** 113/114 retired the readout and the names layer
+  ≤768, following the reference. User call: show the current section only —
+  one non-interactive label on the narrow ruler, driven by 130's reached rule
+  (no new rule), set as an upright letter column. No list, no letter travel;
+  the % readout stays retired.
+
+## 2026-11-08 — ticket 131 (hero chips on phones) — decisions recorded during implementation
+
+- **The narrow chip cap is 14vw** (52.5 px at 375, 60.2 at 430, 107.5 at 768),
+  chosen from a 13 / 14 / 15vw render at 375/390/430: all three clear the type;
+  14vw keeps each glyph legible as its brand. The user confirmed 14vw.
+- **The phone backdrop was already uniform.** At 22vw every chip clamped to the
+  cap at phone widths, so the desktop size hierarchy never reached phones; 131
+  keeps it uniform, only smaller. Restoring a hierarchy would need a per-chip
+  narrow scale — out of scope.
+- **Chips crossing the hero's edge are by design** (kubernetes/python at 1440
+  too). The harness rule is "the document never scrolls sideways", not "every
+  chip inside the hero".
+- **The harness now has phone profiles.** `openPage({ device })` takes a
+  Playwright device descriptor; the screenshot pass shoots iPhone 13 (EN) and
+  Pixel 7 (FR). Chromium only — iOS Safari (WebKit) is still unverified.

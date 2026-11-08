@@ -1,7 +1,6 @@
 # 131: Hero chips step down on phones
 
-**Status:** `in-review` (2026-11-08) — implemented, screenshot-checked, self-reviewed;
-awaiting the user's cap pick and commit approval.
+**Status:** `done` (2026-11-08) — `7b8d071`. Reviewed, approved; the user picked 14vw.
 
 **Why (phone pass, 2026-11-08):**
 
@@ -55,7 +54,7 @@ anchors, colours, opacity tiers, blur and orbit. No chip is hidden. See
   - Screenshot pass adds `iphone13-en` and `pixel7-fr` (device profiles) to the
     resized 375 shots.
 
-**The cap value (user pick pending):** 13 / 14 / 15vw were rendered at 375,
+**The cap value (user pick, 2026-11-08: 14vw):** 13 / 14 / 15vw were rendered at 375,
 390 and 430 next to today's 22vw. All three clear the name, tagline, CTA and
 meta line; 14vw is the shipped default (52.5 px at 375, 60.2 at 430) — the
 glyphs stay legible as brands without crowding. Changing it is one token plus

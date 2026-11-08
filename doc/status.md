@@ -60,3 +60,6 @@ A ticket only reaches `done` after the user approves the commit (see
 | 128 | Final acceptance gate — v3 tree | 125–127 | `done` | — | The ledger (`doc/acceptance-criteria.md`) maps every v1 criterion. No code change. |
 | 129 | Names layer — the current title follows the section in view | 127 | `done` | `a00debd` | The occupancy rule; superseded in part by 130 (its reasoning stays as the record). |
 | 130 | Names layer — the title names the section you have reached | 129 | `done` | `a00debd` | The reached rule, measured on the reference; 129's occupancy rule retires with it. |
+| 131 | Hero chips step down on phones | 130 | `done` | `7b8d071` | Narrow cap 22vw → 14vw (user pick). 176/0; mobile 97, a11y 100. Reviewed, approved. |
+| 132 | Nav — one row on phones, menu button | 130 | `todo` | — | Disclosure panel ≤768; retires 126's wrap reservation. Desktop unchanged. |
+| 133 | Names on phones — reached title on the narrow ruler | 132 | `todo` | — | Current section only, upright letter column; reuses 130's rule. |
