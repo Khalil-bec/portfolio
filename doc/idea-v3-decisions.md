@@ -556,3 +556,21 @@ tickets 116–121. Spec: `doc/idea-v3-spec.md`.
 - **The harness now has phone profiles.** `openPage({ device })` takes a
   Playwright device descriptor; the screenshot pass shoots iPhone 13 (EN) and
   Pixel 7 (FR). Chromium only — iOS Safari (WebKit) is still unverified.
+
+## 2026-11-08 — ticket 132 (nav menu on phones) — decisions recorded during implementation
+
+- **The menu is a native popover** (`popovertarget` + `popover`), not a
+  scripted toggle: Esc, focus return, light dismiss, top layer and Tab order
+  come from the platform, and the menu works if `nav.js` never loads. Without
+  popover support the pre-132 wrapped list returns and the button hides.
+- **A language switch closes the open panel** (light dismiss), against the
+  plan's "keeps it open"; the language still switches. Keeping it open would
+  cost light dismiss.
+- **126's reservation and the early `lang` hint retire.** The bar is one 47 px
+  row at every width, so there is nothing language-specific to reserve.
+- **`--eyebrow-top`'s fallback is now the bar's exact height**, computed from
+  the tokens that size it, replacing a 4rem guess. The guess resized the hero
+  (its min-height subtracts the token) when eyebrows.js landed: mobile CLS
+  0.056 → 0.092 with the one-row bar. Now 0.053 mobile, 0.009 desktop.
+  Any future change to the bar's height must keep this calc in step — the
+  `hero.fallback-height-*` check fails if it drifts.

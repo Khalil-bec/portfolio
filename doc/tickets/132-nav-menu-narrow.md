@@ -1,7 +1,6 @@
 # 132: Nav — one row on phones, the links fold behind a menu button
 
-**Status:** `in-review` (2026-11-08) — implemented, screenshot-checked,
-self-reviewed; awaiting the user's look and commit approval.
+**Status:** `done` (2026-11-08) — `1e43568`. Reviewed, approved.
 
 **Why (phone pass, 2026-11-08):**
 
