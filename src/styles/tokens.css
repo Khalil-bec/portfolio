@@ -507,6 +507,12 @@
     /* The names layer leaves with the lane (114): no express list over the
      * narrow keeper — the nav links carry the jump affordance alone. */
     --names-display: none;
+    /* Ticket 131: the chips step down with the phone. At 22vw every chip
+     * clamps to ~22 % of a phone's width (83px at 375) against 10–12 % for the
+     * largest chips on desktop, so the backdrop crowded the type. 13 chips,
+     * same anchors — only the ceiling drops. It binds at 768 as well: one
+     * narrow moment, one boundary (111). */
+    --chip-size-cap: 14vw;
     /* Ticket 117: the brand mark steps down with the bar (122: one step
      * smaller again — the approved mock-up's mark, not the oversized one). */
     --nav-brand-size: 1.125rem;

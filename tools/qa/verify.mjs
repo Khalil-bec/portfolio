@@ -17,7 +17,7 @@ import { spawnSync } from "node:child_process";
 import { access, mkdir, readFile, readdir, stat, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { chromium } from "playwright";
+import { chromium, devices } from "playwright";
 import { runLighthouse, readScores } from "./lighthouse.mjs";
 import { serve } from "./serve.mjs";
 
@@ -363,9 +363,15 @@ async function openPage({
   reducedMotion = false,
   javaScriptEnabled = true,
   hash = "",
+  device = null,
 } = {}) {
+  // Ticket 131: a named Playwright device brings what a resized desktop
+  // viewport lacks (isMobile, hasTouch, the phone's DPR and user agent). Its
+  // browser hint is dropped — the harness drives Chromium only.
+  const { defaultBrowserType: _browserHint, ...profile } = device ? devices[device] : {};
   const context = await browser.newContext({
     viewport: { width, height },
+    ...profile,
     locale,
     reducedMotion: reducedMotion ? "reduce" : "no-preference",
     javaScriptEnabled,
@@ -925,6 +931,55 @@ async function navReservationAudits() {
   }
 }
 
+/**
+ * Ticket 131: the hero chips' narrow ceiling. Every chip's layout size
+ * (offsetWidth — the orbit's rotation never changes it) must sit at or under
+ * the live `--chip-size-cap`, the narrow cap must be the 131 value rather than
+ * the desktop 22vw, and the page must never scroll sideways. Chips crossing
+ * the hero's own edge are by design (kubernetes/python do at 1440 too), so
+ * the edge rule is the document's, not the hero's. 769 and 1440 pin the
+ * desktop cap.
+ */
+async function heroChipAudits() {
+  const NARROW_CAP = 0.14;
+  const DESKTOP_CAP = 0.22;
+  // 768/769 pin the boundary: the narrow block's cap ends exactly at 768.
+  for (const [width, ratio] of [
+    [375, NARROW_CAP], [390, NARROW_CAP], [430, NARROW_CAP],
+    [768, NARROW_CAP], [769, DESKTOP_CAP], [1440, DESKTOP_CAP],
+  ]) {
+    const session = await openPage({ width, height: 812 });
+    await settle(session.page, `chips-${width}`);
+    const state = await session.page.evaluate(() => {
+      const probe = document.createElement("div");
+      probe.style.inlineSize = "var(--chip-size-cap)";
+      document.body.append(probe);
+      const cap = probe.getBoundingClientRect().width;
+      probe.remove();
+      return {
+        cap,
+        chips: [...document.querySelectorAll(".hero__chip")].map((chip) => [chip.dataset.chip, chip.offsetWidth]),
+        docWidth: document.documentElement.scrollWidth,
+        viewWidth: window.innerWidth,
+      };
+    });
+    const expected = width * ratio;
+    const over = state.chips.filter(([, size]) => size > state.cap + 0.5);
+    add(
+      `hero.chip-cap-${width}`,
+      Math.abs(state.cap - expected) <= 0.5 && state.chips.length === 13 && over.length === 0,
+      `cap ${state.cap.toFixed(1)}px (want ${expected.toFixed(1)}), ${state.chips.length} chips` +
+        (over.length ? `, over: ${over.map(([name, size]) => `${name}=${size}`).join(" ")}` : ""),
+    );
+    add(
+      `hero.no-overflow-${width}`,
+      state.docWidth <= state.viewWidth,
+      `scrollWidth ${state.docWidth} vs ${state.viewWidth}`,
+    );
+    await session.context.close();
+  }
+}
+
 /* ------------------------------------------------------------ lighthouse --- */
 
 async function lighthouseAudits() {
@@ -958,6 +1013,9 @@ async function screenshots() {
     ["375-en", { width: 375, height: 812 }],
     ["375-fr", { width: 375, height: 812, locale: "fr-FR" }],
     ["1440-reduced", { width: 1440, height: 900, reducedMotion: true }],
+    // Ticket 131: real phone profiles, not only a resized desktop viewport.
+    ["iphone13-en", { device: "iPhone 13" }],
+    ["pixel7-fr", { device: "Pixel 7", locale: "fr-FR" }],
   ]) {
     const session = await openPage(options);
     await settle(session.page, `screens-${name}`);
@@ -991,6 +1049,7 @@ let lighthouse = null;
 try {
   await runtimeAudits();
   await navReservationAudits();
+  await heroChipAudits();
   if (!SKIP_LH) lighthouse = await lighthouseAudits();
   if (!SKIP_SHOTS) await screenshots();
 } finally {
