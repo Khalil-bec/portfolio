@@ -82,32 +82,15 @@
          desktop edge (the same narrow mode 115 uses) it never gates the hero,
          so the tagline is the first paint on phones and mobile LCP stays
          under the performance criterion.
-         The same guard publishes two pre-paint facts the CSS uses to reserve
+         The same guard publishes one pre-paint fact the CSS uses to reserve
          settled space before the dictionaries bind: data-motion (JS + motion
-         allowed; the ticker band can reserve its live height) and the early
-         `lang` hint (so the nav's language-specific wrapped height is right
-         from the first frame). i18n remains the owner of both later. -->
+         allowed; the ticker band can reserve its live height). Ticket 132
+         retired the second one, the early `lang` hint: its only reader was
+         126's wrapped-nav reservation, and the narrow bar is one row now.
+         i18n owns `lang`. -->
     <script>
       (function () {
         var root = document.documentElement;
-        try {
-          var stored = localStorage.getItem("mkb-portfolio:lang");
-          var primary =
-            (navigator.languages && navigator.languages[0]) ||
-            navigator.language ||
-            "";
-          // Mirror i18n's stored-language rule: only en/fr are valid, otherwise
-          // the browser's primary language decides. This must match
-          // src/i18n/i18n.js readStoredLanguage/detectLanguage so the nav's
-          // reserved FR height is right from the first frame (ticket 126).
-          var validStored = stored === "en" || stored === "fr";
-          var preferred = validStored ? stored : primary;
-          if (preferred.toLowerCase().indexOf("fr") === 0) {
-            root.lang = "fr";
-          }
-        } catch (error) {
-          /* private mode / blocked storage: keep the en default */
-        }
         if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
         root.setAttribute("data-motion", "run");
         if (!window.matchMedia("(min-width: 769px)").matches) return;
@@ -158,12 +141,16 @@
       <a class="nav__brand" href="#hero" data-i18n-attr="aria-label=nav.hero">
         <svg class="nav__brand-mark" aria-hidden="true" focusable="false"><use href="#brand-mark"></use></svg>
       </a>
-      <ul class="nav__list">
+      <ul class="nav__list" id="nav-list" popover>
         <li class="nav__item"><a class="nav__link" href="#projects" data-i18n="nav.projects"></a></li>
         <li class="nav__item"><a class="nav__link" href="#skills" data-i18n="nav.skills"></a></li>
         <li class="nav__item"><a class="nav__link" href="#education" data-i18n="nav.education"></a></li>
         <li class="nav__item"><a class="nav__link" href="#contact" data-i18n="nav.contact"></a></li>
       </ul>
+      <button class="nav__menu" type="button" popovertarget="nav-list" aria-controls="nav-list" aria-expanded="false">
+        <span class="nav__menu-label nav__menu-label--open" data-i18n="nav.menu"></span>
+        <span class="nav__menu-label nav__menu-label--close" data-i18n="nav.menuClose"></span>
+      </button>
       <div class="lang-switch" data-lang-switch role="group" data-i18n-attr="aria-label=lang.group">
         <button class="lang-switch__button" type="button" data-lang="en" aria-pressed="false" data-i18n="lang.en"></button>
         <button class="lang-switch__button" type="button" data-lang="fr" aria-pressed="false" data-i18n="lang.fr"></button>

@@ -11,10 +11,11 @@
  * formula as the 106 brows), mono uppercase link labels, and links that draw
  * an inverted box on hover. Since 117 the bar's left end hosts the traced
  * brand mark as the home link (logo-only, their nav's own pattern); the list
- * links carry projects→contact only. On narrow screens the link list wraps
- * onto extra lines so every label stays visible; the page never overflows
- * horizontally. --eyebrow-top re-syncs to whatever height this reflows into
- * (src/motion/eyebrows.js).
+ * links carry projects→contact only. Since 132, at ≤768 the bar is a single
+ * row — mark, menu button, EN/FR — and the links fold into a popover panel
+ * under it (the wrap and 126's row-count reservation retired). The page never
+ * overflows horizontally. --eyebrow-top re-syncs to the bar's live height
+ * (src/motion/eyebrows.js); the panel hangs from the same value.
  */
 
 .nav {
@@ -32,11 +33,27 @@
   border-block-end: var(--border-width) solid var(--color-border);
 }
 
-.nav__list {
-  display: flex;
-  flex: 1 1 auto;
-  flex-wrap: wrap;
-  gap: var(--space-xs) var(--space-md);
+/* The list is a popover (132) so the narrow panel gets Esc, light dismiss,
+ * focus return and the top layer from the platform — the button works even
+ * if nav.js never loads. Above 768 the popover is never opened: the list is
+ * restyled back into the bar's inline row, overriding the UA popover box
+ * (author styles beat the UA's `[popover]:not(:popover-open)` hide). */
+@media (min-width: 769px) {
+  .nav__list {
+    position: static;
+    display: flex;
+    flex: 1 1 auto;
+    flex-wrap: wrap;
+    gap: var(--space-xs) var(--space-md);
+    inline-size: auto;
+    block-size: auto;
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+    border: 0;
+    background: none;
+    color: inherit;
+  }
 }
 
 /* Mono uppercase labels (ticket 107), matching the brow bars and micro-labels.
@@ -127,52 +144,97 @@
   color: var(--color-accent-contrast);
 }
 
-/* Ticket 126 — reserve the wrapped link list before the dictionaries bind.
- * The bar is sticky and in flow; an empty one-row list growing to two/three/
- * four rows after the bind pushes <main> down (the dominant mobile CLS). The
- * `lang` hint in index.html makes the FR steps correct on the first frame.
- *
- * Measured wrap boundaries (Playwright, the shipped fonts): EN 4 rows ≤358,
- * 3 rows 359–375, 2 rows 376–529, 1 row from 530; FR 4 rows ≤375, 3 rows
- * 376–392, 2 rows 393–564, 1 row from 565. Each edge keeps the taller
- * reservation one pixel longer than measured, so a wrap that lands one pixel
- * later is still covered — under-reserving moves the page (the CLS this
- * reservation exists to prevent), over-reserving only leaves the bar a row
- * taller at that single width. */
-@media (max-width: 359px) {
-  .nav__list {
-    min-block-size: var(--nav-list-h-4);
-  }
+/* ---- Ticket 132: the narrow menu -------------------------------------- */
+
+/* The button only exists ≤768, and only where the platform can open the
+ * popover; elsewhere the list falls back to the pre-132 wrap (below). Its
+ * height is the language switch's settled height, so the one-row bar does not
+ * grow when the labels bind. It sits at the bar's right end, before EN/FR. */
+.nav__menu {
+  display: none;
 }
 
-@media (min-width: 360px) and (max-width: 376px) {
-  .nav__list {
-    min-block-size: var(--nav-list-h-3);
+@media (max-width: 768px) {
+  @supports selector(:popover-open) {
+    .nav__menu {
+      display: inline-flex;
+      flex: 0 0 auto;
+      align-items: center;
+      min-block-size: var(--nav-menu-h);
+      margin-inline-start: auto;
+      padding-inline: var(--space-sm);
+      border: var(--border-width) solid var(--color-border);
+      border-radius: var(--radius-pill);
+      background-color: transparent;
+      font-family: var(--font-mono);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-medium);
+      letter-spacing: var(--letter-spacing-wide);
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      transition: color var(--duration-fast) var(--ease-standard),
+        background-color var(--duration-fast) var(--ease-standard);
+    }
+
+    /* The links' inverted box (107) for hover, focus and the open state. */
+    .nav__menu:hover,
+    .nav__menu:focus-visible,
+    .nav:has(.nav__list:popover-open) .nav__menu {
+      color: var(--color-accent-contrast);
+      background-color: var(--color-accent);
+    }
+
+    /* The label follows the panel's real state (CSS, so it holds without
+     * nav.js); the hidden span leaves the accessible name. */
+    .nav__menu-label--close,
+    .nav:has(.nav__list:popover-open) .nav__menu-label--open {
+      display: none;
+    }
+
+    .nav:has(.nav__list:popover-open) .nav__menu-label--close {
+      display: inline;
+    }
+
+    /* The panel: full width, hung from the bar's live bottom edge, the bar's
+     * own translucent band and hairline. No transition, so reduced motion
+     * needs no branch. */
+    .nav__list:popover-open {
+      position: fixed;
+      inset: var(--eyebrow-top) 0 auto;
+      display: flex;
+      flex-direction: column;
+      inline-size: auto;
+      block-size: auto;
+      margin: 0;
+      padding: var(--nav-panel-pad-block) var(--container-pad);
+      overflow: visible;
+      border: 0;
+      border-block-end: var(--border-width) solid var(--color-border);
+      background-color: var(--overlay-bg);
+      -webkit-backdrop-filter: blur(var(--blur-radius));
+      backdrop-filter: blur(var(--blur-radius));
+      color: inherit;
+    }
+
+    /* One link per row, the full width, at least the 44px touch target; the
+     * bar's hover-box margin trick is not needed in a column. */
+    .nav__list:popover-open .nav__link {
+      display: flex;
+      align-items: center;
+      min-block-size: var(--nav-panel-row);
+      margin: 0;
+    }
   }
 
-  html:lang(fr) .nav__list {
-    min-block-size: var(--nav-list-h-4);
-  }
-}
-
-@media (min-width: 377px) and (max-width: 393px) {
-  .nav__list {
-    min-block-size: var(--nav-list-h-2);
-  }
-
-  html:lang(fr) .nav__list {
-    min-block-size: var(--nav-list-h-3);
-  }
-}
-
-@media (min-width: 394px) and (max-width: 530px) {
-  .nav__list {
-    min-block-size: var(--nav-list-h-2);
-  }
-}
-
-@media (min-width: 531px) and (max-width: 565px) {
-  html:lang(fr) .nav__list {
-    min-block-size: var(--nav-list-h-2);
+  /* No popover support: the pre-132 wrapped row, so every link stays
+   * reachable (the bar is taller there, as it was before 132). */
+  @supports not selector(:popover-open) {
+    .nav__list {
+      display: flex;
+      flex: 1 1 auto;
+      flex-wrap: wrap;
+      gap: var(--space-xs) var(--space-md);
+    }
   }
 }

@@ -788,7 +788,10 @@ async function runtimeAudits() {
     const { page } = session;
     await settle(page);
     const total = await page.evaluate(() => {
-      const nodes = [...document.querySelectorAll('a[href], button, [tabindex="0"]')];
+      // Rendered controls only: 132's menu button is display:none above 768.
+      const nodes = [...document.querySelectorAll('a[href], button, [tabindex="0"]')].filter(
+        (node) => node.checkVisibility(),
+      );
       nodes.forEach((node, index) => node.setAttribute("data-qa-focus", String(index)));
       return nodes.length;
     });
@@ -868,22 +871,18 @@ async function runtimeAudits() {
   }
 }
 
-/* ------------------------------------------------------- nav reservation --- */
+/* --------------------------------------------------------------- nav --- */
 
 /**
- * Ticket 126's nav reservation: the wrapped link list must never outgrow the
- * space reserved for it before the dictionaries bind, or the sticky bar grows
- * after the first paint and pushes the page down (the dominant mobile CLS).
- *
- * The measurement is the bar's own height — the list alone is not enough: at
- * wide widths the bar's own height dominates the list, so a list without a
- * reservation does not move the page. The dictionary is held back so the
- * pre-bind layout can be read, then released and the same widths read again.
- * The widths are the measured wrap boundaries (EN 4/3/2/1 rows at 359/376/530,
- * FR 4/3/2/1 rows at 376/393/565) plus their neighbours.
+ * Ticket 132 (replaces 126's reservation check): at ≤768 the bar is one row —
+ * mark, menu button, EN/FR — so its height is a single constant across the
+ * dictionary bind, at every narrow width, in both languages. The dictionaries
+ * are held so the pre-bind layout can be read, then released and the same
+ * widths read again. The widths keep 126's measured wrap boundaries (where the
+ * old list changed row count) plus 768.
  */
-async function navReservationAudits() {
-  const widths = [320, 358, 359, 360, 375, 376, 377, 392, 393, 394, 529, 530, 531, 564, 565, 566, 768];
+async function navOneRowAudits() {
+  const widths = [320, 358, 359, 375, 376, 390, 392, 393, 430, 529, 530, 564, 565, 768];
 
   for (const language of ["en", "fr"]) {
     const context = await browser.newContext({
@@ -907,27 +906,207 @@ async function navReservationAudits() {
         return bar ? Math.round(bar.getBoundingClientRect().height) : -1;
       });
 
-    const before = {};
+    const heights = [];
     for (const width of widths) {
       await page.setViewportSize({ width, height: 900 });
       await page.waitForTimeout(60);
-      before[width] = await barHeight();
+      heights.push([width, "before", await barHeight()]);
     }
 
     release();
     await settle(page, `nav-${language}`);
 
-    const offenders = [];
     for (const width of widths) {
       await page.setViewportSize({ width, height: 900 });
       await page.waitForTimeout(60);
-      const after = await barHeight();
-      if (after !== before[width]) {
-        offenders.push(`${width}px: ${before[width]}->${after}`);
-      }
+      heights.push([width, "after", await barHeight()]);
     }
-    add(`nav.reservation-${language}`, offenders.length === 0, offenders.slice(0, 5).join(" | "));
+    // The hero subtracts --eyebrow-top from its min-height, so a pre-measure
+    // fallback that differs from the bar resizes it (and moves its rings)
+    // when eyebrows.js lands — the 132 CLS finding. Same widths, both phases.
+    const heroHeight = () =>
+      page.evaluate(() => Math.round(document.getElementById("hero").getBoundingClientRect().height));
+    const heroDrift = [];
+    for (const width of [375, 412]) {
+      await page.setViewportSize({ width, height: 823 });
+      await page.waitForTimeout(60);
+      const settled = await heroHeight();
+      const measured = await page.evaluate(() => {
+        const root = document.documentElement;
+        const value = root.style.getPropertyValue("--eyebrow-top");
+        root.style.removeProperty("--eyebrow-top");
+        return value;
+      });
+      await page.waitForTimeout(60);
+      const fallback = await heroHeight();
+      await page.evaluate((value) => document.documentElement.style.setProperty("--eyebrow-top", value), measured);
+      if (!measured) heroDrift.push(`${width}px: no measured --eyebrow-top`);
+      else if (fallback !== settled) heroDrift.push(`${width}px: ${fallback}->${settled}`);
+    }
+    add(`hero.fallback-height-${language}`, heroDrift.length === 0, heroDrift.join(" | "));
+    const values = new Set(heights.map(([, , height]) => height));
+    add(
+      `nav.one-row-${language}`,
+      values.size === 1,
+      values.size === 1
+        ? `${[...values][0]}px at every width, before and after the bind`
+        : heights.map(([width, phase, height]) => `${width}${phase[0]}:${height}`).join(" "),
+    );
     await context.close();
+  }
+}
+
+/**
+ * Ticket 132: the narrow menu's behaviour (375, a phone profile) and the
+ * desktop bar it must leave alone.
+ */
+async function navMenuAudits() {
+  for (const language of ["en", "fr"]) {
+    const session = await openPage({
+      device: "iPhone 13",
+      locale: language === "fr" ? "fr-FR" : "en-US",
+    });
+    const { page } = session;
+    await settle(page, `menu-${language}`);
+    const want = dicts[language].nav;
+
+    const state = () =>
+      page.evaluate(() => {
+        const list = document.getElementById("nav-list");
+        const button = document.querySelector(".nav__menu");
+        const nav = document.querySelector(".nav").getBoundingClientRect();
+        const panel = list.getBoundingClientRect();
+        const label = [...button.querySelectorAll(".nav__menu-label")].find(
+          (span) => getComputedStyle(span).display !== "none",
+        );
+        return {
+          open: list.matches(":popover-open"),
+          expanded: button.getAttribute("aria-expanded"),
+          label: label?.textContent.trim() ?? "",
+          buttonShown: getComputedStyle(button).display !== "none",
+          focusOnButton: document.activeElement === button,
+          navBottom: Math.round(nav.bottom),
+          panelTop: Math.round(panel.top),
+          panelWidth: Math.round(panel.width),
+          rows: [...list.querySelectorAll(".nav__link")].map((link) =>
+            Math.round(link.getBoundingClientRect().height),
+          ),
+          viewWidth: innerWidth,
+        };
+      });
+
+    const closed = await state();
+    add(
+      `nav.menu-closed-${language}`,
+      !closed.open && closed.buttonShown && closed.expanded === "false" && closed.label === want.menu,
+      JSON.stringify({ open: closed.open, expanded: closed.expanded, label: closed.label }),
+    );
+
+    await page.click(".nav__menu");
+    await page.waitForTimeout(100);
+    const opened = await state();
+    add(
+      `nav.menu-open-${language}`,
+      opened.open &&
+        opened.expanded === "true" &&
+        opened.label === want.menuClose &&
+        Math.abs(opened.panelTop - opened.navBottom) <= 1 &&
+        opened.panelWidth === opened.viewWidth &&
+        opened.rows.length === 4 &&
+        opened.rows.every((height) => height >= 44),
+      JSON.stringify({ ...opened, focusOnButton: undefined }),
+    );
+
+    await page.keyboard.press("Escape");
+    await page.waitForTimeout(100);
+    const escaped = await state();
+    add(
+      `nav.menu-esc-${language}`,
+      !escaped.open && escaped.expanded === "false" && escaped.focusOnButton,
+      JSON.stringify({ open: escaped.open, expanded: escaped.expanded, focus: escaped.focusOnButton }),
+    );
+
+    if (language === "en") {
+      // Outside tap closes (light dismiss).
+      await page.click(".nav__menu");
+      await page.waitForTimeout(100);
+      await page.mouse.click(20, 600);
+      await page.waitForTimeout(100);
+      add("nav.menu-outside", !(await state()).open);
+
+      // A chosen link closes the panel and the jump still lands.
+      await page.click(".nav__menu");
+      await page.waitForTimeout(100);
+      await page.click('.nav__link[href="#skills"]');
+      await page.waitForTimeout(1600);
+      const landed = await page.evaluate(() => ({
+        open: document.getElementById("nav-list").matches(":popover-open"),
+        top: Math.round(document.getElementById("skills").getBoundingClientRect().top),
+      }));
+      add("nav.menu-link", !landed.open && Math.abs(landed.top) <= 80, JSON.stringify(landed));
+
+      // Keyboard: Tab reaches the button, Enter opens, Tab enters the panel,
+      // Escape closes with focus back on the button.
+      await page.evaluate(() => window.scrollTo(0, 0));
+      await page.evaluate(() => document.querySelector(".nav__brand").focus());
+      await page.keyboard.press("Tab");
+      const onButton = await page.evaluate(() => document.activeElement?.classList.contains("nav__menu"));
+      await page.keyboard.press("Enter");
+      await page.waitForTimeout(100);
+      await page.keyboard.press("Tab");
+      const inPanel = await page.evaluate(() => Boolean(document.activeElement?.closest("#nav-list")));
+      await page.keyboard.press("Escape");
+      await page.waitForTimeout(100);
+      const back = await state();
+      add(
+        "nav.menu-keyboard",
+        onButton && inPanel && !back.open && back.focusOnButton,
+        JSON.stringify({ onButton, inPanel, open: back.open, focus: back.focusOnButton }),
+      );
+
+      // Widening past 768 closes the panel and restores the desktop bar.
+      await page.click(".nav__menu");
+      await page.waitForTimeout(100);
+      await page.setViewportSize({ width: 1024, height: 800 });
+      await page.waitForTimeout(150);
+      const wide = await page.evaluate(() => {
+        const list = document.getElementById("nav-list");
+        return {
+          open: list.matches(":popover-open"),
+          listDisplay: getComputedStyle(list).display,
+          button: getComputedStyle(document.querySelector(".nav__menu")).display,
+        };
+      });
+      add(
+        "nav.menu-resize",
+        !wide.open && wide.listDisplay === "flex" && wide.button === "none",
+        JSON.stringify(wide),
+      );
+    }
+
+    add(`nav.menu-errors-${language}`, session.pageErrors.length === 0, session.pageErrors[0] ?? "");
+    await session.context.close();
+  }
+
+  // The desktop bar is untouched: links inline in one row, no button.
+  for (const width of [769, 1024, 1440]) {
+    const session = await openPage({ width, height: 900 });
+    await settle(session.page, `nav-desktop-${width}`);
+    const bar = await session.page.evaluate(() => {
+      const links = [...document.querySelectorAll(".nav__link")].map((link) => link.getBoundingClientRect());
+      return {
+        button: getComputedStyle(document.querySelector(".nav__menu")).display,
+        list: getComputedStyle(document.getElementById("nav-list")).display,
+        rows: new Set(links.map((rect) => Math.round(rect.top))).size,
+        visible: links.every((rect) => rect.width > 0 && rect.height > 0),
+      };
+    });
+    add(
+      `nav.desktop-${width}`,
+      bar.button === "none" && bar.list === "flex" && bar.rows === 1 && bar.visible,
+      JSON.stringify(bar),
+    );
+    await session.context.close();
   }
 }
 
@@ -1048,7 +1227,8 @@ browser = await chromium.launch();
 let lighthouse = null;
 try {
   await runtimeAudits();
-  await navReservationAudits();
+  await navOneRowAudits();
+  await navMenuAudits();
   await heroChipAudits();
   if (!SKIP_LH) lighthouse = await lighthouseAudits();
   if (!SKIP_SHOTS) await screenshots();

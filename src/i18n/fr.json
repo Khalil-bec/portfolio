@@ -9,7 +9,9 @@
     "projects": "Projets",
     "skills": "Compétences",
     "education": "Formation",
-    "contact": "Contact"
+    "contact": "Contact",
+    "menu": "Menu",
+    "menuClose": "Fermer"
   },
   "lang": {
     "group": "Langue",

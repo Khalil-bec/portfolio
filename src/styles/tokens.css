@@ -159,10 +159,16 @@
   /* Overlay bands (ticket 106 brows + the 107 nav bar share one formula):
    * translucent warm-near-black so pinned/reserved text stays AA over scrolled
    * content (0.85 chosen analytically; inspo's ~0.6 composites below 4.5:1 on
-   * white content). `--eyebrow-top` is the no-JS fallback; eyebrows.js
-   * overrides it with the nav's live measured height. Blur radius and the
-   * drawn `/` live here per the token rule. */
-  --eyebrow-top: 4rem;
+   * white content). `--eyebrow-top` is the pre-measure / no-JS fallback;
+   * eyebrows.js overrides it with the nav's live measured height. Blur radius
+   * and the drawn `/` live here per the token rule.
+   * Ticket 132: the bar is one row at every width now, so the fallback is its
+   * exact settled height — the tallest child (the language switch, which
+   * --nav-menu-h equals) plus the bar's block padding and bottom hairline —
+   * instead of a 4rem guess. The hero's min-height subtracts this value, so a
+   * guess that differed from the measured bar resized the hero (and moved its
+   * ring) once eyebrows.js landed: +17 px on a 412 px phone, CLS 0.056 → 0.092. */
+  --eyebrow-top: calc(var(--nav-menu-h) + var(--space-2xs) * 2 + var(--border-width));
   --overlay-bg: rgba(18, 19, 22, 0.85);
   --blur-radius: 8px;
   /* Eyebrow right-side meta (ticket 111). Shown in the default state so the
@@ -463,12 +469,18 @@
    * home with the other ink tiers, not inline in nav.css). */
   --nav-brand-hover: 0.72;
 
-  /* Ticket 126 — settled heights of the wrapped nav link list, reserved
-   * before the dictionaries bind so the sticky bar never grows after first
-   * paint. Measured: 2 rows at 401–520, 3 rows at 375 EN, 4 rows at 375 FR. */
-  --nav-list-h-2: 3.7rem;
-  --nav-list-h-3: 5.8rem;
-  --nav-list-h-4: 7.9rem;
+  /* Ticket 132 — the narrow menu. 126's wrapped-list reservation (the
+   * --nav-list-h-* heights) retired with the wrap: ≤768 the bar is one row
+   * (mark, menu button, EN/FR) and the links open in a popover panel.
+   * The button's height is the language switch's settled height (its button's
+   * reserved box + the group's padding and hairline), so the bar's single row
+   * is the same height before and after the dictionaries bind. Panel rows meet
+   * the 44px touch target. */
+  --nav-menu-h: calc(
+    var(--font-size-xs) * var(--line-height-base) + var(--space-2xs) * 4 + var(--border-width) * 2
+  );
+  --nav-panel-row: 2.75rem;
+  --nav-panel-pad-block: var(--space-xs);
 
   /* Ticket 121 — the footer mark's glyph height (the nav mark's larger
    * sibling; its inline-size derives from the artwork's 923:687 aspect in
