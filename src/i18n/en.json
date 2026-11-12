@@ -33,9 +33,9 @@
   "about": {
     "title": "About",
     "body": [
-      "A computer science student at UPPA, working my way toward **DevOps and infrastructure**: automation, containerization, CI/CD, and everything that gets code into production without pain.",
-      "What draws me in is the part nobody sees — understanding what actually happens underneath rather than copying commands from memory. I wrote my own command interpreter to know exactly what occurs when you type into a terminal.",
-      "My three projects are built as evidence, not demos: each one solves a real infrastructure problem, and every piece was chosen and configured by hand."
+      "Computer Science student at UPPA. Outside of my courses, I learn DevOps and infrastructure engineering by building my own projects, picking up new skills and tools along the way. My goal: to design robust continuous delivery pipelines and industrialize the application lifecycle to make production deployments more reliable.",
+      "Passionate about low-level programming and how systems work internally, I aim to understand the mechanisms under the hood rather than follow simple recipes. Most notably, I built my own shell in Python to dive deep into process management, system calls and PATH resolution.",
+      "My projects follow a pragmatic philosophy: every infrastructure component addresses a real use case and is configured and provisioned declaratively to guarantee reproducible environments."
     ],
     "languages": "**Languages**: Arabic (mother tongue) · French (fluent) · English (technical)"
   },
@@ -127,14 +127,14 @@
     "items": [
       {
         "name": "Homelab",
-        "summary": "Self-hosted infrastructure on a single machine, provisioned declaratively.",
+        "summary": "Infrastructure as Code & Self-Hosting: Deployment of a complete stack on a single-node architecture, provisioned declaratively.",
         "stackLabel": "Stack",
         "stack": "Traefik · Prometheus · node-exporter · Grafana · Uptime Kuma · Ansible · Docker Compose · mkcert",
         "bullets": [
-          "**Traefik as reverse proxy**: automatic service discovery via Docker labels, dashboard enabled, HTTP → HTTPS redirection, and mkcert-issued TLS certificates for `*.homelab.lab`.",
-          "**Monitoring as code**: Grafana datasources and dashboards provisioned from files versioned in the repository, so the monitoring setup replays identically.",
-          "**Ansible drives everything**: the playbook creates the shared bridge network first, then brings up each Docker Compose project in order. The entire stack is reproducible from a single command.",
-          "**Disciplined installation**: pinned `ansible-core`, collections installed locally into `./.collections` instead of `~/.ansible`, and the script explicitly refuses `sudo` and any modification to system trust stores."
+          "**Traffic Management (Traefik / Reverse Proxy)**: Implementation of a reverse proxy with dynamic service discovery through Docker labels, automatic HTTP-to-HTTPS redirection and TLS certificate lifecycle management (wildcard `*.homelab.lab` via mkcert).",
+          "**Observability & Monitoring as Code**: Full industrialization of the monitoring stack (Prometheus, Node Exporter, Grafana, Uptime Kuma): data sources and dashboards are versioned in the repository and hot-provisioned to guarantee complete environment parity.",
+          "**Orchestration & Automation (Ansible)**: Design of an idempotent playbook that creates the shared bridge networks and deploys the Docker Compose stacks sequentially, enabling fast Disaster Recovery and fully reproducible infrastructure with a single command.",
+          "**Security & Best Practices**: Isolated installation of ansible-core (collections kept in `./.collections`, outside the global `~/.ansible` scope) and strict application of the principle of least privilege (no use of sudo, no modifications to the host system)."
         ]
       },
       {
@@ -143,27 +143,27 @@
         "stackLabel": "Stack",
         "stack": "Python 3.11 · Flask · MySQL 8.0 · Docker Compose · Nginx · Adminer · pytest · GitHub Actions",
         "bullets": [
-          "**Careful orchestration**: a MySQL healthcheck with `condition: service_healthy`, so the API only starts once the database is genuinely ready. A named volume for persistence, a dedicated bridge network for isolation, credentials externalized to `.env`, and the SQL schema seeded automatically at startup.",
-          "**Flask API**: 6 endpoints, field validation, HTTP error handling (400, 409, 500), and multi-table joins across 4 relational tables (`athletes → seances → exercice_logs → series`) with foreign keys and a UNIQUE constraint.",
-          "**Isolated tests**: a pytest suite using `unittest.mock`, with no dependency on a live database — success, missing fields, duplicate email, empty body.",
-          "**CI/CD**: GitHub Actions on every push — pytest runs plus a Docker build check. A Makefile gathers all routine operations.",
-          "**Frontend**: an interactive dashboard served from an `nginx:alpine` image (no Python server involved), `fetch` calls to the API, Bootstrap modal forms, and a Chart.js chart of weekly training volume."
+          "**Architecture & Resilience (Docker Compose)**: Multi-container orchestration of a three-tier application. Advanced healthchecks (`condition: service_healthy`) synchronize the Flask API's startup with the MySQL database's actual availability. Data persistence through volumes, network isolation via a dedicated bridge, externalized secrets (`.env`) and automatic bootstrapping of the relational schema.",
+          "**Back-end API (Flask)**: Design of a RESTful API with rigorous payload validation, centralized handling of HTTP error codes (400, 409, 500) and joins across up to 4 tables in a 6-table relational schema secured by integrity constraints (FOREIGN KEY and UNIQUE).",
+          "**Testing & Code Quality**: Unit and integration test suite built with pytest and unittest.mock, ensuring deterministic behavior with no dependency on a live database (covering nominal cases, edge cases, duplicates and empty payloads).",
+          "**CI/CD Pipeline**: GitHub Actions workflow triggered on every push (pytest test validation and container image build). Engineering tasks standardized through a dedicated Makefile.",
+          "**Front-end & Delivery**: Front-end served from a lightweight nginx:alpine image (strict separation of concerns, no Python application server involved in serving the front-end), asynchronous fetch calls, native `<dialog>` modals and training metrics visualized with Chart.js."
         ],
-        "note": "*In progress: deployment to Oracle Cloud Free Tier.*"
+        "note": "*In progress: migration to a cloud deployment on Oracle Cloud Free Tier.*"
       },
       {
         "name": "Kshell",
         "alias": "ksh",
-        "summary": "An interactive, modular command interpreter written from scratch in Python.",
+        "summary": "Modular command interpreter: Interactive shell built from scratch in Python.",
         "whyLabel": "Why",
-        "why": "to understand what really happens inside a terminal — process management, system calls, `$PATH` resolution.",
+        "why": "to explore and understand a terminal's low-level behavior (launching processes with subprocess, piping between processes, built-ins that change the shell's own state).",
         "bullets": [
-          "Executes any command from `$PATH`, with pipelines via `|`",
-          "Built-in commands: `cd`, `pwd`, `exit`, `alias`, `unalias`, `aide` (built-in French documentation)",
-          "Persistent aliases saved to `~/.ksh_aliases` and reloaded on every session",
-          "Tab completion for commands and file paths, via `readline`",
-          "Dynamic ANSI-colored prompt showing the current directory and Git branch",
-          "Clean modular separation: parsing, execution, built-ins, completion, prompt, aliases"
+          "**Execution & Piping**: Execution of binaries found in `$PATH` and command chaining through pipelines (`|`).",
+          "**Built-ins**: Implementation of internal commands (cd, pwd, exit, alias, unalias, aide) with built-in user documentation in French.",
+          "**Persistence & User Experience (UX)**: Custom aliases saved automatically to `~/.ksh_aliases` and loaded dynamically at each session.",
+          "Command and path autocompletion via readline.",
+          "Dynamic ANSI-colored prompt showing the current directory and Git branch.",
+          "**Architecture**: Rigorously decoupled codebase split into specialized modules (parsing, execution, built-ins, autocompletion, prompt, alias management)."
         ]
       }
     ]
